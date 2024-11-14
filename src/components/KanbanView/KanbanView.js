@@ -3,7 +3,7 @@ import "./KanbanView.css";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import axios from "axios";
 
-const KanbanView = () => {
+const KanbanView = ({isOpen}) => {
   const [lst, setLst] = useState([]);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const KanbanView = () => {
       }
     };
     getData();
-  }, []);
+  }, [isOpen]);
 
   return (
     <div className="section-kanban">

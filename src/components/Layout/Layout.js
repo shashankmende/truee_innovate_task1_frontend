@@ -15,9 +15,9 @@ const Layout = () => {
   const displayData = () => {
     switch (view) {
       case 0:
-        return <TableView />;
+        return <TableView isOpen={isOpen}/>;
       case 1:
-        return <KanbanView />;
+        return <KanbanView isOpen={isOpen}/>;
     }
   };
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import "./TableView.css";
 import { HiDotsHorizontal } from "react-icons/hi";
 
-const TableView = () => {
+const TableView = ({isOpen}) => {
   const [lst, setLst] = useState([]);
   const [message, setMessage] = useState("");
   useEffect(() => {
@@ -17,7 +17,7 @@ const TableView = () => {
       }
     };
     getData();
-  }, []);
+  }, [isOpen]);
   return (
     <div className="table-container">
       <table>
