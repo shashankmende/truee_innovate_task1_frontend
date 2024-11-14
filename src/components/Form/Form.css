@@ -1,0 +1,83 @@
+.section-form {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+   
+
+  & form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-top: 2rem;
+    width: 600px;
+  }
+  & form>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & form div label{
+    font-size: 1.2rem;
+  }
+
+  & form div input,
+  textarea {
+    width: 65%;
+    border: none;
+    border-bottom: 1px solid gray;
+    outline: none;
+    font-size: 1.2rem;
+  }
+}
+
+textarea{
+    max-width: 65%;
+}
+
+.experience-container {
+    display: flex;
+
+    & div{
+        width: 65%;
+        display: flex;
+        gap: 1rem;
+
+        & input {
+            width: 50%;
+        }
+    }
+
+}
+
+.add-position-btn--container{
+    
+    display: flex;
+    justify-content: end !important;
+    & button{
+        background-color: #227A8A;
+        padding: 0.7rem 2rem;
+        font-weight: bold;
+        border: none;
+        color: white;
+        border-radius: 0.7rem;
+        -webkit-border-radius: 0.7rem;
+        -moz-border-radius: 0.7rem;
+        -ms-border-radius: 0.7rem;
+        -o-border-radius: 0.7rem;
+        cursor: pointer;
+}
+}
+
+.form-heading--container {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+span {
+  color: red;
+  margin-left: 0.4rem;
+}

@@ -1,0 +1,16 @@
+
+.toggle-section{
+    margin-bottom: 2rem;
+}
+
+.toggle-section,ul{
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+
+}
+
+li{
+    list-style-type: none;
+    cursor: pointer;
+}

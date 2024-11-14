@@ -1,0 +1,46 @@
+
+.layot-top--container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3rem 2rem 1rem 2rem;
+
+    & button{
+        border: none;
+        background-color: #227A8A;
+        padding: 1rem 2rem;
+        border-radius: 0.8rem;
+        -webkit-border-radius: 0.8rem;
+        -moz-border-radius: 0.8rem;
+        -ms-border-radius: 0.8rem;
+        -o-border-radius: 0.8rem;
+        font-size: 1rem;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+}
+}
+
+.toggle-contaiiner{
+    padding: 0 2rem;
+}
+
+
+
+.popup-overlay{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    transition: all 2s linear;
+    display: flex;
+    justify-content: end;
+
+    & .popup-content{
+        width: 50%;
+        background-color: white;
+    }
+}
+

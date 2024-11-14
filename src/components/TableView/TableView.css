@@ -1,0 +1,26 @@
+
+.table-container{
+    width: 100%;
+    
+    
+    & table{
+        border-collapse: collapse;
+    }
+     & th {
+        background-color: #e2ebed;
+        
+     }
+     & td{
+        border-bottom: 1px solid rgba(128, 128, 128, 0.752);
+        font-size: 1.2rem;
+        letter-spacing: 0.4px;
+        word-spacing: 3px;
+     }
+}
+
+
+
+.table-container th,td{
+    padding: 1rem 1.2rem;
+    text-align: left;
+}
