@@ -6,4 +6,20 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Poppins", sans-serif;
+  
+overflow-x: hidden;
+}
+
+@media (max-width:576px) {
+    :root{
+        font-size: 80%;
+    }
+}
+
+
+
+@media (max-width:992px) {
+    :root{
+        font-size: 85%;
+    }
 }

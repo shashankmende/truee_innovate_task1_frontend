@@ -9,7 +9,8 @@ const KanbanView = ({isOpen}) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/position");
+        // const response = await axios.get("http://localhost:4000/api/position");
+        const response = await axios.get(`${process.env.REACT_APP_URL}/api/position`);
         console.log(response);
         setLst(response.data.positions.reverse());
       } catch (error) {
@@ -38,20 +39,22 @@ const KanbanView = ({isOpen}) => {
                 {position.experience.min} - {position.experience.max} years
               </p>
             </div>
+            {position.skills.length>0 &&
             <div className="kanban-item">
               <p className="field">Skills</p>
               <p className="value">
-                {position.skills.join(", ").length < 50
+                {position.skills.join(", ").length < 40
                   ? position.skills.join(", ")
-                  : `${position.skills.join(", ").slice(0, 50)}...`}
+                  : `${position.skills.join(", ").slice(0, 40)}...`}
               </p>
             </div>
+        }
             <div className="kanban-item">
               <p className="field">Job Description</p>
               <p className="value">
-                {position.jobDescription.length < 50
+                {position.jobDescription.length < 30
                   ? position.jobDescription
-                  : `${position.jobDescription.slice(0, 50)}...`}
+                  : `${position.jobDescription.slice(0, 30)}...`}
               </p>
             </div>
           </li>

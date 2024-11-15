@@ -8,10 +8,13 @@
     }
      & th {
         background-color: #e2ebed;
+        color: #227A8A;
+        letter-spacing: 1.2px;
+        text-align: center;
         
      }
      & td{
-        border-bottom: 1px solid rgba(128, 128, 128, 0.752);
+        border-bottom: 2px solid rgba(128, 128, 128, 0.216);
         font-size: 1.2rem;
         letter-spacing: 0.4px;
         word-spacing: 3px;
@@ -21,6 +24,40 @@
 
 
 .table-container th,td{
-    padding: 1rem 1.2rem;
-    text-align: left;
+    padding: 1rem 2.2rem;
+}
+
+.title{
+    color: #227A8A;
+}
+
+@media (max-width:992px) {
+    .table-container{
+        width: 100%;
+        & th{
+            padding: 1rem;
+        }
+    }
+    
+}
+
+@media (max-width:768px) {
+    .table-container{
+        width: 100%;
+        & th,td{
+            padding: 0.7rem;
+        }
+    }
+}
+
+@media (max-width:576px) {
+
+    .table-container{
+        overflow-x: hidden;
+        width: 100%;
+        & th,td{
+            font-size: 50%;
+            padding: 0.4rem;
+        }
+    }
 }

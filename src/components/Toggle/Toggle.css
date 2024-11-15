@@ -13,4 +13,17 @@
 li{
     list-style-type: none;
     cursor: pointer;
+     & svg{
+        font-size: 2rem;
+     }
+}
+
+@media (max-width:576px) {
+    .toggle-section{
+        margin-bottom: 0rem;
+
+        & svg{
+            font-size: 1.5rem;
+        }
+    }
 }

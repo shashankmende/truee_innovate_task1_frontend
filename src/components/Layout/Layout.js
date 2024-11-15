@@ -24,7 +24,7 @@ const Layout = () => {
   return (
     <div className="layout">
       <div>
-        <div className="layot-top--container">
+        <div className="layout-top--container">
           <h1>Positions</h1>
 
           {/* popup start */}

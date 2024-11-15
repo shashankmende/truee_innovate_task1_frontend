@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import "./Form.css";
 import axios from "axios";
-import { IoArrowBackSharp } from "react-icons/io5";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
-
-const Form = ({setIsopen}) => {
+const Form = ({ setIsopen }) => {
   const [formData, setFormData] = useState({
     title: "",
     company: "",
@@ -13,9 +12,9 @@ const Form = ({setIsopen}) => {
     jobDescription: "",
     additionalNotes: "",
     skills: [],
+    rounds: []
   });
 
-  const navigate = useNavigate()
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
@@ -30,6 +29,11 @@ const Form = ({setIsopen}) => {
         return {
           ...prevData,
           experience: { ...prevData.experience, max: value },
+        };
+      } else if (name === "rounds") {
+        return {
+          ...prevData,
+          rounds: value.split(",").map((round) => round.trim()),
         };
       } else if (name === "skills") {
         return {
@@ -47,7 +51,8 @@ const Form = ({setIsopen}) => {
     try {
       console.log(formData);
       const response = await axios.post(
-        "http://localhost:4000/api/position",
+        // "http://localhost:4000/api/position",
+        `${process.env.REACT_APP_URL}/api/position`,
         formData
       );
       console.log(response);
@@ -58,9 +63,10 @@ const Form = ({setIsopen}) => {
         jobDescription: "",
         additionalNotes: "",
         skills: [],
+        rounds: []
       });
     } catch (error) {
-      console.log("error in adding positin");
+      console.log("Error in adding position:", error);
     }
   };
 
@@ -68,8 +74,12 @@ const Form = ({setIsopen}) => {
     <div className="section-form">
       <div>
         <div className="form-heading--container">
-            <IoArrowBackSharp size={24} style= {{cursor:"pointer"}} onClick={()=>setIsopen(false)}/>
-            <h2>Add Position</h2>
+          <h2>New Position</h2>
+          <IoIosCloseCircleOutline
+            size={24}
+            style={{ cursor: "pointer" }}
+            onClick={() => setIsopen(false)}
+          />
         </div>
         <form onSubmit={onSubmitForm}>
           <div className="input-control">
@@ -104,7 +114,7 @@ const Form = ({setIsopen}) => {
                 value={formData.experience.min}
                 required
                 type="number"
-                placeholder="Enter min experience"
+                placeholder="min experience"
                 onChange={onChangeInput}
               />
               <input
@@ -112,7 +122,7 @@ const Form = ({setIsopen}) => {
                 value={formData.experience.max}
                 required
                 type="number"
-                placeholder="Enter max experience"
+                placeholder="max experience"
                 onChange={onChangeInput}
               />
             </div>
@@ -137,6 +147,17 @@ const Form = ({setIsopen}) => {
               required
               id="description"
               placeholder="Enter job description"
+              onChange={onChangeInput}
+            />
+          </div>
+          <div className="input-control">
+            <label htmlFor="rounds">Rounds<span>*</span></label>
+            <input
+              name="rounds"
+              value={formData.rounds.join(", ")}
+              type="text"
+              id="rounds"
+              placeholder="Enter rounds (comma separated)"
               onChange={onChangeInput}
             />
           </div>
