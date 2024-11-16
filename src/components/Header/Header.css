@@ -1,0 +1,18 @@
+
+
+.section-header{
+    padding: 1rem 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    
+}
+
+.dropdowns--container{
+    display: flex;
+    gap: 5rem;
+    background-color: #fff;
+
+}

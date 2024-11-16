@@ -3,6 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
    
 
   & form {
@@ -10,28 +11,59 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 2rem;
-    margin-top: 2rem;
     width: 600px;
+    padding:  1rem 0;
+    width: 100%;
   }
   & form>div {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 0..5rem;
   }
 
   & form div label{
-    font-size: 1.2rem;
+    font-size: 1.05rem;
   }
 
   & form div input,
   textarea {
     width: 65%;
     border: none;
-    border-bottom: 1px solid gray;
+    border-bottom: 2px solid rgba(128, 128, 128, 0.393);
     outline: none;
-    font-size: 1.2rem;
+    font-size: 1.05rem;
+  }
+
+  & form .input-control,.experience-container{
+    padding: 0 2rem;
+    overflow: hidden;
   }
 }
+
+
+.section-form-content{
+  height: 100%;
+  width: 100%;
+  gap: 2.5rem;
+  display: flex;
+  
+  flex-direction: column;
+}
+
+.form-heading--container {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid rgba(128, 128, 128, 0.414);
+    padding: 2rem 1rem;
+    width: 100%;
+    overflow: hidden;
+    
+}
+
+
 
 textarea{
     max-width: 65%;
@@ -39,7 +71,6 @@ textarea{
 
 .experience-container {
     display: flex;
-
     & div{
         width: 65%;
         display: flex;
@@ -57,10 +88,12 @@ textarea{
     display: flex;
     justify-content: end !important;
     margin-top: 2rem;
+    border-top: 1px solid gray  ;
+    width: 100%;
+    overflow: hidden;
     & button{
         background-color: #227A8A;
         padding: 0.7rem 2rem;
-        font-weight: bold;
         border: none;
         color: white;
         border-radius: 0.7rem;
@@ -69,20 +102,22 @@ textarea{
         -ms-border-radius: 0.7rem;
         -o-border-radius: 0.7rem;
         cursor: pointer;
+        margin: 1.5rem 1.5rem 0 0;
+        
 }
 }
 
-.form-heading--container {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-    justify-content: space-between;
-}
 
-span {
+
+
+ form label span {
   color: red;
   margin-left: 0.4rem;
 }
+
+
+
+
 
 @media (max-width:576px) {
   .section-form{

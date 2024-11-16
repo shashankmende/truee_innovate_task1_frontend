@@ -3,6 +3,8 @@ import "./Form.css";
 import axios from "axios";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { closeIcon } from "../../IconsData";
+import { useCustomContext } from "../../context/context";
 
 const Form = ({ setIsopen }) => {
   const [formData, setFormData] = useState({
@@ -12,9 +14,11 @@ const Form = ({ setIsopen }) => {
     jobDescription: "",
     additionalNotes: "",
     skills: [],
-    rounds: []
+    rounds: [],
   });
 
+
+  const { setLoaddata }= useCustomContext()
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
@@ -56,15 +60,19 @@ const Form = ({ setIsopen }) => {
         formData
       );
       console.log(response);
-      setFormData({
-        title: "",
-        company: "",
-        experience: { min: "", max: "" },
-        jobDescription: "",
-        additionalNotes: "",
-        skills: [],
-        rounds: []
-      });
+      if (response.data.success) {
+        setFormData({
+          title: "",
+          company: "",
+          experience: { min: "", max: "" },
+          jobDescription: "",
+          additionalNotes: "",
+          skills: [],
+          rounds: [],
+        });
+        setLoaddata(true)
+        setIsopen(false);
+      }
     } catch (error) {
       console.log("Error in adding position:", error);
     }
@@ -72,18 +80,18 @@ const Form = ({ setIsopen }) => {
 
   return (
     <div className="section-form">
-      <div>
+      <div className="section-form-content">
         <div className="form-heading--container">
           <h2>New Position</h2>
-          <IoIosCloseCircleOutline
-            size={24}
-            style={{ cursor: "pointer" }}
-            onClick={() => setIsopen(false)}
-          />
+          <div style={{ cursor: "pointer",fontSize:"1.5rem" }} onClick={() => setIsopen(false)}>
+            {closeIcon}
+          </div>
         </div>
         <form onSubmit={onSubmitForm}>
           <div className="input-control">
-            <label htmlFor="title">Title<span>*</span></label>
+            <label htmlFor="title">
+              Title<span>*</span>
+            </label>
             <input
               name="title"
               value={formData.title}
@@ -95,7 +103,9 @@ const Form = ({ setIsopen }) => {
             />
           </div>
           <div className="input-control">
-            <label htmlFor="company">Company<span>*</span></label>
+            <label htmlFor="company">
+              Company<span>*</span>
+            </label>
             <input
               name="company"
               value={formData.company}
@@ -107,7 +117,9 @@ const Form = ({ setIsopen }) => {
             />
           </div>
           <div className="experience-container">
-            <label>Experience<span>*</span></label>
+            <label>
+              Experience<span>*</span>
+            </label>
             <div>
               <input
                 name="experience_min"
@@ -128,7 +140,9 @@ const Form = ({ setIsopen }) => {
             </div>
           </div>
           <div className="input-control">
-            <label htmlFor="skills">Skills<span>*</span></label>
+            <label htmlFor="skills">
+              Skills<span>*</span>
+            </label>
             <input
               name="skills"
               value={formData.skills.join(", ")}
@@ -140,7 +154,9 @@ const Form = ({ setIsopen }) => {
             />
           </div>
           <div className="input-control">
-            <label htmlFor="description">Job Description<span>*</span></label>
+            <label htmlFor="description">
+              Job Description<span>*</span>
+            </label>
             <textarea
               name="jobDescription"
               value={formData.jobDescription}
@@ -151,7 +167,9 @@ const Form = ({ setIsopen }) => {
             />
           </div>
           <div className="input-control">
-            <label htmlFor="rounds">Rounds<span>*</span></label>
+            <label htmlFor="rounds">
+              Rounds<span>*</span>
+            </label>
             <input
               name="rounds"
               value={formData.rounds.join(", ")}
@@ -162,7 +180,9 @@ const Form = ({ setIsopen }) => {
             />
           </div>
           <div className="input-control">
-            <label htmlFor="additional">Additional Notes<span>*</span></label>
+            <label htmlFor="additional">
+              Additional Notes<span>*</span>
+            </label>
             <input
               name="additionalNotes"
               value={formData.additionalNotes}

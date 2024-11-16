@@ -2,6 +2,7 @@
     padding: 1rem;
     display: flex;
     justify-content: center;
+    /* font-size: 1rem !important; */
 }
 
 .kanban-content {
@@ -9,10 +10,15 @@
     width: 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    border: 1px solid red;
+
+    & svg{
+        font-size: 1.5rem;
+    }
 }
 
 .kanban-item{
-    width: 100%;
+    /* width: 100%; */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -25,6 +31,7 @@
     & p{
         line-height: 1.5;
         letter-spacing: 0.7px;
+        font-size: 1rem;
     }
 }
 
@@ -38,14 +45,14 @@
     flex-direction: row;
     min-width:80%;
     height: 250px;
-    border: 1px solid #227A8A;
+    border: 1.5px solid #227A8A;
     /* padding: 1rem 2rem; */
     padding: 0.6rem;
     border-radius: 0.8rem;
-    box-shadow: #227A8A 0px 1px 3px, #227A8A 0px 1px 2px;
+    /* box-shadow: #227A8A 0px 1px 0px, #227A8A 0px 1px 0px; */
     flex-wrap: wrap;
     gap: 0.4rem;
-    font-size: 1rem;
+    /* font-size: 1rem; */
 }
 
 .title-container {
@@ -92,6 +99,9 @@
     }
     .kanban-content{
         grid-template-columns: repeat(1,1fr);
+        & svg{
+            font-size: 1.4rem;
+        }
     }
     .kanban-content li{
         width: 100%;
@@ -102,4 +112,5 @@
     .kanban-content .value{
         width: 60%;
     }
+
 }

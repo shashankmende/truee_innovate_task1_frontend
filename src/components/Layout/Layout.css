@@ -2,12 +2,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 3rem 2rem 1rem 2rem;
-
+  padding: 1rem 2rem 1rem 2rem;
   & button {
     border: none;
     background-color: #227a8a;
-    padding: 1rem 2rem;
+    padding: 0.5rem 2rem;
     border-radius: 0.8rem;
     -webkit-border-radius: 0.8rem;
     -moz-border-radius: 0.8rem;
@@ -15,13 +14,21 @@
     -o-border-radius: 0.8rem;
     font-size: 1rem;
     color: white;
-    font-weight: bold;
+    /* font-weight: bold; */
     cursor: pointer;
   }
 }
 
+.data-container{
+  /* width: 100vw; */
+  display: flex;
+}
+
 .toggle-contaiiner {
   padding: 0 2rem;
+  display: flex;
+
+  justify-content: space-between;
 }
 
 .popup-overlay {
@@ -34,6 +41,7 @@
   transition: all 2s linear;
   display: flex;
   justify-content: end;
+  
 
   & .popup-content {
     width: 50%;
@@ -43,7 +51,7 @@
     */-webkit-animation: popup 0.3s linear;
     border-bottom-left-radius: 0.8rem;
     border-top-left-radius: 0.8rem;
-    -webkit-animation: popup 0.5s linear;
+    -webkit-animation: popup 0.2s linear;
 }
 }
 

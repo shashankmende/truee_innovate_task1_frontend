@@ -1,0 +1,21 @@
+
+
+.header-icons--container{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+
+    & svg{
+        font-size: 2.4rem;
+        color: #227A8A;
+        border: 1px solid #227A8A;
+        padding: 0.2rem;
+        border-radius: 0.4rem;
+        -webkit-border-radius: 0.4rem;
+        -moz-border-radius: 0.4rem;
+        -ms-border-radius: 0.4rem;
+        -o-border-radius: 0.4rem;
+        font-weight: bold;
+}
+}
