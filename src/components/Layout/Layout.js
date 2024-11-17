@@ -15,6 +15,8 @@ const Layout = () => {
   const [isOpen, setIsopen] = useState(false);
   const [isFilterOpen,setIsfilteropen]=useState(false)
   const [experienceRange,setExperienceRange]=useState({min:null,max:null})
+  const [skillsFilterLst,setSkillsFilterLst]=useState([])
+  
   
   const lst = useMemo(
     () => positions.slice(pagination - iter, pagination),
@@ -28,9 +30,9 @@ const Layout = () => {
     const expMaxValue = experienceRange.max ?? Number.MAX_VALUE; 
   
     return lst.filter((eachPosition) => {
-      const { title = "", company = "", experience = {} } = eachPosition;
+      const { title = "", company = "", experience = {},skills=[] } = eachPosition;
       const { min: expMin = 0, max: expMax = Infinity } = experience;
-  
+      console.log(skills)
       
       const filterThroughText =
         title.toLowerCase().includes(searchValue) ||
@@ -39,9 +41,11 @@ const Layout = () => {
       
       const filterThroughExpe =
         expMin <= expMaxValue && expMax >= expMinValue;
+      
+      // const filterThroughSkills = skillsFilterLst.length === 0 || skillsFilterLst.some((skill)=>skills.includes(skill.toLowerCase()))
+      const filterThroughSkills = skillsFilterLst.length === 0 || skillsFilterLst.some((skill)=>skills.map(skill=>skill.toLowerCase()).includes(skill.toLowerCase()))
   
-  
-      return filterThroughText && filterThroughExpe;
+      return filterThroughText && filterThroughExpe && filterThroughSkills;
     });
   };
   
@@ -84,7 +88,7 @@ const Layout = () => {
         <div className="data-container">
           {displayData()}
           {
-            isFilterOpen && <Filter expValue={experienceRange} setExp = {setExperienceRange} setFilter={setIsfilteropen}/>
+            isFilterOpen && <Filter experienceRange={experienceRange} setSkillsFilterLst={setSkillsFilterLst} expValue={experienceRange} setExp = {setExperienceRange} setFilter={setIsfilteropen}/>
           }
           
           

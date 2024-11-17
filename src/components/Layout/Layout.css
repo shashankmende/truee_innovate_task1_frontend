@@ -22,6 +22,8 @@
 .data-container{
   /* width: 100vw; */
   display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .toggle-contaiiner {

@@ -4,21 +4,7 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import axios from "axios";
 
 const KanbanView = ({isOpen,lst}) => {
-  // const [lst, setLst] = useState([]);
 
-  // useEffect(() => {
-  //   const getData = async () => {
-  //     try {
-  //       // const response = await axios.get("http://localhost:4000/api/position");
-  //       const response = await axios.get(`${process.env.REACT_APP_URL}/api/position`);
-  //       console.log(response);
-  //       setLst(response.data.positions.reverse());
-  //     } catch (error) {
-  //       console.log("Error in retrieving data");
-  //     }
-  //   };
-  //   getData();
-  // }, [isOpen]);
 
   return (
     <div className="section-kanban">
