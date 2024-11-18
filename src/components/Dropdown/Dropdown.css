@@ -9,9 +9,14 @@
 .dropdown-item-popup{
     display: flex;
     flex-direction: column;
-    background-color: #fff;
     padding: 1rem;
-    & li:not(:first-child){
+    /*background-color: #fff;
+    *//*background-color: rgba(128, 128, 128, 0.47);
+    */background-color: #227A8A;
+    border-radius:0.5rem;
+    color: white;
+    & li:not(:first-child)
+{
         cursor: pointer;
         margin-top:-2rem;
     }
@@ -42,3 +47,11 @@
 .activeColor{
     color: #227A8A;
 }
+
+.reactjs-popup-arrow {
+    border-color: white; /* Change arrow color */
+    width: 12px; /* Adjust width */
+    height: 12px; /* Adjust height */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow */
+  }
+  

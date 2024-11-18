@@ -26,36 +26,44 @@ const Layout = () => {
   const filterLst = () => {
     const searchValue = searchText?.toLowerCase() || "";
   
-    const expMinValue = experienceRange.min ?? Number.MIN_VALUE; 
-    const expMaxValue = experienceRange.max ?? Number.MAX_VALUE; 
+    const expMinValue = experienceRange.min ?? Number.MIN_VALUE;
+    const expMaxValue = experienceRange.max ?? Number.MAX_VALUE;
   
     return lst.filter((eachPosition) => {
-      const { title = "", company = "", experience = {},skills=[] } = eachPosition;
+      const { title = "", company = "", experience = {}, skills = [] } = eachPosition;
       const { min: expMin = 0, max: expMax = Infinity } = experience;
-      console.log(skills)
-      
+  
+      // Check if title or company matches the search text
       const filterThroughText =
         title.toLowerCase().includes(searchValue) ||
         company.toLowerCase().includes(searchValue);
   
-      
+      // Check if the experience range matches the filter
       const filterThroughExpe =
         expMin <= expMaxValue && expMax >= expMinValue;
-      
-      // const filterThroughSkills = skillsFilterLst.length === 0 || skillsFilterLst.some((skill)=>skills.includes(skill.toLowerCase()))
-      const filterThroughSkills = skillsFilterLst.length === 0 || skillsFilterLst.some((skill)=>skills.map(skill=>skill.toLowerCase()).includes(skill.toLowerCase()))
   
+      // Check if the skills match the filter
+      const filterThroughSkills =
+        skillsFilterLst.length === 0 || 
+        skillsFilterLst.some((filterSkill) =>
+          skills.map((skill) => skill.name.toLowerCase()).includes(filterSkill.toLowerCase())
+        );
+  
+      // Return true if all filters pass
       return filterThroughText && filterThroughExpe && filterThroughSkills;
     });
   };
+  
   
 
   const displayData = () => {
     switch (view) {
       case 0:
         return <TableView lst={filterLst()} isOpen={isOpen} />;
+        // return <h1>Table view</h1>;
       case 1:
         return <KanbanView lst={filterLst()} isOpen={isOpen} />;
+        
       default:
         return "";
     }

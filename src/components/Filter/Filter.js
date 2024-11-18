@@ -126,10 +126,13 @@ const onClickReset = () => {
           <>
           <div className="skills-options">
             {predefinedSKills.map((skill) => (
-              <div key={skill}>
+              // <div key={skill} style={{background: skillsList.includes(skill) ? "white":"lightgray"}}>
+              // <div key={skill} style={{opacity: skillsList.includes(skill) ? "1":"0.5"}}>
+              <div key={skill} >
                 <input
                   id={skill.toLowerCase()}
                   type="checkbox"
+                  
                   onChange={handleSkillChange(skill.toLowerCase())}
                 />
                 <label htmlFor={skill.toLowerCase()}>{skill}</label>

@@ -17,6 +17,9 @@ const Form = ({ setIsopen }) => {
     rounds: [],
   });
 
+  const [skillName,setSKillName]=useState('')
+  const [skillDesc,setSkillDesc]=useState('')
+
 
   const { setLoaddata }= useCustomContext()
 
@@ -77,6 +80,18 @@ const Form = ({ setIsopen }) => {
       console.log("Error in adding position:", error);
     }
   };
+
+
+  const onClickSkillAdd =(e)=>{
+    const obj = {name:skillName,description:skillDesc}
+    setFormData(prevData=>({
+      ...prevData,
+      skills:[...prevData.skills,obj]
+    }))
+    setSKillName("")
+    setSkillDesc("")
+  }
+
 
   return (
     <div className="section-form">
@@ -139,7 +154,32 @@ const Form = ({ setIsopen }) => {
               />
             </div>
           </div>
-          <div className="input-control">
+          <div className="experience-container">
+            <label>
+              Skils<span>*</span>
+            </label>
+            <div>
+              <input
+                name="name"
+                value={skillName}
+                
+                type="text"
+                placeholder="Name"
+                onChange={(e)=>setSKillName(e.target.value)}
+              />
+              <input
+                name="description"
+                value={skillDesc}
+                
+                type="text"
+                placeholder="Skill description"
+                onChange={(e)=>setSkillDesc(e.target.value)}
+              />
+              <button onClick={onClickSkillAdd}>Add</button>
+            </div>
+            
+          </div>
+          {/* <div className="input-control">
             <label htmlFor="skills">
               Skills<span>*</span>
             </label>
@@ -152,7 +192,7 @@ const Form = ({ setIsopen }) => {
               placeholder="Enter skills (comma separated)"
               onChange={onChangeInput}
             />
-          </div>
+          </div> */}
           <div className="input-control">
             <label htmlFor="description">
               Job Description<span>*</span>

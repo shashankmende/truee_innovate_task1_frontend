@@ -24,14 +24,14 @@ const Dropdown = ({ tab, data }) => {
         position="bottom center"
         closeOnDocumentClick
         contentStyle={{
-          background: "#fff",
-          borderRadius: "0.4rem",
+          // background: "#fff",
+          background: "transparent",
           width: "220px",
           marginTop: "20px",
         }}
         onOpen={() => setIsopen(true)}
         onClose={() => setIsopen(false)}
-        // on={"hover"}
+        on={"click"}
       >
         <ul className="dropdown-item-popup">
           {data.map((each, index) => {

@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
 import "./TableView.css";
 import { HiDotsHorizontal } from "react-icons/hi";
 
-const TableView = ({isOpen,lst}) => {
-
+const TableView = ({ isOpen, lst }) => {
   return (
     <div className="table-container">
       <table>
@@ -29,12 +27,20 @@ const TableView = ({isOpen,lst}) => {
                     ? position.jobDescription
                     : `${position.jobDescription.slice(0, 30)}...`}
                 </td>
-
                 <td>
                   {position.experience.min}-{position.experience.max} years
                 </td>
-                <td>{position.skills.join(",").length < 30 ? position.skills.join(", "): `${position.skills.join(", ").slice(0,30)}...`}</td>
-                <td>{<HiDotsHorizontal/>}</td>
+                <td>
+                  {position.skills
+                    .map((skill) => skill.name) // Extract the `name` from each skill object
+                    .join(", ")
+                    .length < 30
+                    ? position.skills.map((skill) => skill.name).join(", ")
+                    : `${position.skills.map((skill) => skill.name).join(", ").slice(0, 30)}...`}
+                </td>
+                <td>
+                  <HiDotsHorizontal />
+                </td>
               </tr>
             );
           })}
