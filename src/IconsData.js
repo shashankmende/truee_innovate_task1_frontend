@@ -11,6 +11,8 @@ import { IoCaretDownSharp } from "react-icons/io5";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { VscFilterFilled } from "react-icons/vsc";
+import { RxHamburgerMenu } from "react-icons/rx";
+
 
 
 export const searchIcon = <FaSearch />;
@@ -30,3 +32,4 @@ export const leftArrow = <FaAngleLeft />;
 
 export const rightArrow = <FaAngleRight />;
 export const filterIcon = <VscFilterFilled/>
+export const hamburgerIcon = <RxHamburgerMenu/>

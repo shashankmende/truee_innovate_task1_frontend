@@ -18,7 +18,7 @@
 }
 
 
-.header-search--container{
+.header-search--container,.medium-header-search--container{
     /*border: 1px solid #227A8A;*/
     border: 1px solid gray;
     padding: 0.5rem 0.8rem;
@@ -26,7 +26,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    
+    transition: all 0.3s ease;
     & input{
         border: none;
         outline: none;
@@ -60,19 +60,36 @@
 }
 }
 
+.hamburger-menu{
+    display: none;
+}
+.medium-middle-section{
+    display: none;
+}
+
+.small-dropdowns--container {
+    display: flex;
+    flex-direction: column;
+}
+
 
 @media (max-width:998px) {
+
     .section-header{
         width: 100%;
+        padding: 0.3rem;
+
     }
     .dropdowns--container{
         display: none;
     }
     .header-logo--container{
         order: 2;
+        display: none;
     }
     .header-icons--container{
-        order: 3;
+        gap: 1rem;
+
         & svg{
             font-size: 2rem;
             padding: 0.091rem;
@@ -82,15 +99,66 @@
     }
     .header-search--container{
         order: 2;
+        display: none;
     }
+    .hamburger-menu{
+        display: block;
+        width: 8%;
+        & button{
+            padding: 0.2rem;
+            border: none;
+            background-color: #227A8A;
+            color: white;
+            border-radius: 0.3rem;
+            -webkit-border-radius: 0.3rem;
+            -moz-border-radius: 0.3rem;
+            -ms-border-radius: 0.3rem;
+            -o-border-radius: 0.3rem;
+}
+    }
+
+    .medium-middle-section{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        
+    }
+    .medium-header-search--container{
+        padding: 0.3rem;
+        border-radius: 0.2rem;
+        -webkit-border-radius: 0.2rem;
+        -moz-border-radius: 0.2rem;
+        -ms-border-radius: 0.2rem;
+        -o-border-radius: 0.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80%;
+        gap: 0;
+        & input {
+            padding: 0rem;
+            width:80%;
+            font-size: 0.9rem;
+        }
+
+        & div{
+            display: block;
+            width: 20%;
+        }
+}
 }
 
 @media (max-width:576px) {
     .header-icons--container{
         & svg{
-            font-size: 1.8rem;
+            font-size: 2rem;
             padding: 0;
             border: none;
         }
+    }
+    .header-search--container{
+        width: 100%;
+        padding: 0.2rem;
     }
 }

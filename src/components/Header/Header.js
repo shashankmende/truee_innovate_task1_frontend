@@ -6,13 +6,66 @@ import {
   AssignmentDropDownData,
   AnalyticstDropDownData,
 } from "../../DropdownData";
+
 import Dropdown from "../Dropdown/Dropdown";
-import { searchIcon,HomeIcon,questionIcon,notificationIcon,profileIcon } from "../../IconsData";
+import {
+  searchIcon,
+  HomeIcon,
+  questionIcon,
+  notificationIcon,
+  profileIcon,
+  hamburgerIcon,
+} from "../../IconsData";
+import Popup from "reactjs-popup";
 
 const Header = () => {
   const [headerSearch, setHeaderSearch] = useState("");
   return (
     <div className="section-header">
+      <div className="hamburger-menu">
+        
+        
+        <Popup
+          trigger={<button>{hamburgerIcon}</button>}
+          contentStyle={{
+            background: "#fff",
+            // background: "transparent",
+            width: "220px",
+            // marginTop: "20px",
+            padding:'1rem',
+            borderRadius:"0.3rem"
+          }}
+          position="right top"
+          >
+              <div className="small-dropdowns--container">
+              <Dropdown tab={"Interviews"} data={interviewDropDownData} />
+        <Dropdown tab={"Assignments"} data={AssignmentDropDownData} />
+        <Dropdown tab={"Analytics"} data={AnalyticstDropDownData} />
+        <Dropdown tab={"More"} data={moreDropDownData} />
+              </div>
+          </Popup>
+
+      </div>
+
+      <div className="medium-middle-section">
+        <div className="medium-header-logo--container">
+          <h3>Logo</h3>
+          
+          
+        </div>
+        <div className="medium-header-search--container">
+          <div>
+          {searchIcon}
+          </div>
+          <input
+            type="search"
+            value={headerSearch}
+            onChange={(e) => setHeaderSearch(e.target.value)}
+            placeholder="Search Setup"
+          />
+        </div>
+      </div>
+
       <div className="header-logo--container">
         <h3>Logo</h3>
       </div>
@@ -31,8 +84,8 @@ const Header = () => {
           placeholder="Search Setup"
         />
       </div>
-      <div className='header-icons--container'>
-      {HomeIcon}
+      <div className="header-icons--container">
+        {HomeIcon}
         {questionIcon}
         {notificationIcon}
         {profileIcon}
