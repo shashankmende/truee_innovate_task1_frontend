@@ -32,11 +32,10 @@ const TableView = ({ isOpen, lst }) => {
                 </td>
                 <td>
                   {position.skills
-                    .map((skill) => skill.name) // Extract the `name` from each skill object
                     .join(", ")
                     .length < 30
-                    ? position.skills.map((skill) => skill.name).join(", ")
-                    : `${position.skills.map((skill) => skill.name).join(", ").slice(0, 30)}...`}
+                    ? position.skills.join(", ")
+                    : `${position.skills.join(", ").slice(0, 30)}...`}
                 </td>
                 <td>
                   <HiDotsHorizontal />

@@ -1,16 +1,17 @@
 
 .sorting-section{
-    /* width: 650px; */
+    width: 500px;
     
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2rem;
+    /* gap: 3rem;    */
+    /* border: 1px solid red; */
 }
 
 .sorting-search--container{
-    /*padding: 0.6rem;
-    */display: flex;
+    padding:0  0.6rem;
+    display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
@@ -18,7 +19,7 @@
     border: 1px solid gray;
     border-radius:0.5rem;
     height: 40px;
-  
+  /* border: 1px solid red; */
     -webkit-border-radius:0.5rem;
     -moz-border-radius:0.5rem;
     -ms-border-radius:0.5rem;

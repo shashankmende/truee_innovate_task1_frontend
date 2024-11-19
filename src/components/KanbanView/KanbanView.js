@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./KanbanView.css";
 import { HiOutlineDotsVertical } from "react-icons/hi";
-import axios from "axios";
-
-const KanbanView = ({isOpen,lst}) => {
 
 
+const KanbanView = ({ lst }) => {
   return (
     <div className="section-kanban">
       <ul className="kanban-content">
@@ -25,16 +23,16 @@ const KanbanView = ({isOpen,lst}) => {
                 {position.experience.min} - {position.experience.max} years
               </p>
             </div>
-            {position.skills.length>0 &&
-            <div className="kanban-item">
-              <p className="field">Skills</p>
-              <p className="value">
-                {position.skills.join(", ").length < 40
-                  ? position.skills.join(", ")
-                  : `${position.skills.join(", ").slice(0, 40)}...`}
-              </p>
-            </div>
-        }
+            {position.skills.length > 0 && (
+              <div className="kanban-item">
+                <p className="field">Skills</p>
+                <p className="value">
+                  {position.skills.join(", ").length < 30
+                    ? position.skills.join(", ")
+                    : `${position.skills.join(", ").slice(0, 30)}...`}
+                </p>
+              </div>
+            )}
             <div className="kanban-item">
               <p className="field">Job Description</p>
               <p className="value">

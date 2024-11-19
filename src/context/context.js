@@ -26,7 +26,7 @@ const CustomProvider = ({ children }) => {
   }, [loadData]);
 
   return (
-    <CustomContext.Provider value={{ iter,setLoaddata,searchText,setSearchText,setPagination, pagination, positions, error }}>
+    <CustomContext.Provider value={{setPositions, iter,setLoaddata,searchText,setSearchText,setPagination, pagination, positions, error }}>
       {children}
     </CustomContext.Provider>
   );

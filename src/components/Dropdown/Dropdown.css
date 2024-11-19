@@ -5,20 +5,22 @@
 }
 
 
-
-.dropdown-item-popup{
+ 
+ .dropdown-item-popup{
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    /*background-color: #fff;
-    *//*background-color: rgba(128, 128, 128, 0.47);
-    */background-color: #227A8A;
+    background-color: #fff;
+    /*background-color: rgba(128, 128, 128, 0.47);*/
+    background-color: #227A8A;
     border-radius:0.5rem;
     color: white;
+    gap: 1rem;
+    align-items: center;
     & li:not(:first-child)
 {
         cursor: pointer;
-        margin-top:-2rem;
+        margin-top:0rem;
     }
 }
 

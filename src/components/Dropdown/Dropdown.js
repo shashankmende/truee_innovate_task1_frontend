@@ -9,19 +9,16 @@ const Dropdown = ({ tab, data }) => {
     <div className="dropdown-item">
       <Popup
         trigger={
-          
           <button
-            className={`dropdown-button ${isOpen? "activeColor":""} `}
+            className={`dropdown-button ${isOpen ? "activeColor" : ""} `}
             onClick={() => setIsopen(!isOpen)}
           >
-            
             {tab}
             <FaAngleDown className={`arrow-icon ${isOpen ? "rotate" : ""}`} />
-            
-            
           </button>
         }
         position="bottom center"
+        // position="right center"
         closeOnDocumentClick
         contentStyle={{
           // background: "#fff",
@@ -35,7 +32,6 @@ const Dropdown = ({ tab, data }) => {
       >
         <ul className="dropdown-item-popup">
           {data.map((each, index) => {
-            
             return <li key={index}>{each}</li>;
           })}
         </ul>

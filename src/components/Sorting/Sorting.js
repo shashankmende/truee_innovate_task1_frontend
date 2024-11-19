@@ -1,16 +1,26 @@
 import React from "react";
 import "./Sorting.css";
-import SearchbarHeader from "../SearchbarHeader/SearchbarHeader";
-import { downArrow, leftArrow, rightArrow, filterIcon } from "../../IconsData";
+import {
+  downArrow,
+  leftArrow,
+  rightArrow,
+  filterIcon,
+  searchIcon,
+} from "../../IconsData";
 import { useCustomContext } from "../../context/context";
-import Filter from "../Filter/Filter";
 
-const Sorting = ({open,setFilter}) => {
-  const { pagination, setPagination, iter,positions, searchText, setSearchText } = useCustomContext();
-  
+const Sorting = ({ open, setFilter }) => {
+  const {
+    pagination,
+    setPagination,
+    iter,
+    positions,
+    searchText,
+    setSearchText,
+  } = useCustomContext();
 
   const onClickLeftArrow = () => {
-    if (pagination > iter){
+    if (pagination > iter) {
       setPagination(pagination - iter);
     }
   };
@@ -24,12 +34,12 @@ const Sorting = ({open,setFilter}) => {
   return (
     <div className="sorting-section">
       <div className="sorting-search--container">
-        <SearchbarHeader
+        {searchIcon}
+        <input
+          type="search"
+          placeholder="Search by Title, Company"
           value={searchText}
-          setFn={setSearchText}
-          placeholder={"Search by Title, Company"}
-          br="0rem"
-          border=""
+          onChange={(e) => setSearchText(e.target.value)}
         />
         <div className="down-arrow--container">{downArrow}</div>
       </div>
@@ -44,10 +54,12 @@ const Sorting = ({open,setFilter}) => {
         </div>
       </div>
 
-      <div className="sorting-filter--container" onClick={()=>setFilter(!open)}>
+      <div
+        className="sorting-filter--container"
+        onClick={() => setFilter(!open)}
+      >
         {filterIcon}
-        
-        </div>
+      </div>
     </div>
   );
 };

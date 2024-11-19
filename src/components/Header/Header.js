@@ -7,27 +7,35 @@ import {
   AnalyticstDropDownData,
 } from "../../DropdownData";
 import Dropdown from "../Dropdown/Dropdown";
-import SearchbarHeader from "../SearchbarHeader/SearchbarHeader";
-import HeaderIcons from "../HeaderIcons/HeaderIcons";
+import { searchIcon,HomeIcon,questionIcon,notificationIcon,profileIcon } from "../../IconsData";
 
 const Header = () => {
-  const [headerSearch,setHeaderSearch]=useState('')
+  const [headerSearch, setHeaderSearch] = useState("");
   return (
     <div className="section-header">
       <div className="header-logo--container">
         <h3>Logo</h3>
       </div>
       <ul className="dropdowns--container">
-        <Dropdown tab={"Interviews"} data={interviewDropDownData}/>
-        <Dropdown tab={"Assignments"} data={AssignmentDropDownData}/>
-        <Dropdown tab={"Analytics"} data={AnalyticstDropDownData}/>
-        <Dropdown tab={"More"} data={moreDropDownData}/>
+        <Dropdown tab={"Interviews"} data={interviewDropDownData} />
+        <Dropdown tab={"Assignments"} data={AssignmentDropDownData} />
+        <Dropdown tab={"Analytics"} data={AnalyticstDropDownData} />
+        <Dropdown tab={"More"} data={moreDropDownData} />
       </ul>
-      <div>
-        <SearchbarHeader value={headerSearch} setFn = {setHeaderSearch} placeholder="Search Setup" br="1.1rem" border="1px solid gray"/>
+      <div className="header-search--container">
+        {searchIcon}
+        <input
+          type="search"
+          value={headerSearch}
+          onChange={(e) => setHeaderSearch(e.target.value)}
+          placeholder="Search Setup"
+        />
       </div>
-      <div>
-        <HeaderIcons/>
+      <div className='header-icons--container'>
+      {HomeIcon}
+        {questionIcon}
+        {notificationIcon}
+        {profileIcon}
       </div>
     </div>
   );

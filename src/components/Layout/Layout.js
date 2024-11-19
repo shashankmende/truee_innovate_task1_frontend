@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import "./Layout.css";
-import Toggle from "../Toggle/Toggle";
+// import Toggle from "../Toggle/Toggle";
 import TableView from "../TableView/TableView";
 import KanbanView from "../KanbanView/KanbanView";
 import Form from "../Form/Form";
@@ -8,10 +8,11 @@ import Header from "../Header/Header";
 import Sorting from "../Sorting/Sorting";
 import { useCustomContext } from "../../context/context";
 import Filter from "../Filter/Filter";
+import { listViewIcon,kanbanViewIcon } from '../../IconsData'
 
 const Layout = () => {
   const [view, setView] = useState(0);
-  const { positions, pagination,searchText,iter} = useCustomContext();
+  const { positions, pagination,setPositions,searchText,iter} = useCustomContext();
   const [isOpen, setIsopen] = useState(false);
   const [isFilterOpen,setIsfilteropen]=useState(false)
   const [experienceRange,setExperienceRange]=useState({min:null,max:null})
@@ -29,29 +30,25 @@ const Layout = () => {
     const expMinValue = experienceRange.min ?? Number.MIN_VALUE;
     const expMaxValue = experienceRange.max ?? Number.MAX_VALUE;
   
-    return lst.filter((eachPosition) => {
+    const filteredList =  lst.filter((eachPosition) => {
       const { title = "", company = "", experience = {}, skills = [] } = eachPosition;
       const { min: expMin = 0, max: expMax = Infinity } = experience;
   
-      // Check if title or company matches the search text
       const filterThroughText =
         title.toLowerCase().includes(searchValue) ||
         company.toLowerCase().includes(searchValue);
-  
-      // Check if the experience range matches the filter
       const filterThroughExpe =
-        expMin <= expMaxValue && expMax >= expMinValue;
-  
-      // Check if the skills match the filter
+      expMin <= expMaxValue && expMax >= expMinValue;
+
       const filterThroughSkills =
         skillsFilterLst.length === 0 || 
-        skillsFilterLst.some((filterSkill) =>
-          skills.map((skill) => skill.name.toLowerCase()).includes(filterSkill.toLowerCase())
+        skillsFilterLst.some((filterSkill) =>  skills.map(each=>each.toLowerCase()).includes(filterSkill.toLowerCase())
         );
   
-      // Return true if all filters pass
       return filterThroughText && filterThroughExpe && filterThroughSkills;
     });
+    
+    return filteredList
   };
   
   
@@ -60,7 +57,6 @@ const Layout = () => {
     switch (view) {
       case 0:
         return <TableView lst={filterLst()} isOpen={isOpen} />;
-        // return <h1>Table view</h1>;
       case 1:
         return <KanbanView lst={filterLst()} isOpen={isOpen} />;
         
@@ -89,7 +85,10 @@ const Layout = () => {
         </div>
 
         <div className="toggle-contaiiner">
-          <Toggle view={view} setView={setView} />
+          <ul>
+          <li onClick={()=>setView(0)} style={{color: view ===0 ?  "#227A8A":""}}>{kanbanViewIcon} </li>
+          <li  onClick={()=>setView(1)} style={{color: view ===1 ?  "#227A8A":""}}>{listViewIcon}</li>
+          </ul>
           <Sorting  open={isFilterOpen} setFilter = {setIsfilteropen}/>
         </div>
 
@@ -102,6 +101,7 @@ const Layout = () => {
           
           </div>
       </div>
+          
     </div>
   );
 };

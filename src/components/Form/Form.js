@@ -1,8 +1,6 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import "./Form.css";
 import axios from "axios";
-import { IoIosCloseCircleOutline } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
 import { closeIcon } from "../../IconsData";
 import { useCustomContext } from "../../context/context";
 
@@ -17,11 +15,26 @@ const Form = ({ setIsopen }) => {
     rounds: [],
   });
 
-  const [skillName,setSKillName]=useState('')
-  const [skillDesc,setSkillDesc]=useState('')
+  const [skills, setSkills] = useState([]);
 
 
-  const { setLoaddata }= useCustomContext()
+  const { setLoaddata } = useCustomContext();
+
+  useEffect(() => {
+    const getSkills = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:4000/api/get-skills"
+        );
+        console.log(skills);
+        setSkills(response.data?.skills);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
+    getSkills();
+  }, []);
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
@@ -41,6 +54,7 @@ const Form = ({ setIsopen }) => {
         return {
           ...prevData,
           rounds: value.split(",").map((round) => round.trim()),
+          // rounds: value.split(","),
         };
       } else if (name === "skills") {
         return {
@@ -73,7 +87,7 @@ const Form = ({ setIsopen }) => {
           skills: [],
           rounds: [],
         });
-        setLoaddata(true)
+        setLoaddata(true);
         setIsopen(false);
       }
     } catch (error) {
@@ -82,23 +96,23 @@ const Form = ({ setIsopen }) => {
   };
 
 
-  const onClickSkillAdd =(e)=>{
-    const obj = {name:skillName,description:skillDesc}
+
+  const onChangeSKill =(e)=>{
     setFormData(prevData=>({
       ...prevData,
-      skills:[...prevData.skills,obj]
+      skills:[e.target.value]
     }))
-    setSKillName("")
-    setSkillDesc("")
   }
-
 
   return (
     <div className="section-form">
       <div className="section-form-content">
         <div className="form-heading--container">
           <h2>New Position</h2>
-          <div style={{ cursor: "pointer",fontSize:"1.5rem" }} onClick={() => setIsopen(false)}>
+          <div
+            style={{ cursor: "pointer", fontSize: "1.5rem" }}
+            onClick={() => setIsopen(false)}
+          >
             {closeIcon}
           </div>
         </div>
@@ -154,45 +168,20 @@ const Form = ({ setIsopen }) => {
               />
             </div>
           </div>
-          <div className="experience-container">
-            <label>
-              Skils<span>*</span>
-            </label>
-            <div>
-              <input
-                name="name"
-                value={skillName}
-                
-                type="text"
-                placeholder="Name"
-                onChange={(e)=>setSKillName(e.target.value)}
-              />
-              <input
-                name="description"
-                value={skillDesc}
-                
-                type="text"
-                placeholder="Skill description"
-                onChange={(e)=>setSkillDesc(e.target.value)}
-              />
-              <button onClick={onClickSkillAdd}>Add</button>
-            </div>
-            
-          </div>
-          {/* <div className="input-control">
+
+          <div className="input-control">
             <label htmlFor="skills">
               Skills<span>*</span>
             </label>
-            <input
-              name="skills"
-              value={formData.skills.join(", ")}
-              required
-              type="text"
-              id="skills"
-              placeholder="Enter skills (comma separated)"
-              onChange={onChangeInput}
-            />
-          </div> */}
+            <select name="skills" id="skills" onChange={(e)=>onChangeSKill(e)}>
+              <option value="">Select Skills</option>
+              {skills?.map((skill, index) => (
+                <option key={index} value={skill.name.toLowerCase()}>
+                  {skill.name.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="input-control">
             <label htmlFor="description">
               Job Description<span>*</span>
@@ -212,7 +201,7 @@ const Form = ({ setIsopen }) => {
             </label>
             <input
               name="rounds"
-              value={formData.rounds.join(", ")}
+              value={formData.rounds.join(",")}
               type="text"
               id="rounds"
               placeholder="Enter rounds (comma separated)"
