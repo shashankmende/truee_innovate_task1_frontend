@@ -1,10 +1,10 @@
-import React, { useState,useEffect } from "react";
-import "./Form.css";
+import React, { useState, useEffect } from "react";
+import "./EditForm.css";
 import axios from "axios";
 import { closeIcon } from "../../IconsData";
 import { useCustomContext } from "../../context/context";
 
-const Form = ({ setIsopen }) => {
+const EditForm = ({ pid, setFn }) => {
   const [formData, setFormData] = useState({
     title: "",
     company: "",
@@ -14,43 +14,71 @@ const Form = ({ setIsopen }) => {
     skills: [],
     rounds: [],
   });
+  console.log(pid);
   const { setLoaddata } = useCustomContext();
 
   const [skills, setSkills] = useState([]);
-  const [technology,setTechnology]=useState([])
-  const [selectedTech,setSelectedTech]=useState("")
+  const [technology, setTechnology] = useState([]);
+  const [selectedTech, setSelectedTech] = useState(null);
 
-  useEffect(()=>{
-    const getTech = async()=>{
+  useEffect(() => {
+    const getTech = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/tech')
-        setTechnology(response.data.technology)
-
+        const response = await axios.get("http://localhost:4000/api/tech");
+        setTechnology(response.data.technology);
       } catch (error) {
-        console.log("error in fetching technology from frontend")
+        console.log("error in fetching technology from frontend");
       }
-    }
-    getTech()
-  },[])
+    };
+    getTech();
+  }, []);
 
-  //get skills based on techs 
-  useEffect(()=>{
-    const getSkills = async()=>{
+  //get skills based on techs
+  useEffect(() => {
+    const getSkills = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/api/get-tech/${selectedTech}`)
-      setSkills(response.data?.technology.skills);
+        const response = await axios.get(
+          `http://localhost:4000/api/get-tech/${selectedTech}`
+        );
+        // console.log(response.data.technology.skills)
+        const lst = [
+          ...response.data?.technology?.skills.map((each) => {
+            return { name: each.name, _id: each._id };
+          }),
+        ];
+        console.log(lst);
+        setSkills(lst);
       } catch (error) {
-        console.log("error in retrieving skills from frontend")
+        console.log("error in retrieving skills from frontend");
       }
-    }
+    };
     if (selectedTech) {
-      getSkills()
+      getSkills();
+    } else {
+      setSkills([]);
+      setFormData((prevData) => ({ ...prevData, skills: [] }));
     }
-    else{
-      setSkills([])
-    }
-     
-  },[selectedTech])
+  }, [selectedTech]);
+
+  useEffect(() => {
+    const getPosition = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/position/${pid}`
+        );
+        console.log(response);
+        if (response.data.success) {
+          // setSkills(response.data.position.skills)
+          setFormData({ ...response.data.position });
+        } else {
+          alert("Something went wrong while retrieving position");
+        }
+      } catch (error) {
+        console.log("Error in positions useEffect function", error);
+      }
+    };
+    getPosition();
+  }, [pid]);
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
@@ -59,12 +87,12 @@ const Form = ({ setIsopen }) => {
       if (name === "experience_min") {
         return {
           ...prevData,
-          experience: { ...prevData.experience, min: value },
+          experience: { ...prevData.experience, min: +value },
         };
       } else if (name === "experience_max") {
         return {
           ...prevData,
-          experience: { ...prevData.experience, max: value },
+          experience: { ...prevData.experience, max: +value },
         };
       } else if (name === "rounds") {
         return {
@@ -84,15 +112,25 @@ const Form = ({ setIsopen }) => {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
-    if (!formData.title || !formData.jobDescription || !formData.company || formData.experience.min==="" ||formData.experience.max==="" || formData.skills.length ===0){
-      return alert("Please fill all required fields")
+    if (
+      !formData.title ||
+      !formData.jobDescription ||
+      !formData.company ||
+      formData.experience.min === "" ||
+      formData.experience.max === "" ||
+      formData.skills.length === 0
+    ) {
+      return alert("Please fill all required fields");
     }
-    
+
     try {
       console.log(formData);
-      const response = await axios.post(
+      console.log(`http://localhost:4000/api/position/${formData?._id}`)
+      const response = await axios.put(
         // "http://localhost:4000/api/position",
-        `${process.env.REACT_APP_URL}/api/position`,
+        // `${process.env.REACT_APP_URL}/api/position`,
+        
+        `http://localhost:4000/api/position/${formData?._id}`,
         formData
       );
       console.log(response);
@@ -107,38 +145,44 @@ const Form = ({ setIsopen }) => {
           rounds: [],
         });
         setLoaddata(true);
-        setIsopen(false);
-        alert(response.data.message || "Failed to add position");
+        setFn(false);
+        alert(response.data.message || "Failed to update position");
       }
     } catch (error) {
-      console.log("Error in adding position:", error);
+      console.log("Error in updating position:", error);
       alert("An error occurred. Please try again.");
     }
   };
 
-  const onChangeSKill =(e)=>{
-    setFormData(prevData=>({
+  const onChangeSKill = (e) => {
+    setFormData((prevData) => ({
       ...prevData,
-      skills:[... new Set([...prevData.skills, e.target.value])]
-    }))
-  }
+      skills: [...new Set([...prevData.skills, e.target.value])],
+    }));
+  };
 
-  const onClickRemoveAllSkills =()=>{
-    setFormData(prevData=>({
+  const onClickRemoveAllSkills = () => {
+    setFormData((prevData) => ({
       ...prevData,
-      skills:[]
-    }))
-  }
+      skills: [],
+    }));
+  };
 
+  const handleSkillRemove = (skillName) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      skills: prevData.skills.filter((s) => s !== skillName),
+    }));
+  };
 
   return (
     <div className="section-form">
       <div className="section-form-content">
         <div className="form-heading--container">
-          <h2>New Position</h2>
+          <h2>Update Position</h2>
           <div
             style={{ cursor: "pointer", fontSize: "1.5rem" }}
-            onClick={() => setIsopen(false)}
+            onClick={() => setFn(false)}
           >
             {closeIcon}
           </div>
@@ -179,7 +223,7 @@ const Form = ({ setIsopen }) => {
             <div>
               <input
                 name="experience_min"
-                value={formData.experience.min}
+                value={formData?.experience?.min}
                 required
                 type="number"
                 placeholder="min experience"
@@ -187,7 +231,7 @@ const Form = ({ setIsopen }) => {
               />
               <input
                 name="experience_max"
-                value={formData.experience.max}
+                value={formData?.experience?.max}
                 required
                 type="number"
                 placeholder="max experience"
@@ -199,11 +243,15 @@ const Form = ({ setIsopen }) => {
             <label htmlFor="skills">
               Technology<span>*</span>
             </label>
-            <select required name="skills" id="skills" onChange={(e)=>setSelectedTech(e.target.value)}>
+            <select
+              required
+              name="skills"
+              id="skills"
+              onChange={(e) => setSelectedTech(e.target.value)}
+            >
               <option value="">Select Technology</option>
               {technology?.map((technology, index) => (
                 <option key={technology._id} value={technology._id}>
-                  
                   {technology.name}
                 </option>
               ))}
@@ -213,36 +261,57 @@ const Form = ({ setIsopen }) => {
             <label htmlFor="skills">
               Skills<span>*</span>
             </label>
-            <div className="multiple-skills-section" style={{display:'flex',flexDirection:"column"}}>
+            <div
+              className="multiple-skills-section"
+              style={{ display: "flex", flexDirection: "column" }}
+            >
               <ul className="selected-skills">
-                {formData.skills.length>0?(
-                  
-                    formData.skills.map((skill,index)=>(
-                      <>
-                      <li key={index}>{skill}
-
-                        <button type="button"
-                        onClick={()=>setFormData(prevData=>({
-                          ...prevData,
-                          skills: prevData.skills.filter(s=>s!==skill)
-                        }))}
-                        >{closeIcon}</button>
+                {formData.skills.length > 0 ? (
+                  formData.skills.map((skill, index) => (
+                    <>
+                      <li key={index}>
+                        {skill}
+                        <button
+                          type="button"
+                          // onClick={()=>setFormData(prevData=>({
+                          //   ...prevData,
+                          //   skills: prevData.skills.filter(s=>s!==skill)
+                          // }))}
+                          onClick={() => handleSkillRemove(skill)}
+                        >
+                          {closeIcon}
+                        </button>
                       </li>
-
-                      </>
-                    ))
-                  
-                ):(<p style={{color:"gray"}}>No skill selected</p>)}
+                    </>
+                  ))
+                ) : (
+                  <p style={{ color: "gray" }}>No skill selected</p>
+                )}
               </ul>
-              <button className="remove-all-skills--container" type="button" onClick={onClickRemoveAllSkills}>{closeIcon}</button>
-            <select  name="skills" id="skills" value={formData.skills.join(',')} onChange={(e)=>onChangeSKill(e)}>
-              <option value=""></option>
-              {skills.length>0? (
-                skills.map((skill,index)=>(
-                  <option key={index} value={skill.name}>{skill.name}</option>
-                ))
-              ):(<option disabled>Please select Technology</option>)}
-            </select>
+              <button
+                className="remove-all-skills--container"
+                type="button"
+                onClick={onClickRemoveAllSkills}
+              >
+                {closeIcon}
+              </button>
+              <select
+                name="skills"
+                id="skills"
+                value={formData.skills.join(",")}
+                onChange={(e) => onChangeSKill(e)}
+              >
+                <option value=""></option>
+                {skills.length > 0 ? (
+                  skills.map((skill, index) => (
+                    <option key={index} value={skill.name}>
+                      {skill.name}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>Please select Technology</option>
+                )}
+              </select>
             </div>
           </div>
           <div className="input-control">
@@ -264,7 +333,7 @@ const Form = ({ setIsopen }) => {
             </label>
             <input
               name="rounds"
-              value={formData.rounds.join(",")}
+              value={formData?.rounds?.join(",")}
               type="text"
               id="rounds"
               placeholder="Enter rounds (comma separated)"
@@ -287,7 +356,7 @@ const Form = ({ setIsopen }) => {
             />
           </div>
           <div className="add-position-btn--container">
-            <button type="submit">Save</button>
+            <button type="submit">Update</button>
           </div>
         </form>
       </div>
@@ -295,4 +364,4 @@ const Form = ({ setIsopen }) => {
   );
 };
 
-export default Form;
+export default EditForm;

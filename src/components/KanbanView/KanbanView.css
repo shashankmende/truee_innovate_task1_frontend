@@ -60,6 +60,7 @@
     /* box-shadow: #227A8A 0px 1px 0px, #227A8A 0px 1px 0px; */
     flex-wrap: wrap;
     gap: 0.4rem;
+    cursor: pointer;
 }
 
 .title-container {

@@ -75,8 +75,8 @@ const Layout = () => {
           <div className="popup--container">
             <button onClick={() => setIsopen(true)}>Add</button>
             {isOpen && (
-              <div className="popup-overlay">
-                <div className="popup-content">
+              <div className="layout-popup-overlay">
+                <div className="layout-popup-content">
                   <Form setIsopen={setIsopen} />
                 </div>
               </div>

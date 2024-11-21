@@ -9,7 +9,8 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 2rem;
+    gap: 1rem;
+    height: 100vh;
     width: 600px;
     padding: 1rem 0;
     width: 100%;
@@ -35,13 +36,21 @@
     border-bottom: 2px solid rgba(128, 128, 128, 0.393);
     outline: none;
     font-size: 1.05rem;
+
+    
   }
+
 
   & form .input-control,
   .experience-container {
     padding: 0 2rem;
     overflow: hidden;
   }
+}
+
+.section-form textarea{
+  max-height: 90px;
+  overflow: auto;
 }
 
 .section-form-content {
@@ -63,6 +72,54 @@
   width: 100%;
   overflow: hidden;
 
+}
+
+.multiple-skills-section{
+  width: 65%;
+  position: relative;
+  overflow: auto;
+  max-height: 130px;
+  padding: 0.2rem 0.2rem;
+  background-color: rgb(240, 237, 237);
+
+  & .remove-all-skills--container{
+    position: absolute;
+    width: max-content;
+    padding: 0.2rem 0.4rem;
+    background-color: transparent;
+    color: black;
+    right: 0;
+  }
+  
+  & select {
+    width: 100%;
+    margin-top: 0.4rem;
+  }
+  & .selected-skills{
+    width: 75%;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    & li{
+      display: flex;
+      align-items: center;
+      background-color: gray;
+      padding: 0 0.3rem;
+      color: white;
+      border-radius: 0.3rem;
+      -webkit-border-radius: 0.3rem;
+      -moz-border-radius: 0.3rem;
+      -ms-border-radius: 0.3rem;
+      -o-border-radius: 0.3rem;
+}
+    & button{
+      padding: 0.2rem;
+      background-color: transparent;
+      margin-left: 0.2rem;
+      
+    }
+  }
 }
 
 textarea {

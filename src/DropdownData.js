@@ -1,7 +1,7 @@
 
 
-export const moreDropDownData =["positions"]
+export const moreDropDownData =[{name:"positions",link:"/position"}]
 
-export const interviewDropDownData = ["interview1","interview2","interview3",'interview4']
-export const AssignmentDropDownData = ["Assignment1","Assignment2","Assignment3",'Assignment4']
-export const AnalyticstDropDownData = ["Analytics1","Analytics2","Analytics3",'Analytics4']
+export const interviewDropDownData = [{name:"Interview1",link:"/"}]
+export const AssignmentDropDownData = [{name:"Assignment1",link:"/"}]
+export const AnalyticstDropDownData = [{name:"Analytics1",link:"/"}]

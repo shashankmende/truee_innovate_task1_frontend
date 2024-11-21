@@ -83,7 +83,7 @@
 
 .skills-filter-container{
     overflow: hidden;
-    /* border: 1px solid red; */
+    border: 1px solid red;
     padding: 0.4rem;
 }
 
@@ -96,6 +96,7 @@
   margin-bottom: 0.5rem;
   cursor: pointer;
   overflow: hidden;
+  padding: 0.4rem;
    
   & div{
     display: flex;
@@ -158,4 +159,44 @@
     color: white;
     cursor: pointer;
   }
+}
+
+
+.skills-content-options {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.label-container{
+  /* border: 1px solid red; */
+  padding-right: 0.4rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  
+  & >div{
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+.filter-item-skills-options{
+  /* border: 1px solid red; */
+  padding-left: 1.5rem;
+
+  & >div{
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 0.7rem;
+  }
+  
+}
+
+.filter-item-skills-options>div{
+  display: flex;
+  flex-direction: row;
 }
