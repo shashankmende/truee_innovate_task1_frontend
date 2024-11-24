@@ -12,7 +12,9 @@ import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { VscFilterFilled } from "react-icons/vsc";
 import { RxHamburgerMenu } from "react-icons/rx";
+import { CiCirclePlus } from "react-icons/ci";
 
+import { TbCameraPlus } from "react-icons/tb";
 
 
 export const searchIcon = <FaSearch />;
@@ -33,3 +35,5 @@ export const leftArrow = <FaAngleLeft />;
 export const rightArrow = <FaAngleRight />;
 export const filterIcon = <VscFilterFilled/>
 export const hamburgerIcon = <RxHamburgerMenu/>
+export const plusIcon = <CiCirclePlus/>
+export const cameraIcon = <TbCameraPlus/>

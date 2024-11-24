@@ -21,7 +21,7 @@ import { NavLink } from "react-router-dom";
 
 const Header = () => {
   const [headerSearch, setHeaderSearch] = useState("");
-  const [activeBtn,setActiveBtn]=useState("")
+  const [activeBtn, setActiveBtn] = useState("");
   return (
     <div className="section-header">
       <div className="hamburger-menu">
@@ -42,6 +42,7 @@ const Header = () => {
             <Dropdown tab={"Assignments"} data={AssignmentDropDownData} />
             <Dropdown tab={"Analytics"} data={AnalyticstDropDownData} />
             <Dropdown tab={"More"} data={moreDropDownData} />
+           
           </div>
         </Popup>
       </div>
@@ -62,7 +63,9 @@ const Header = () => {
       </div>
 
       <div className="header-logo--container">
-        <NavLink to={'/'}><h3>Logo</h3></NavLink>
+        <NavLink to={"/"}>
+          <h3>Logo</h3>
+        </NavLink>
       </div>
       <ul className="dropdowns--container">
         <Dropdown tab={"Interviews"} data={interviewDropDownData} />

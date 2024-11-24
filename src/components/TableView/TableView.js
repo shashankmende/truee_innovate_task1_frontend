@@ -13,8 +13,14 @@ const TableView = ({ lst }) => {
   const [positionId,setPositionId]=useState(null)
   const navigate = useNavigate();
 
+  const [navPopup,setNavpopup]=useState(null)
+
   const handlePopupOpen = (id) => {
     setActivePopup((prev) => (prev === id ? null : id));
+  };
+
+  const handleNavPopup = (id) => {
+    setNavpopup((prev) => (prev === id ? null : id));
   };
 
   return (
@@ -36,9 +42,9 @@ const TableView = ({ lst }) => {
               <td>{position.title}</td>
               <td>{position.company}</td>
               <td>
-                {position.jobDescription.length < 30
+                {position.jobDescription?.length < 30
                   ? position.jobDescription
-                  : `${position.jobDescription.slice(0, 30)}...`}
+                  : `${position.jobDescription?.slice(0, 30)}...`}
               </td>
               <td>
                 {position.experience.min}-{position.experience.max} years
@@ -48,62 +54,28 @@ const TableView = ({ lst }) => {
                   ? position.skills.join(", ")
                   : `${position.skills.join(", ").slice(0, 30)}...`}
               </td>
-              <td style={{ position: "" }}>
-                <Popup
-                  trigger={
-                    <button
-                      className="popup-trigger-button"
-                      onClick={() => handlePopupOpen(position._id)}
-                    >
-                      <HiDotsHorizontal />
-                    </button>
-                  }
-                  position="center left"
-                  open={activePopup === position._id}
-                  onClose={() => setActivePopup(null)}
-                  contentStyle={{
-                    marginLeft: "2.5rem",
-                    width: "max-content",
-                    padding: "0",
-                  }}
-                  // closeOnDocumentClick={false}
-                >
-                  <div className="popup-content">
-                    <div className="popup-top--container">
-                      <h3>Actions</h3>
-                      <button
-                        onClick={() => {
-                          console.log("close icon clicked");
-                          setActivePopup(null);
-                          handlePopupOpen(position._id)
-                        }}
-                      >
-                        {closeIcon}
-                      </button>
-                    </div>
-                    <div className="popup-buttons--container">
-                      <button
-                        onClick={() => {
-                          setActivePopup(null)
-                          navigate(`/position/${position._id}`)
-                        }}
-                      >
-                        View
-                      </button>
-                      <button onClick={()=>{
-                        setActivePopup(null)
+              <td>
+                <div>
+                <HiDotsHorizontal style={{cursor:"pointer"}} onClick={()=>handleNavPopup(position._id)}/>
+                  {navPopup===position._id && <div className=" nav-popup--container" >
+                    <button onClick={()=>{
+                      handleNavPopup(position._id)
+                      navigate(`/position/${position._id}`)
+                      }}>view</button>
+                    <button onClick={()=>{
+                        // setActivePopup(null)
                         setPositionId(position._id)
+                        // handleNavPopup(position._id)
                         setEditFormOpen(true)                                                
                       }}>Edit</button>
                       {isEditFormOpen && (<div className="edit-form-overlay">
                           <div className="edit-form-content">
-                            <EditForm pid={positionId} setFn={setEditFormOpen}/>
+                            <EditForm navPopFn={handleNavPopup} pid={positionId} setFn={setEditFormOpen}/>
                           </div>
                         </div>)}
-                      
-                    </div>
-                  </div>
-                </Popup>
+
+                    </div>}
+                </div>
               </td>
             </tr>
           ))}

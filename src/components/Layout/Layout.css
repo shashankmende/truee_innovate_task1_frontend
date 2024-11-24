@@ -24,6 +24,8 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
+  /* border: 1px solid red; */
+  height: 70vh;
 }
 
 .toggle-contaiiner {
@@ -109,13 +111,13 @@
   }
 }
 
-@media (max-width: 576px) {
-  .popup-overlay {
-    & .layout-popup-content {
-      width: 100%;
-      padding: 1rem;
-      border-bottom-left-radius: 0rem;
-      border-top-left-radius: 0rem;
-    }
+@media (max-width: 768px) {
+  
+  .layout-popup-content {
+    width: 100% !important;
+    /* border: 10px solid red; */
+    padding: 1rem;
+    border-bottom-left-radius: 0rem;
+    border-top-left-radius: 0rem;
   }
 }

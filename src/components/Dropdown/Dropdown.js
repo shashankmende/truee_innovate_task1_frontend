@@ -26,9 +26,12 @@ const Dropdown = ({ tab, data }) => {
         position="bottom center"
         closeOnDocumentClick
         contentStyle={{
-          background: "transparent",
-          width: "220px",
+          backgroundColor: "transparent",
+          // width: "220px",
+          
+          
           marginTop: "20px",
+          padding:'0'
         }}
         onOpen={() => setIsopen(true)}
         onClose={() => setIsopen(false)}

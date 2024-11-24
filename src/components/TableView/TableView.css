@@ -10,14 +10,14 @@
   & th {
     background-color: #e2ebed;
     color: #227a8a;
-    letter-spacing: 1.2px;
+    letter-spacing: 0.4px;
+    word-spacing: 3px;
     text-align: left;
     width: 260px;
     font-weight: bold;
   }
   & td {
     border-bottom: 2px solid rgba(128, 128, 128, 0.216);
-
     letter-spacing: 0.4px;
     word-spacing: 3px;
   }
@@ -140,6 +140,41 @@ td {
     opacity: 1;
     width: 50%;
   }
+}
+
+
+.nav-popup--container {
+  border-radius: 0.4rem;
+  /* width: 150px; */
+  padding: 1rem;
+  background-color: white;
+  position: fixed;
+  -webkit-border-radius: 0.4rem;
+  -moz-border-radius: 0.4rem;
+  -ms-border-radius: 0.4rem;
+  -o-border-radius: 0.4rem;
+  box-shadow: 0px 0px 0px 1px #00000052,0px 0px 0px 1px #0000004e;
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+
+  & button{
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+}
+
+& button:hover{
+background-color: #227a8a;
+color: white;
+}
+
 }
 
 

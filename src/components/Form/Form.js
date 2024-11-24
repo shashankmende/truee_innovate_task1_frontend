@@ -4,7 +4,7 @@ import axios from "axios";
 import { closeIcon } from "../../IconsData";
 import { useCustomContext } from "../../context/context";
 
-const Form = ({ setIsopen }) => {
+const Form = ({popupTab, setIsopen,setPopupTab }) => {
   const [formData, setFormData] = useState({
     title: "",
     company: "",
@@ -97,6 +97,14 @@ const Form = ({ setIsopen }) => {
       );
       console.log(response);
       if (response.data.success) {
+        const position = formData.title
+
+        alert(response.data.message || "Failed to add position");
+        if (!isNaN(popupTab)){
+          localStorage.setItem("candpos",JSON.stringify(position))
+          setPopupTab(1)
+        }
+        
         setFormData({
           title: "",
           company: "",
@@ -108,18 +116,25 @@ const Form = ({ setIsopen }) => {
         });
         setLoaddata(true);
         setIsopen(false);
-        alert(response.data.message || "Failed to add position");
+        // alert(response.data.message || "Failed to add position");
+        // if (!isNaN(popupTab)){
+        //   localStorage.setItem("candpos",JSON.stringify(position))
+        //   setPopupTab(0)
+        // }
+      }
+      else{
+        alert(response.data.message)
       }
     } catch (error) {
       console.log("Error in adding position:", error);
-      alert("An error occurred. Please try again.");
+      // alert("An error occurred in adding position. Please try again.");
     }
   };
 
   const onChangeSKill =(e)=>{
     setFormData(prevData=>({
       ...prevData,
-      skills:[... new Set([...prevData.skills, e.target.value])]
+      skills:[...new Set([...prevData.skills, e.target.value])]
     }))
   }
 
@@ -138,7 +153,7 @@ const Form = ({ setIsopen }) => {
           <h2>New Position</h2>
           <div
             style={{ cursor: "pointer", fontSize: "1.5rem" }}
-            onClick={() => setIsopen(false)}
+            onClick={() => setPopupTab ? setPopupTab(""):setIsopen(false)}
           >
             {closeIcon}
           </div>

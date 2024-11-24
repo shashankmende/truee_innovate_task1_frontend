@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import "./EditForm.css";
+// import "./EditForm.css";
 import axios from "axios";
 import { closeIcon } from "../../IconsData";
 import { useCustomContext } from "../../context/context";
 
-const EditForm = ({ pid, setFn }) => {
+const EditForm = ({navPopFn, pid, setFn }) => {
   const [formData, setFormData] = useState({
     title: "",
     company: "",
@@ -124,8 +124,6 @@ const EditForm = ({ pid, setFn }) => {
     }
 
     try {
-      console.log(formData);
-      console.log(`http://localhost:4000/api/position/${formData?._id}`)
       const response = await axios.put(
         // "http://localhost:4000/api/position",
         // `${process.env.REACT_APP_URL}/api/position`,
@@ -182,7 +180,10 @@ const EditForm = ({ pid, setFn }) => {
           <h2>Update Position</h2>
           <div
             style={{ cursor: "pointer", fontSize: "1.5rem" }}
-            onClick={() => setFn(false)}
+            onClick={() => {
+              setFn(false)
+              navPopFn(null)
+            }}
           >
             {closeIcon}
           </div>
