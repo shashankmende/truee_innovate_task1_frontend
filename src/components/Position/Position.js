@@ -4,27 +4,49 @@ import Header from '../Header/Header';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
+import CandidateTableView from '../CandidateTableView/CandidateTableView';
 
 const Position = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [position, setPosition] = useState([]);
+  const [candidate,setCandidate]=useState([])
+  const [title,setTitle]=useState('')
   const { id } = useParams();
 
   const createdAt = position.createdAt ? new Date(position.createdAt) : null;
   const updatedAt = position.updatedAt ? new Date(position.updatedAt) : null ;
   
-  const formattedDate = createdAt && !isNaN(createdAt) 
+const formattedDate = createdAt && !isNaN(createdAt) 
     ? format(createdAt, 'dd MMM, yyyy . hh:mm a') 
     : 'Date not available';
-
+ 
   const ModifiedDate = position.updatedAt && !isNaN(updatedAt) 
   ? format(updatedAt,'dd MMM ,yyyy .hh:mm a'):""
+
+  useEffect(()=>{
+    const getCandidates = async()=>{
+      try {
+        const response = await axios.get(`http://localhost:4000/api/candidate/${title}`)
+        console.log(response);
+        if (response.data.success){
+          setCandidate(response.data.candidate)
+        }
+        else{
+          alert(response.data.message || "Something went wrong")
+        }
+      } catch (error) {
+        console.log(error)
+        alert(error && error.message || "Something went wrong")
+      }
+    }
+    getCandidates()
+  },[title])
 
   useEffect(() => {
     const getPosition = async () => {
       try {
         const response = await axios.get(`http://localhost:4000/api/position/${id}`);
-        console.log(response);
+        
         if (response.data.success) {
           setPosition(response.data.position);
         } else {
@@ -36,6 +58,12 @@ const Position = () => {
     };
     getPosition();
   }, [id]);
+
+  useEffect(()=>{
+    if (activeTab===1 && position){
+      setTitle(position.title)
+    }
+  },[activeTab])
 
   const PositionsData = () => {
     return (
@@ -95,7 +123,11 @@ const Position = () => {
   };
 
   const CandidatesData = () => {
-    return <h1>Candidates data</h1>;
+    return (
+      <div style={{marginTop:"2rem"}}>
+        {candidate && <CandidateTableView lst={candidate}/>}
+      </div>
+    )
   };
 
   const displayData = () => {

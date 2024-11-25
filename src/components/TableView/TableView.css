@@ -157,6 +157,8 @@ td {
   display: flex;
   justify-content: space-between;
   gap: 2rem;
+  right: 10px;
+  /* border: 1px solid red; */
 
   & button{
     background-color: #f5f5f5;

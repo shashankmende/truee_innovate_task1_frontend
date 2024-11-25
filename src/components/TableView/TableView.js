@@ -8,16 +8,12 @@ import { useNavigate } from "react-router-dom";
 import EditForm from "../EditForm/EditForm";
 
 const TableView = ({ lst }) => {
-  const [activePopup, setActivePopup] = useState(null);
   const [isEditFormOpen, setEditFormOpen] = useState(false);
   const [positionId,setPositionId]=useState(null)
   const navigate = useNavigate();
 
   const [navPopup,setNavpopup]=useState(null)
 
-  const handlePopupOpen = (id) => {
-    setActivePopup((prev) => (prev === id ? null : id));
-  };
 
   const handleNavPopup = (id) => {
     setNavpopup((prev) => (prev === id ? null : id));
@@ -57,15 +53,13 @@ const TableView = ({ lst }) => {
               <td>
                 <div>
                 <HiDotsHorizontal style={{cursor:"pointer"}} onClick={()=>handleNavPopup(position._id)}/>
-                  {navPopup===position._id && <div className=" nav-popup--container" >
+                  {navPopup===position._id && <div className="nav-popup--container" >
                     <button onClick={()=>{
                       handleNavPopup(position._id)
                       navigate(`/position/${position._id}`)
                       }}>view</button>
                     <button onClick={()=>{
-                        // setActivePopup(null)
                         setPositionId(position._id)
-                        // handleNavPopup(position._id)
                         setEditFormOpen(true)                                                
                       }}>Edit</button>
                       {isEditFormOpen && (<div className="edit-form-overlay">

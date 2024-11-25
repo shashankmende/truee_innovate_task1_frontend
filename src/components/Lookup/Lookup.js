@@ -5,7 +5,7 @@ import { plusIcon } from "../../IconsData";
 import { useCustomContext } from "../../context/context";
 import { useNavigate } from "react-router-dom";
 
-const LookupFeature = ({ setFormData, setPopupTab }) => {
+const LookupFeature = ({ updatedValue,setFormData, setPopupTab }) => {
   const [inputValue, setInputValue] = useState("");
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [positionSuggestions, setPositionSuggestions] = useState([]);
@@ -78,7 +78,7 @@ const LookupFeature = ({ setFormData, setPopupTab }) => {
         id="position"
         name="position"
         type="text"
-        value={JSON.parse(localStorage.getItem("candpos")) || inputValue}
+        value={JSON.parse(localStorage.getItem("candpos")) || inputValue || updatedValue}
         onChange={handleInputChange}
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}

@@ -64,7 +64,8 @@ margin-left: 1rem;
 .section-form-content {
   height: 100%;
   width: 100%;
-  gap: 2.5rem;
+  /* gap: 2.5rem; */
+  gap: 1rem;
   display: flex;
   
   flex-direction: column;
@@ -151,19 +152,36 @@ textarea {
   }
 }
 
-.add-position-btn--container {
+.candidate-add-position-btn--container{
+  width: 100%;
+  display: flex;
+  justify-content: end;
+  gap: 1rem;
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  padding: 1rem;
+  border-top: 1px solid gray;
+ 
+  & button{
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}
+}
+
+/* .add-position-btn--container {
   background-color: white;
   position: sticky;
   bottom: 0;
   display: flex;
   justify-content: end !important;
-  /* margin-top: 2rem; */
   border-top: 1px solid gray;
   width: 100%;
   padding: 1rem;
-  /* padding-bottom: 5rem; */
   padding-bottom: 2rem;
-  /* margin-bottom: 1rem; */
   & button {
     background-color: #227a8a;
     padding: 0.7rem 2rem;
@@ -177,7 +195,7 @@ textarea {
     cursor: pointer;
     margin: 1.5rem 1.5rem 0 0;
   }
-}
+} */
 
 form label span {
   color: red;

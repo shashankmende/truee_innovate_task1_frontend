@@ -5,8 +5,9 @@ import { closeIcon, cameraIcon } from "../../IconsData";
 import { useCustomContext } from "../../context/context";
 import LookupFeature from "../Lookup/Lookup";
 import { useNavigate } from "react-router-dom";
+import {format} from 'date-fns'
 
-const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
+const CandidateForm = ({cid,setFn,getCandidate, updatedLst,popupTab, setPopupTab }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -19,7 +20,7 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
     position: localStorage.getItem("candpos") || "",
     dateOfBirth: "",
     skills: [],
-    photo:""
+    photo: "",
   });
   const { setLoaddata, setIsopen, fetchCandidates } = useCustomContext();
   const [skills, setSkills] = useState([]);
@@ -29,6 +30,34 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
   const [collgesLst, SetCollegeLst] = useState([]);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const [photoPreview, setPhotoPreview] = useState("");
+  const formRef = useRef(null);
+  
+  useEffect(()=>{
+    if (cid){
+      
+      const {firstName,lastName,experience,phone,email,gender,higherQualification,college,position,dateOfBirth,skills}=cid
+      const formatedData = format(new Date(dateOfBirth),'yyyy-MM-dd')
+      console.log(position)
+      setFormData(prev=>({
+        ...prev,
+        firstName,lastName,experience,phone,email,gender,higherQualification,college,position,dateOfBirth:formatedData,skills
+      }))
+    }
+  },[cid])
+
+  useEffect(()=>{
+    if (updatedLst){
+      
+    const {firstName,lastName,experience,phone,email,gender,higherQualification,college,position,dateOfBirth,skills}=updatedLst[0]
+    const formatedData = format(new Date(dateOfBirth),'yyyy-MM-dd')
+    console.log(position)
+    setFormData(prev=>({
+      ...prev,
+      firstName,lastName,experience,phone,email,gender,higherQualification,college,position,dateOfBirth:formatedData,skills
+    }))
+  }
+  },[updatedLst])
 
   useEffect(() => {
     setFormData((prev) => ({
@@ -37,7 +66,7 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
     }));
   }, [popupTab]);
 
-  useEffect(() => {
+useEffect(() => {
     const getSkills = async () => {
       try {
         const response = await axios.get(
@@ -46,6 +75,7 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
         setSkills(response.data.skills);
       } catch (error) {
         console.log("Error");
+        alert("Failed to fetch skills. Please try again later.");
       }
     };
     getSkills();
@@ -117,8 +147,46 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
     });
   };
 
-  const onSubmitForm = async (e) => {
+  const validateForm = () => {
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "experience",
+      "phone",
+      "email",
+      "gender",
+      "higherQualification",
+      "college",
+      "position",
+      "dateOfBirth",
+      "skills",
+      "photo",
+    ];
+    for (let field of requiredFields) {
+      if (formData[field]) {
+        alert(`${field} is required`);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const onClickSaveForm = async () => {
+    if (formRef.current) {
+      // if (!validateForm) return;
+      // else {
+      //   formRef.current.requestSubmit();
+      // }
+      formRef.current.requestSubmit();
+    }
+  };
+
+
+ const onSubmitForm = async (e) => {
     e.preventDefault();
+    if (!validateForm){
+      return
+    }
 
     try {
       console.log(formData);
@@ -174,14 +242,56 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
     }));
   };
 
-  const onClickPhotoContainer =()=>{
-    fileInputRef.current.click()
-  }
+  const onClickPhotoContainer = () => {
+    fileInputRef.current.click();
+  };
 
-  const onChangeFile =(event)=>{
-    const file  = event.target.files[0]
-    if (file){
-      console.log("selected file:",file)
+  const onChangeFile = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    if (file) {
+      if (file.type.startsWith("image/")) {
+        reader.onload = () => {
+          setPhotoPreview(reader.result);
+          setFormData((prev) => ({ ...prev, photo: reader.result }));
+        };
+      }
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please upload a valid image file.");
+    }
+  };
+
+  const onClickUpdateForm =async(e)=>{
+    e.preventDefault()
+    try {
+      const response = await axios.put(`http://localhost:4000/api/candidate/update/${updatedLst._id}`,formData)
+      if (response.data.success){
+        alert(response.data.message)
+        setFormData({
+          firstName: "",
+          lastName: "",
+          experience: "",
+          phone: "",
+          email: "",
+          gender: "",
+          higherQualification: "",
+          college: "",
+          position: "",
+          dateOfBirth: "",
+          skills: [],
+          photo: "",
+        })
+        getCandidate()
+        setFn(false)
+
+      }
+      else{
+        alert(response.data.message || 'something went wrong')
+      }
+    } catch (error) {
+      console.log(error)
+      alert("Something went wrong")
     }
   }
 
@@ -193,7 +303,10 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
           <div
             style={{ cursor: "pointer", fontSize: "1.5rem" }}
             // onClick={() => setIsCandidateForm(false)}
-            onClick={() => setPopupTab("")}
+            onClick={() => {
+              { setPopupTab && setPopupTab("")}
+              { setFn &&   setFn(false)}
+            }}
           >
             {closeIcon}
           </div>
@@ -202,7 +315,7 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
           className="form-profile--container"
           style={{ display: "flex", alignItems: "center" }}
         >
-          <form style={{ width: "80%" }} onSubmit={onSubmitForm}>
+          <form ref={formRef} style={{ width: "85%" }} onSubmit={onSubmitForm}>
             <h3>Personal details</h3>
             <div className="candidate-input-control">
               <label htmlFor="firstName">
@@ -374,6 +487,7 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
               </label>
               <div style={{ width: "65%" }}>
                 <LookupFeature
+                  updatedValue={updatedLst && updatedLst.position}
                   setFormData={setFormData}
                   setPopupTab={setPopupTab}
                 />
@@ -454,21 +568,38 @@ const CandidateForm = ({ popupTab, setIsCandidateForm, setPopupTab }) => {
               {plusIcon} Add position
             </button> */}
             </div>
-            <div className="add-position-btn--container">
+            {/* <div className="add-position-btn--container">
               <button type="submit">Save</button>
               <button type="submit">Save & Schedule</button>
-            </div>
+            </div> */}
           </form>
-          <div onClick={onClickPhotoContainer} style={{ width: "20%" }} className="photo-container">
-            {cameraIcon}
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={onChangeFile}
-            />
+          <div
+            className="photo-container"
+            style={{ width: "15%", display: "flex", flexDirection: "column" }}
+          >
+            {/* <div onClick={onClickPhotoContainer} style={{ width: "20%" }} className="photo-container"> */}
+            <div onClick={onClickPhotoContainer}>
+              {cameraIcon}
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={onChangeFile}
+              />
+            </div>
+            <div className="photo-preview">
+              {photoPreview && (
+                <img width={"80px"} src={photoPreview} alt="preview" />
+              )}
+            </div>
           </div>
+        </div>
+        <div className="candidate-add-position-btn--container">
+          <button onClick={updatedLst ? onClickUpdateForm:onClickSaveForm} type="submit">
+            {updatedLst ? "Update":"Save"}
+          </button>
+          <button type="submit">Save & Schedule</button>
         </div>
       </div>
     </div>
