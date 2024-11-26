@@ -7,6 +7,7 @@ import Position from './components/Position/Position';
 import Candidate from './components/Candidate/Candidate';
 import LookupFeature from './components/Lookup/Lookup';
 import CandidateViewPage from './components/CandidateViewPage/CandidateViewPage';
+import Support from './components/Support/Support';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -21,7 +22,7 @@ function App() {
         <Route path='/position/:id' element={<Position/>}/>
         <Route path='/candidate' element={<Candidate/>}/>
         <Route path='/candidate/:id' element={<CandidateViewPage/>}/>
-        <Route path='/look' element={<LookupFeature/>}/>
+        <Route path='/support' element={<Support/>}/>
         </Routes>
       </BrowserRouter>
       

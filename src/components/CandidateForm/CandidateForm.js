@@ -7,7 +7,7 @@ import LookupFeature from "../Lookup/Lookup";
 import { useNavigate } from "react-router-dom";
 import {format} from 'date-fns'
 
-const CandidateForm = ({cid,setFn,getCandidate, updatedLst,popupTab, setPopupTab }) => {
+const CandidateForm = ({navPopFn,cid,setFn,getCandidate, updatedLst,popupTab, setPopupTab }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -18,6 +18,7 @@ const CandidateForm = ({cid,setFn,getCandidate, updatedLst,popupTab, setPopupTab
     higherQualification: "",
     college: "",
     position: localStorage.getItem("candpos") || "",
+    positionId:localStorage.getItem("pid") || '',
     dateOfBirth: "",
     skills: [],
     photo: "",
@@ -30,9 +31,18 @@ const CandidateForm = ({cid,setFn,getCandidate, updatedLst,popupTab, setPopupTab
   const [collgesLst, SetCollegeLst] = useState([]);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const [photoPreview, setPhotoPreview] = useState("");
+  const [selectedFile,setSelectedFile]=useState(null)
+  const [photoPreview, setPhotoPreview] = useState(null);
   const formRef = useRef(null);
   
+  useEffect(()=>{
+    setFormData(prev=>({
+      ...prev,
+      positionId:localStorage.getItem("pid")
+    }))
+
+  },[])
+
   useEffect(()=>{
     if (cid){
       
@@ -207,6 +217,7 @@ useEffect(() => {
           gender: "",
           higherQualification: "",
           college: "",
+          positionId:"",
           position: "",
           dateOfBirth: "",
           skills: [],
@@ -214,6 +225,7 @@ useEffect(() => {
         setLoaddata(true);
         setIsopen(false);
         localStorage.removeItem("candpos");
+        localStorage.removeItem('pid')
         fetchCandidates();
         setPopupTab("");
         alert(response.data.message || "Failed to add position");
@@ -246,17 +258,37 @@ useEffect(() => {
     fileInputRef.current.click();
   };
 
-  const onChangeFile = (event) => {
+  const onChangeFile = async(event) => {
     const file = event.target.files[0];
-    const reader = new FileReader();
-    if (file) {
+    
+    if (file && file.type.startsWith("image/")) {
       if (file.type.startsWith("image/")) {
-        reader.onload = () => {
-          setPhotoPreview(reader.result);
-          setFormData((prev) => ({ ...prev, photo: reader.result }));
-        };
+        const filePreview = URL.createObjectURL(file)
+        console.log("File preview",filePreview)
+        setPhotoPreview(filePreview)
+        setSelectedFile(file)
+        const formData = new FormData()
+        formData.append("photo",file)
+        try {
+          const response = await axios.post('http://localhost:4000/api/candidate/uploadImage',formData,{
+            headers:{
+              "Content-Type":"multipart/form-data"
+            }
+          })
+          if (response.status===200){
+            alert(response.data.message|| "Image uploaded successfully...")
+            const photoPath = response.data.imagePath || selectedFile
+            setFormData(prev=>({
+              ...prev,
+              photo:photoPath
+            }))
+          }
+        } catch (error) {
+          console.log("error in uplaoding photo")
+          alert("error in uploading photo")
+        }
       }
-      reader.readAsDataURL(file);
+      
     } else {
       alert("Please upload a valid image file.");
     }
@@ -278,6 +310,7 @@ useEffect(() => {
           higherQualification: "",
           college: "",
           position: "",
+          positionId:"",
           dateOfBirth: "",
           skills: [],
           photo: "",
@@ -306,6 +339,7 @@ useEffect(() => {
             onClick={() => {
               { setPopupTab && setPopupTab("")}
               { setFn &&   setFn(false)}
+              {navPopFn && navPopFn(null)}
             }}
           >
             {closeIcon}
@@ -454,33 +488,6 @@ useEffect(() => {
                 onChange={onChangeInput}
               />
             </div>
-
-            {/* <div className="position-search">
-              <input
-                type="text"
-                value={positionSearch}
-                onChange={onChangeSearchPosition}
-                
-                onBlur={handleBlur}
-                placeholder="Search positions"
-              />
-              
-              <ul
-                className={`suggestion-container ${
-                  isInputClicked && positionSearch ? "visible" : ""
-                }`}
-              >
-                {filteredPositions.length > 0 ? (
-                  filteredPositions.map((position, index) => (
-                    <li key={index} onClick={() => setPositionSearch(position)}>
-                      {position}
-                    </li>
-                  ))
-                ) : (
-                  <li>No positions found</li>
-                )}
-              </ul>
-            </div> */}
             <div className="candidate-input-control">
               <label htmlFor="gender">
                 Position<span>*</span>
@@ -556,22 +563,8 @@ useEffect(() => {
               </div>
             </div>
             <div>
-              {/* <button
-            type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log("navigating to '/'");
-                setIsopen(true);
-                navigate("/");
-              }}
-            >
-              {plusIcon} Add position
-            </button> */}
             </div>
-            {/* <div className="add-position-btn--container">
-              <button type="submit">Save</button>
-              <button type="submit">Save & Schedule</button>
-            </div> */}
+           
           </form>
           <div
             className="photo-container"
@@ -590,7 +583,7 @@ useEffect(() => {
             </div>
             <div className="photo-preview">
               {photoPreview && (
-                <img width={"80px"} src={photoPreview} alt="preview" />
+                <img width={"100%"} src={photoPreview} alt="preview" />
               )}
             </div>
           </div>

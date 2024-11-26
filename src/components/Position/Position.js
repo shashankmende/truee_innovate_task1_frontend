@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './Position.css';
 import Header from '../Header/Header';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import CandidateTableView from '../CandidateTableView/CandidateTableView';
 
@@ -12,7 +12,7 @@ const Position = () => {
   const [candidate,setCandidate]=useState([])
   const [title,setTitle]=useState('')
   const { id } = useParams();
-
+  const navigate = useNavigate()
   const createdAt = position.createdAt ? new Date(position.createdAt) : null;
   const updatedAt = position.updatedAt ? new Date(position.updatedAt) : null ;
   
@@ -61,7 +61,8 @@ const formattedDate = createdAt && !isNaN(createdAt)
 
   useEffect(()=>{
     if (activeTab===1 && position){
-      setTitle(position.title)
+      setTitle(position._id)
+      // setTitle(position._id)
     }
   },[activeTab])
 
@@ -146,7 +147,7 @@ const formattedDate = createdAt && !isNaN(createdAt)
       <Header />
       <div className='positions-section'>
         <div className='positions-top--container'>
-          <h2><span style={{ color: "#227a8a" }}>Positions</span> / Developer</h2>
+          <h2><span style={{ color: "#227a8a",cursor:"pointer" }} onClick={()=>navigate('/')}>Positions</span> / Developer</h2>
         </div>
         <ul className='tabs-switching--container'>
           <li onClick={() => setActiveTab(0)} className={activeTab === 0 ? "activeBtn" : ""}>Position</li>

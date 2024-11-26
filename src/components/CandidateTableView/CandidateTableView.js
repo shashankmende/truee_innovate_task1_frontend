@@ -31,7 +31,7 @@ const CandidateTableView = ({updatedLst,lst, getCandidate }) => {
           {/* {filterLst().slice(pagination-iterCandidate,pagination).map((candidate, index) => ( */}
           {lst.map((candidate, index) => (
             <tr key={index} className="table-row">
-              <td>{candidate.firstName}</td>
+              <td style={{color:"#227a8a",cursor:"pointer"}} onClick={()=>navigate(`/candidate/${candidate._id}`)}>{candidate.firstName}</td>
               <td>{candidate.email}</td>
               <td>{candidate.phone}</td>
               <td>{candidate.higherQualification}</td>

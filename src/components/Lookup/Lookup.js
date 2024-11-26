@@ -10,6 +10,7 @@ const LookupFeature = ({ updatedValue,setFormData, setPopupTab }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [positionSuggestions, setPositionSuggestions] = useState([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+  const [positionId,setPositionId]=useState(null)
   const navigate = useNavigate();
   const { setIsopen } = useCustomContext();
 
@@ -19,7 +20,7 @@ const LookupFeature = ({ updatedValue,setFormData, setPopupTab }) => {
         const response = await axios.get("http://localhost:4000/api/position");
         if (response.data.success) {
           const initialPositions = response.data.positions.map(
-            (each) => each.title
+            (each) => ({title:each.title,id:each._id})
           );
           setPositionSuggestions(initialPositions);
           setFilteredSuggestions(initialPositions.slice(0, 4));
@@ -38,8 +39,9 @@ const LookupFeature = ({ updatedValue,setFormData, setPopupTab }) => {
     setFormData((prev) => ({
       ...prev,
       position: inputValue,
+      positionId
     }));
-  }, [inputValue]);
+  }, [inputValue,positionId]);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -48,14 +50,15 @@ const LookupFeature = ({ updatedValue,setFormData, setPopupTab }) => {
       setFilteredSuggestions(positionSuggestions.slice(0, 5));
     } else {
       const filtered = positionSuggestions.filter((position) =>
-        position.toLowerCase().includes(value.toLowerCase())
+        position.title.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredSuggestions(filtered);
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
+  const handleSuggestionClick = (suggestion,id) => {
     setInputValue(suggestion);
+    setPositionId(id)
     console.log(suggestion);
     setIsDropdownVisible(false);
     // setIsDropdownVisible(true);
@@ -91,9 +94,9 @@ const LookupFeature = ({ updatedValue,setFormData, setPopupTab }) => {
               filteredSuggestions.map((suggestion, index) => (
                 <li
                   key={index}
-                  onClick={() => handleSuggestionClick(suggestion)}
+                  onClick={() => handleSuggestionClick(suggestion.title,suggestion.id)}
                 >
-                  {suggestion}
+                  {suggestion.title}
                 </li>
               ))
             ) : (

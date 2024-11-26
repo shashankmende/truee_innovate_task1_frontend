@@ -19,16 +19,17 @@ const CandidateSorting = ({
   SetCandidateSearchText,
   candidateSearchText
 }) => {
-  // const { searchText, setSearchText } = useCustomContext();
 
   const onClickLeftArrow = () => {
-    const newPagination = Math.max(candidateIter,pagination-candidateIter)
-    setPgn(newPagination)
+    if (pagination > candidateIter){
+      setPgn(pagination-candidateIter)
+    }
   };
 
   const onClickRightArrow = () => {
-    const newPagination = Math.max(pagination+candidateIter,candidates.length)
-    setPgn(newPagination)
+    if (pagination/candidateIter < Math.ceil(candidates.length/candidateIter)){
+      setPgn(pagination+candidateIter)
+    }
   };
 
   return (

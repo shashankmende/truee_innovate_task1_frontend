@@ -14,7 +14,7 @@ const Form = ({popupTab, setIsopen,setPopupTab }) => {
     skills: [],
     rounds: [],
   });
-  const { setLoaddata } = useCustomContext();
+  const { fetchPositions } = useCustomContext();
 
   const [skills, setSkills] = useState([]);
   const [technology,setTechnology]=useState([])
@@ -69,7 +69,8 @@ const Form = ({popupTab, setIsopen,setPopupTab }) => {
       } else if (name === "rounds") {
         return {
           ...prevData,
-          rounds: value.split(",").map((round) => round.trim()),
+          // rounds: value.split(",").map((round) => round.trim()),
+          rounds: value.split(",")
         };
       } else if (name === "skills") {
         return {
@@ -87,21 +88,27 @@ const Form = ({popupTab, setIsopen,setPopupTab }) => {
     if (!formData.title || !formData.jobDescription || !formData.company || formData.experience.min==="" ||formData.experience.max==="" || formData.skills.length ===0){
       return alert("Please fill all required fields")
     }
-    
+    const reqBody ={
+      ...formData,
+      rounds:formData.rounds.map(each=>each.trim())
+    }
     try {
       console.log(formData);
       const response = await axios.post(
         // "http://localhost:4000/api/position",
         `${process.env.REACT_APP_URL}/api/position`,
-        formData
+        reqBody
       );
       console.log(response);
       if (response.data.success) {
         const position = formData.title
+        const id = response.data.success.position._id
 
         alert(response.data.message || "Failed to add position");
+        fetchPositions()
         if (!isNaN(popupTab)){
           localStorage.setItem("candpos",JSON.stringify(position))
+          localStorage.setItem("pid",JSON.stringify(id))
           setPopupTab(1)
         }
         
@@ -114,7 +121,7 @@ const Form = ({popupTab, setIsopen,setPopupTab }) => {
           skills: [],
           rounds: [],
         });
-        setLoaddata(true);
+        
         setIsopen(false);
         // alert(response.data.message || "Failed to add position");
         // if (!isNaN(popupTab)){

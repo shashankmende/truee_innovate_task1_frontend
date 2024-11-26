@@ -14,17 +14,21 @@ const CustomProvider = ({ children }) => {
   
   const [error, setError] = useState(null);
 
+  const fetchPositions = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_URL}/api/position`);
+      setPositions(response.data.positions.reverse());
+      if (!response.data.success){
+        alert(response.data.message || "something went wrong in getting position in context")
+      }
+    } catch (err) {
+      console.error("Error in retrieving data", err);
+      setError("Failed to load positions");
+    }
+  };
 
   useEffect(() => {
-    const fetchPositions = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/api/position`);
-        setPositions(response.data.positions.reverse());
-      } catch (err) {
-        console.error("Error in retrieving data", err);
-        setError("Failed to load positions");
-      }
-    };
+   
     fetchPositions();
   }, [loadData]);
 
@@ -52,7 +56,7 @@ const CustomProvider = ({ children }) => {
   },[])
 
   return (
-    <CustomContext.Provider value={{fetchCandidates,isOpen,setIsopen,candidates,setPositions, iter,setLoaddata,searchText,setSearchText,setPagination, pagination, positions, error }}>
+    <CustomContext.Provider value={{fetchPositions,fetchCandidates,isOpen,setIsopen,candidates,setPositions, iter,setLoaddata,searchText,setSearchText,setPagination, pagination, positions, error }}>
       {children}
     </CustomContext.Provider>
   );

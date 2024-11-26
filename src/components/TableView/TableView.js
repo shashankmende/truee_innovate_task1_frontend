@@ -35,7 +35,7 @@ const TableView = ({ lst }) => {
         <tbody>
           {lst.map((position, index) => (
             <tr key={index} className="table-row">
-              <td>{position.title}</td>
+              <td style={{color:"#227A8A",cursor:"pointer"}} onClick={()=>navigate(`/position/${position._id}`)}>{position.title}</td>
               <td>{position.company}</td>
               <td>
                 {position.jobDescription?.length < 30
@@ -43,12 +43,12 @@ const TableView = ({ lst }) => {
                   : `${position.jobDescription?.slice(0, 30)}...`}
               </td>
               <td>
-                {position.experience.min}-{position.experience.max} years
+                {position.experience?.min}-{position.experience?.max} years
               </td>
               <td>
-                {position.skills.join(", ").length < 30
-                  ? position.skills.join(", ")
-                  : `${position.skills.join(", ").slice(0, 30)}...`}
+                {position.skills?.join(", ").length < 30
+                  ? position.skills?.join(", ")
+                  : `${position.skills?.join(", ").slice(0, 30)}...`}
               </td>
               <td>
                 <div>
@@ -59,12 +59,12 @@ const TableView = ({ lst }) => {
                       navigate(`/position/${position._id}`)
                       }}>view</button>
                     <button onClick={()=>{
-                        setPositionId(position._id)
+                        setPositionId(null)
                         setEditFormOpen(true)                                                
                       }}>Edit</button>
                       {isEditFormOpen && (<div className="edit-form-overlay">
                           <div className="edit-form-content">
-                            <EditForm navPopFn={handleNavPopup} pid={positionId} setFn={setEditFormOpen}/>
+                            <EditForm navPopFn={handleNavPopup} pid={position._id} setFn={setEditFormOpen}/>
                           </div>
                         </div>)}
 
