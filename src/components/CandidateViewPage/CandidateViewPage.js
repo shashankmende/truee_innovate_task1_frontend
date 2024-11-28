@@ -16,7 +16,8 @@ const CandidateViewPage = () => {
 
     const getCandidate = async()=>{
       try {
-          const response = await axios.get(`http://localhost:4000/api/candidate/id/${id}`)
+        const url=`${process.env.REACT_APP_URL}/api/candidate/id/${id}`
+          const response = await axios.get(url)
           console.log(response)
           if(response.data.success){
               const candidate = response.data.candidate
@@ -40,7 +41,8 @@ const CandidateViewPage = () => {
     useEffect(()=>{
       const getPositionsById = async()=>{
         try {
-          const response = await axios.get(`http://localhost:4000/api/candidate/position/${candidate[0].positionId}`)
+          const url=`${process.env.REACT_APP_URL}/api/candidate/position/${candidate[0].positionId}`
+          const response = await axios.get(url)
           
           if (response.data.success){
             const positions = response.data.positions

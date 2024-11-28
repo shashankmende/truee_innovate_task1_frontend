@@ -34,7 +34,8 @@ const CustomProvider = ({ children }) => {
 
   const fetchCandidates = async()=>{
     try {
-      const response = await axios.get('http://localhost:4000/api/candidate')
+      const url=`${process.env.REACT_APP_URL}/api/candidate`
+      const response = await axios.get(url)
       if (response.data.success){
         setCandidate(response.data.candidates.reverse())
         

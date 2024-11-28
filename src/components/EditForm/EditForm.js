@@ -24,7 +24,8 @@ const EditForm = ({navPopFn, pid, setFn }) => {
   useEffect(() => {
     const getTech = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/tech");
+        const url=`${process.env.REACT_APP_URL}/api/tech`
+        const response = await axios.get(url);
         setTechnology(response.data.technology);
       } catch (error) {
         console.log("error in fetching technology from frontend");
@@ -37,10 +38,11 @@ const EditForm = ({navPopFn, pid, setFn }) => {
   useEffect(() => {
     const getSkills = async () => {
       try {
+        const url=`${process.env.REACT_APP_URL}/api/get-tech/${selectedTech}`
         const response = await axios.get(
-          `http://localhost:4000/api/get-tech/${selectedTech}`
+          url
         );
-        // console.log(response.data.technology.skills)
+        
         const lst = [
           ...response.data?.technology?.skills.map((each) => {
             return { name: each.name, _id: each._id };
@@ -63,8 +65,9 @@ const EditForm = ({navPopFn, pid, setFn }) => {
   useEffect(() => {
     const getPosition = async () => {
       try {
+        const url=`${process.env.REACT_APP_URL}/api/position/${pid}`
         const response = await axios.get(
-          `http://localhost:4000/api/position/${pid}`
+          url
         );
         console.log(response);
         if (response.data.success) {
@@ -124,11 +127,9 @@ const EditForm = ({navPopFn, pid, setFn }) => {
     }
 
     try {
+      const url=`${process.env.REACT_APP_URL}/api/position/${formData?._id}`
       const response = await axios.put(
-        // "http://localhost:4000/api/position",
-        // `${process.env.REACT_APP_URL}/api/position`,
-        
-        `http://localhost:4000/api/position/${formData?._id}`,
+        url,
         formData
       );
       console.log(response);

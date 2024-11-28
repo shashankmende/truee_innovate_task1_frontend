@@ -5,11 +5,9 @@ import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import Form from './components/Form/Form';
 import Position from './components/Position/Position';
 import Candidate from './components/Candidate/Candidate';
-import LookupFeature from './components/Lookup/Lookup';
 import CandidateViewPage from './components/CandidateViewPage/CandidateViewPage';
-import Support from './components/Support/Support';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import Support from './components/Support/SupportTable/SupportTable';
+import SupportViewPage from './components/Support/SupportViewPage/SupportViewPage';
 
 
 function App() {
@@ -23,6 +21,7 @@ function App() {
         <Route path='/candidate' element={<Candidate/>}/>
         <Route path='/candidate/:id' element={<CandidateViewPage/>}/>
         <Route path='/support' element={<Support/>}/>
+        <Route path='/support/:id' element={<SupportViewPage/>}/>
         </Routes>
       </BrowserRouter>
       

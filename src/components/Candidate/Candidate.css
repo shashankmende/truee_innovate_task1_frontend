@@ -5,44 +5,9 @@
   overflow-x: hidden;
   /* width: 100%; */
 }
-
-.table-container{
-  /* width: 50%; */
-  & table {
-    /* width: 80%; */
-  }
-  & th{
-    /* width: 260px; */
-  }
+.kanban-data-container{
+  display: flex;
 }
-/* 
-.layout-top--container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem 1rem 2rem;
-    & button {
-      border: none;
-      background-color: #227a8a;
-      padding: 0.5rem 2rem;
-      border-radius: 0.8rem;
-      -webkit-border-radius: 0.8rem;
-      -moz-border-radius: 0.8rem;
-      -ms-border-radius: 0.8rem;
-      -o-border-radius: 0.8rem;
-      font-size: 1rem;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  } */
-  
-  /* .candidate-data-container {
-    width: 100% !important;
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-  } */
   
   .toggle-contaiiner {
     padding: 0 2rem;

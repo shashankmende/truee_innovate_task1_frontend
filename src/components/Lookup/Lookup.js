@@ -17,7 +17,8 @@ const LookupFeature = ({ updatedValue,setFormData, setPopupTab }) => {
   useEffect(() => {
     const getPositions = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/position");
+        const url=`${process.env.REACT_APP_URL}/api/position`
+        const response = await axios.get(url);
         if (response.data.success) {
           const initialPositions = response.data.positions.map(
             (each) => ({title:each.title,id:each._id})

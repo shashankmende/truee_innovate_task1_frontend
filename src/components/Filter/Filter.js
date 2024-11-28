@@ -34,7 +34,8 @@ const Filter = ({
   useEffect(() => {
     const getTech = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/tech");
+        const url=`${process.env.REACT_APP_URL}/api/tech`
+        const response = await axios.get(url);
         let lst = response.data.technology.map((each) => ({
           ...each,
           flag: false,

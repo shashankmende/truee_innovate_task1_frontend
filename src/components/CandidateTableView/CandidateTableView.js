@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import CandidateForm from "../CandidateForm/CandidateForm";
+import './CandidateTableView.css'
 
 const CandidateTableView = ({updatedLst,lst, getCandidate }) => {
   const [navPopup, setNavpopup] = useState(null);

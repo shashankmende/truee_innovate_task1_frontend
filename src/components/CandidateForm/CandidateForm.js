@@ -25,11 +25,8 @@ const CandidateForm = ({navPopFn,cid,setFn,getCandidate, updatedLst,popupTab, se
   });
   const { setLoaddata, setIsopen, fetchCandidates } = useCustomContext();
   const [skills, setSkills] = useState([]);
-  const [technology, setTechnology] = useState([]);
-  const [selectedTech, setSelectedTech] = useState("");
   const [educationLst, setEducationLlst] = useState([]);
   const [collgesLst, SetCollegeLst] = useState([]);
-  const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [selectedFile,setSelectedFile]=useState(null)
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -79,8 +76,9 @@ const CandidateForm = ({navPopFn,cid,setFn,getCandidate, updatedLst,popupTab, se
 useEffect(() => {
     const getSkills = async () => {
       try {
+        const url =`${process.env.REACT_APP_URL}/api/get-skills`
         const response = await axios.get(
-          "http://localhost:4000/api/get-skills"
+          url
         );
         setSkills(response.data.skills);
       } catch (error) {
@@ -94,7 +92,8 @@ useEffect(() => {
   useEffect(() => {
     const getQualification = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/education");
+        const url=`${process.env.REACT_APP_URL}/api/education`
+        const response = await axios.get(url);
 
         if (response.data.success) {
           setEducationLlst(response.data.educations);
@@ -112,7 +111,8 @@ useEffect(() => {
   useEffect(() => {
     const getColleges = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/college");
+        const url=`${process.env.REACT_APP_URL}/api/college`
+        const response = await axios.get(url);
 
         if (response.data.success) {
           SetCollegeLst(response.data.colleges);
@@ -183,10 +183,6 @@ useEffect(() => {
 
   const onClickSaveForm = async () => {
     if (formRef.current) {
-      // if (!validateForm) return;
-      // else {
-      //   formRef.current.requestSubmit();
-      // }
       formRef.current.requestSubmit();
     }
   };
@@ -200,10 +196,11 @@ useEffect(() => {
 
     try {
       console.log(formData);
+      const url=`${process.env.REACT_APP_URL}/api/candidate`
       const response = await axios.post(
-        // "http://localhost:4000/api/position",
 
-        "http://localhost:4000/api/candidate",
+
+        url,
         formData
       );
       console.log(response);
@@ -270,7 +267,8 @@ useEffect(() => {
         const formData = new FormData()
         formData.append("photo",file)
         try {
-          const response = await axios.post('http://localhost:4000/api/candidate/uploadImage',formData,{
+          const url=`${process.env.REACT_APP_URL}/api/candidate/uploadImage`
+          const response = await axios.post(url,formData,{
             headers:{
               "Content-Type":"multipart/form-data"
             }
@@ -297,7 +295,8 @@ useEffect(() => {
   const onClickUpdateForm =async(e)=>{
     e.preventDefault()
     try {
-      const response = await axios.put(`http://localhost:4000/api/candidate/update/${updatedLst._id}`,formData)
+      const url=`${process.env.REACT_APP_URL}/api/candidate/update/${updatedLst._id}`
+      const response = await axios.put(url,formData)
       if (response.data.success){
         alert(response.data.message)
         setFormData({
@@ -337,9 +336,9 @@ useEffect(() => {
             style={{ cursor: "pointer", fontSize: "1.5rem" }}
             // onClick={() => setIsCandidateForm(false)}
             onClick={() => {
-              { setPopupTab && setPopupTab("")}
-              { setFn &&   setFn(false)}
-              {navPopFn && navPopFn(null)}
+               setPopupTab && setPopupTab("")
+             setFn &&   setFn(false)
+              navPopFn && navPopFn(null)
             }}
           >
             {closeIcon}

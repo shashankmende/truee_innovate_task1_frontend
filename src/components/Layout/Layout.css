@@ -7,16 +7,16 @@
     border: none;
     background-color: #227a8a;
     padding: 0.5rem 2rem;
-    border-radius: 0.8rem;
-    -webkit-border-radius: 0.8rem;
-    -moz-border-radius: 0.8rem;
-    -ms-border-radius: 0.8rem;
-    -o-border-radius: 0.8rem;
+    border-radius: 0.4rem;
+    -webkit-border-radius: 0.4rem;
+    -moz-border-radius: 0.4rem;
+    -ms-border-radius: 0.4rem;
+    -o-border-radius: 0.4rem;
     font-size: 1rem;
     color: white;
-    /* font-weight: bold; */
-    cursor: pointer;
-  }
+    /*font-weight: bold;
+    */cursor: pointer;
+}
 }
 
 .data-container {

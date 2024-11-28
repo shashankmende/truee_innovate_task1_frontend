@@ -26,7 +26,8 @@ const formattedDate = createdAt && !isNaN(createdAt)
   useEffect(()=>{
     const getCandidates = async()=>{
       try {
-        const response = await axios.get(`http://localhost:4000/api/candidate/${title}`)
+        const url=`${process.env.REACT_APP_URL}/api/candidate/${title}`
+        const response = await axios.get(url)
         console.log(response);
         if (response.data.success){
           setCandidate(response.data.candidate)
@@ -45,7 +46,8 @@ const formattedDate = createdAt && !isNaN(createdAt)
   useEffect(() => {
     const getPosition = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/api/position/${id}`);
+        const url = `${process.env.REACT_APP_URL}/api/position/${id}`
+        const response = await axios.get(url);
         
         if (response.data.success) {
           setPosition(response.data.position);

@@ -12,7 +12,7 @@
     gap: 2rem;
 
     & svg{
-        font-size: 1.5rem;
+        font-size: 1.2rem;
     }
 }
 
@@ -24,17 +24,14 @@
     
     & .value{
         width: 100%;
-        /* border: 1px solid black; */
     }
     & p{
         line-height: 1.5;
         letter-spacing: 0.7px;
         font-size: 1rem;
-        /* border: 2px solid green; */
         width: 100%;
     }
     & .field{
-        /* border: 1px solid blue; */
         width: 50%;
     }
 }
@@ -48,19 +45,20 @@
     display: flex;
     flex-direction: row;
     justify-content: start;
-    /* min-width:80%; */
     height: 250px;
     max-height: 350px;
-    /* width: 70%; */
-    /* aspect-ratio: 1; */
     border: 1.5px solid #227A8A;
-    /* padding: 1rem 2rem; */
     padding: 0.6rem;
-    border-radius: 0.8rem;
-    /* box-shadow: #227A8A 0px 1px 0px, #227A8A 0px 1px 0px; */
+    /*border-radius: 0.8rem;
+    */border-radius: 0.2rem;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    /* gap: 0.4rem; */
     cursor: pointer;
+    -webkit-border-radius: 0.4rem;
+    -moz-border-radius: 0.4rem;
+    -ms-border-radius: 0.4rem;
+    -o-border-radius: 0.4rem;
+    
 }
 
 .title-container {

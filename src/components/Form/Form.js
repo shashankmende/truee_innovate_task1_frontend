@@ -23,7 +23,8 @@ const Form = ({popupTab, setIsopen,setPopupTab }) => {
   useEffect(()=>{
     const getTech = async()=>{
       try {
-        const response = await axios.get('http://localhost:4000/api/tech')
+        const url=`${process.env.REACT_APP_URL}/api/tech`
+        const response = await axios.get(url)
         setTechnology(response.data.technology)
 
       } catch (error) {
@@ -37,7 +38,8 @@ const Form = ({popupTab, setIsopen,setPopupTab }) => {
   useEffect(()=>{
     const getSkills = async()=>{
       try {
-        const response = await axios.get(`http://localhost:4000/api/get-tech/${selectedTech}`)
+        const url=`${process.env.REACT_APP_URL}/api/get-tech/${selectedTech}`
+        const response = await axios.get(url)
       setSkills(response.data?.technology.skills);
       } catch (error) {
         console.log("error in retrieving skills from frontend")
@@ -95,7 +97,6 @@ const Form = ({popupTab, setIsopen,setPopupTab }) => {
     try {
       console.log(formData);
       const response = await axios.post(
-        // "http://localhost:4000/api/position",
         `${process.env.REACT_APP_URL}/api/position`,
         reqBody
       );

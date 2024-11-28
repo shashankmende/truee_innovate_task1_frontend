@@ -34,7 +34,8 @@ const CandidateFilter = ({
   useEffect(() => {
     const getTech = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/tech");
+        const url = `${process.env.REACT_APP_URL}/api/tech`
+        const response = await axios.get(url);
         let lst = response.data.technology.map((each) => ({
           ...each,
           flag: false,
@@ -86,7 +87,7 @@ const CandidateFilter = ({
   };
 
   const onClickEachSubFilterItem = (id) => (e) => {
-    e.stopPropagation(); // Prevent the click event from bubbling to the parent
+    e.stopPropagation(); 
     const modifiedLst = technology.map((each) => {
       if (each._id === id) {
         return { ...each, flag: !each.flag };

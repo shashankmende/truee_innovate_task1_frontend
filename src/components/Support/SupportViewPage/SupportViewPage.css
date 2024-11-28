@@ -1,0 +1,74 @@
+
+.issue-details-middle--container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0 2rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.issue-details {
+    border-bottom: 2px solid #217989;
+    cursor: pointer;
+}
+
+.reopen-btn {
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.2rem;
+    background-color: #217989;
+    -webkit-border-radius: 0.2rem;
+    -moz-border-radius: 0.2rem;
+    -ms-border-radius: 0.2rem;
+    -o-border-radius: 0.2rem;
+    cursor: pointer;
+    /* font-weight: bold; */
+}
+
+.disable-btn{
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.2rem;
+    -webkit-border-radius: 0.2rem;
+    -moz-border-radius: 0.2rem;
+    -ms-border-radius: 0.2rem;
+    -o-border-radius: 0.2rem;
+    background-color: gray;
+    color: white;
+    cursor: not-allowed;
+}
+
+.ticket-view-body {
+    padding: 0 2rem 1rem 2rem;
+    
+}
+
+.ticket-details--container{
+    padding: 1rem;
+    border: 1px solid gray;
+    border-radius: 0.4rem;
+    -webkit-border-radius: 0.4rem;
+    -moz-border-radius: 0.4rem;
+    -ms-border-radius: 0.4rem;
+    -o-border-radius: 0.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.ticketId-issue--container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    
+}
+
+.ticket-view-item{
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+}
