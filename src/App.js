@@ -8,6 +8,7 @@ import Candidate from './components/Candidate/Candidate';
 import CandidateViewPage from './components/CandidateViewPage/CandidateViewPage';
 import Support from './components/Support/SupportTable/SupportTable';
 import SupportViewPage from './components/Support/SupportViewPage/SupportViewPage';
+import CodeEditor from './components/CodeEditor/Editor/Editor';
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path='/candidate/:id' element={<CandidateViewPage/>}/>
         <Route path='/support' element={<Support/>}/>
         <Route path='/support/:id' element={<SupportViewPage/>}/>
+        <Route path='/editor' element={<CodeEditor/>}/>
         </Routes>
       </BrowserRouter>
       
