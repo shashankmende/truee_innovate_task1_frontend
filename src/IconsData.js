@@ -13,8 +13,11 @@ import { FaAngleRight } from "react-icons/fa6";
 import { VscFilterFilled } from "react-icons/vsc";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { CiCirclePlus } from "react-icons/ci";
-
+import { IoReload } from "react-icons/io5";
 import { TbCameraPlus } from "react-icons/tb";
+import { IoMoonOutline } from "react-icons/io5";
+import { CiLight } from "react-icons/ci";
+
 
 
 export const searchIcon = <FaSearch />;
@@ -37,3 +40,6 @@ export const filterIcon = <VscFilterFilled/>
 export const hamburgerIcon = <RxHamburgerMenu/>
 export const plusIcon = <CiCirclePlus/>
 export const cameraIcon = <TbCameraPlus/>
+export const reloadIcon = <IoReload/>
+export const lightModeIcon = <IoMoonOutline/>
+export const darkModeIcon = <CiLight/>

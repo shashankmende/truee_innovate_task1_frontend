@@ -5,8 +5,11 @@ import LanguageSelector from "../LanguageSelector";
 import { CODE_SNIPPETS } from "../Constants";
 import Output from "../Output/Output";
 import { closeIcon } from "../../../IconsData";
-import { executeCode } from '../api'
-import toast from 'react-hot-toast';
+import { executeCode } from "../api";
+import toast from "react-hot-toast";
+import "./Editor.css";
+
+import { Spinner } from "@chakra-ui/spinner";
 
 const CodeEditor = () => {
   const [files, setFiles] = useState([
@@ -15,9 +18,11 @@ const CodeEditor = () => {
   const [activeFile, setActiveFile] = useState(files[0]);
   const [language, setLanguage] = useState("javascript");
   const editorRef = useRef();
-  const [isLoading,setIsLoading]=useState(false)
-  const [isError,setIsError]=useState(false)
-  const [output,setOutput]=useState(null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [output, setOutput] = useState(null);
+  const [lightMode,setLightMode]=useState(false)
+  const [outputRetry,setOutputRetry]=useState(false)
   const createNewFile = () => {
     const newFile = {
       id: files.length + 1,
@@ -55,114 +60,164 @@ const CodeEditor = () => {
   const onClickCloseFile = (id) => {
     const newFiles = files.filter((file) => file.id !== id);
     setFiles(newFiles);
+    if (activeFile.id === id && newFiles.length > 0) {
+      setActiveFile(newFiles[0]);
+    }
   };
 
 
-  const runCode = async()=>{
-    const sourceCode = editorRef.current.getValue()
-    if (!sourceCode) return 
-    try {
-        setIsLoading(true)
-        const {run:result} = await executeCode(language,sourceCode)
-        setOutput(result.output.split('\n'))
-        result.stderr ? setIsError(true):setIsError(false)
-    } catch (error) {
-        console.log(error)
-        toast.error(error.response.data.message)
-    }
-    finally{
-        setIsLoading(false)
-    }
-}
 
+  const onClickReload = async()=>{
+    const sourceCode = editorRef.current.getValue();
+    if (!sourceCode) return;
+    try {
+      setOutputRetry(true);
+      const { run: result } = await executeCode(language, sourceCode);
+      setOutput(result.output.split("\n"));
+      setIsError(!!result.stderr);
+    } catch (error) {
+      console.log(error);
+      const errorMessage =
+        error.response?.data?.message || "An unexpected error occurred";
+      toast.error(errorMessage);
+    } finally {
+      setOutputRetry(false);
+    }
+  }
+
+
+  const runCode = async () => {
+    const sourceCode = editorRef.current.getValue();
+    if (!sourceCode) return;
+    try {
+      setIsLoading(true);
+      const { run: result } = await executeCode(language, sourceCode);
+      if (result.error){
+        throw new Error(result.error)
+      }
+      setOutput(result.output.split("\n"));
+      setIsError(!!result.stderr);
+    } catch (error) {
+      console.log(error);
+      const errorMessage =
+        error.response?.data?.message || `Runtime for the selected language (${language}) is not supported`;
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const options = {
+    // theme: "vs", // Built-in themes: "vs", "vs-dark", "hc-black"
+    theme: lightMode ? "vs":"vs-dark", // Built-in themes: "vs", "vs-dark", "hc-black"
+    fontSize: 14,
+    lineNumbers: "on", // Options: "on", "off", "relative"
+    minimap: {
+      enabled: false, // Show or hide the minimap
+    },
+    glyphMargin: false,
+    padding: { top: "10px", bottom: 0 },
+    scrollBeyondLastLine: false,
+    wordWrap: "on", // Enable word wrapping,
+    transition:"background-color 0.3s linear"
+  };
+
+  const changeMode =(theme)=>{
+    setLightMode(theme)
+  }
+
+  const onClickRetry = ()=>{
+    setOutputRetry(!outputRetry)
+  }
 
   return (
     <>
       <Header />
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "50% 50%",
-          padding: "2rem",
-        }}
-      >
-        <div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              // marginBottom: "1rem",
-            }}
-          >
-            <LanguageSelector language={language} onSelect={onSelectLanguage} />
-            {/* <button onClick={createNewFile} style={{ marginLeft: "1rem" }}>
-              + New File
-            </button> */}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              border: "1px solid gray",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                // marginBottom: "1rem",
-                // border: "1px solid gray",
-                borderCollapse: "collapse",
-                width: "100%",
-              }}
-            >
-              {files.map((file) => (
-                <button
-                  key={file.id}
-                  onClick={() => setActiveFile(file)}
-                  style={{
-                    // marginRight: "1rem",
-                    padding: "0.2rem 1rem",
-                    backgroundColor:
-                      file.id === activeFile.id ? "#007BFF" : "#f0f0f0",
-                    color: file.id === activeFile.id ? "#fff" : "#000",
-                    border: "1px solid #ccc",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  {file.name}{" "}
-                  <span
-                    style={{ cursor: "pointer" }}
-                    onClick={() => onClickCloseFile(file.id)}
+      <div className="editor-background--container">
+        <LanguageSelector outputRetry={outputRetry} onClickReload={onClickReload} mode={lightMode} setLightMode={changeMode} language={language} onSelect={onSelectLanguage} />
+        <main className="editor-main--container">
+          <div style={{backgroundColor:lightMode?"#fff":"#000", borderRadius: "0.3rem", border: "2px solid #227a8a" }}>
+            <div className="editor-btns--container">
+              <div className="files-title--container">
+                {files.map((file) => (
+                  <button
+                    key={file.id}
+                    onClick={() => setActiveFile(file)}
+                    style={{
+                      // marginRight: "1rem",
+                      padding: "0.2rem 1rem",
+                      backgroundColor:
+                        file.id === activeFile.id ? "#007BFF" : "#f0f0f0",
+                      color: file.id === activeFile.id ? "#fff" : "#000",
+                      // color: file.id === activeFile.id ? "#1A1A1A" : "#000",
+                      // border: "1px solid #ccc",
+                      // borderRadius:"0.3rem",
+                      border: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                    }}
                   >
-                    {closeIcon}
-                  </span>
+                    {file.name}{" "}
+                    <span
+                      style={{ cursor: "pointer" }}
+                      onClick={() => onClickCloseFile(file.id)}
+                    >
+                      {closeIcon}
+                    </span>
+                  </button>
+                ))}
+                <span
+                  onClick={createNewFile}
+                  style={{ marginLeft: "1rem", cursor: "pointer" }}
+                >
+                  +
+                </span>
+              </div>
+              {isLoading ? (
+                <Spinner boxSize="18px" />
+              ) : (
+                <button
+                  style={{
+                    background: "#227a8a",
+                    color: "white",
+                    padding: "0.2rem 1rem",
+                    cursor: "pointer",
+                    border: "none",
+                    borderTopRightRadius: "0.3rem",
+                  }}
+                  onClick={runCode}
+                >
+                  Run
                 </button>
-              ))}
-              <span
-                onClick={createNewFile}
-                style={{ marginLeft: "1rem", cursor: "pointer" }}
-              >
-                +
-              </span>
-              {/* {
-            isLoading? <Spinner boxSize="18px"/>:<button style={{background:'green',color:'white',padding:'0.2rem 1rem',cursor:'pointer',border:"none",borderRadius:'0.3rem'}}  onClick={runCode}>Run</button>
-        } */}
+              )}
             </div>
-            <button style={{background:'green',color:'white',padding:'0.2rem 1rem',cursor:'pointer',border:"none",borderRadius:'0.3rem'}} onClick={runCode}>Run</button>
+
+            <div>
+              <Editor
+                height="68vh"
+                language={language}
+                value={activeFile.content}
+                onChange={onFileChange}
+                onMount={onMount}
+                options={options}
+              />
+            </div>
           </div>
-          <div style={{ border: "1px solid gray" }}>
-            <Editor
-              height="75vh"
-              language={language}
-              value={activeFile.content}
-              onChange={onFileChange}
-              onMount={onMount}
-            />
+        <div style={{backgroundColor:lightMode ? "white":"#1E1E1E",color:!lightMode?"white":"black"}}>
+          <Output          
+          onClickReload={onClickReload}
+          outputRetry={outputRetry}
+          onClickRetry={onClickRetry}
+          isError={isError}
+          setIsError={setIsError}
+            setOutput={setOutput}
+            output={output}
+            editorRef={editorRef}
+            language={language}
+          />
           </div>
-        </div>
-        <Output setOutput={setOutput} output={output} editorRef={editorRef} language={language} />
+        </main>
       </div>
     </>
   );
