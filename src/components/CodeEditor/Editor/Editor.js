@@ -2,11 +2,12 @@ import React, { useState, useRef } from "react";
 import Header from "../../Header/Header";
 import Editor from "@monaco-editor/react";
 import LanguageSelector from "../LanguageSelector";
-import { CODE_SNIPPETS } from "../Constants";
+import { CODE_SNIPPETS, languageOptions } from "../Constants";
 import Output from "../Output/Output";
 import { closeIcon } from "../../../IconsData";
 import { executeCode } from "../api";
 import toast from "react-hot-toast";
+import axios from "axios";
 import "./Editor.css";
 
 import { Spinner } from "@chakra-ui/spinner";
@@ -20,9 +21,11 @@ const CodeEditor = () => {
   const editorRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [output, setOutput] = useState(null);
-  const [lightMode,setLightMode]=useState(false)
-  const [outputRetry,setOutputRetry]=useState(false)
+  // const [output, setOutput] = useState(null);
+  const [output, setOutput] = useState(["Hello, Alex!"]);
+  const [lightMode, setLightMode] = useState(true);
+  const [outputRetry, setOutputRetry] = useState(false);
+  const [languageId, setLanguageId] = useState(63);
   const createNewFile = () => {
     const newFile = {
       id: files.length + 1,
@@ -31,6 +34,7 @@ const CodeEditor = () => {
     };
     setFiles([...files, newFile]);
     setActiveFile(newFile);
+    setLanguage("javascript");
   };
 
   const onMount = (editor) => {
@@ -38,16 +42,7 @@ const CodeEditor = () => {
     editor.focus();
   };
 
-  const onSelectLanguage = (language) => {
-    setLanguage(language);
-    const updatedFiles = files.map((file) =>
-      file.id === activeFile.id
-        ? { ...file, content: CODE_SNIPPETS[language] }
-        : file
-    );
-    setFiles(updatedFiles);
-    setActiveFile({ ...activeFile, content: CODE_SNIPPETS[language] });
-  };
+
 
   const onFileChange = (value) => {
     const updatedFiles = files.map((file) =>
@@ -65,9 +60,7 @@ const CodeEditor = () => {
     }
   };
 
-
-
-  const onClickReload = async()=>{
+  const onClickReload = async () => {
     const sourceCode = editorRef.current.getValue();
     if (!sourceCode) return;
     try {
@@ -83,8 +76,7 @@ const CodeEditor = () => {
     } finally {
       setOutputRetry(false);
     }
-  }
-
+  };
 
   const runCode = async () => {
     const sourceCode = editorRef.current.getValue();
@@ -92,15 +84,16 @@ const CodeEditor = () => {
     try {
       setIsLoading(true);
       const { run: result } = await executeCode(language, sourceCode);
-      if (result.error){
-        throw new Error(result.error)
+      if (result.error) {
+        throw new Error(result.error);
       }
       setOutput(result.output.split("\n"));
       setIsError(!!result.stderr);
     } catch (error) {
       console.log(error);
       const errorMessage =
-        error.response?.data?.message || `Runtime for the selected language (${language}) is not supported`;
+        error.response?.data?.message ||
+        `Runtime for the selected language (${language}) is not supported`;
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -109,7 +102,7 @@ const CodeEditor = () => {
 
   const options = {
     // theme: "vs", // Built-in themes: "vs", "vs-dark", "hc-black"
-    theme: lightMode ? "vs":"vs-dark", // Built-in themes: "vs", "vs-dark", "hc-black"
+    theme: lightMode ? "vs" : "vs-dark", // Built-in themes: "vs", "vs-dark", "hc-black"
     fontSize: 14,
     lineNumbers: "on", // Options: "on", "off", "relative"
     minimap: {
@@ -119,39 +112,129 @@ const CodeEditor = () => {
     padding: { top: "10px", bottom: 0 },
     scrollBeyondLastLine: false,
     wordWrap: "on", // Enable word wrapping,
-    transition:"background-color 0.3s linear"
+    transition: "background-color 0.3s linear",
   };
 
-  const changeMode =(theme)=>{
-    setLightMode(theme)
-  }
+  const changeMode = (theme) => {
+    setLightMode(theme);
+  };
 
-  const onClickRetry = ()=>{
-    setOutputRetry(!outputRetry)
-  }
+  const onClickRetry = () => {
+    setOutputRetry(!outputRetry);
+  };
+
+  const handleCompile = async () => {
+    const formData = {
+      language_id: languageId,
+      source_code: btoa(activeFile.content),
+    };
+
+    const options = {
+      method: "POST",
+      url: process.env.REACT_APP_RAPID_API_URL,
+      params: { base64_encoded: "true", fields: "*" },
+      headers: {
+        "content-type": "application/json",
+        "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
+        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
+      },
+      data: formData,
+    };
+    try {
+      const response = await axios.request(options);
+      console.log(response);
+      const token = response.data.token;
+      checkStatus(token);
+    } catch (error) {
+      console.log("error in test editror", error);
+    }
+  };
+
+  const checkStatus = async (token) => {
+    const options = {
+      method: "GET",
+      url: process.env.REACT_APP_RAPID_API_URL + "/" + token,
+      params: { base64_encoded: "true", fields: "*" },
+      headers: {
+        "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
+        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
+      },
+    };
+    try {
+      const response = await axios.request(options);
+      const statusId = response.data.status?.id;
+      if (statusId === 1 || statusId === 2) {
+        alert("processing");
+        setTimeout(() => {
+          checkStatus(token);
+        }, 2000);
+      } else if (statusId === 3) {
+        // setNewOutput(atob(response.data.stdout))
+    
+        setOutput(atob(response.data.stdout).split('\n'));
+
+      } else {
+        console.log("response.data", response);
+      }
+    } catch (error) {
+      console.log("err", error);
+    }
+  };
+
+
+  const onChangeSelectedLanguage = (id) => {
+    
+    const languageObj = languageOptions.filter((each) => each.id === +id);
+  
+    setLanguageId(+id);
+    const updatedFiles = files.map((file) =>
+      file.id === activeFile.id
+        ? { ...file, content: CODE_SNIPPETS[languageObj[0].value] }
+        : file
+    );
+    setFiles(updatedFiles);
+    setActiveFile({
+      ...activeFile,
+      content: CODE_SNIPPETS[languageObj[0].value],
+    });
+  };
 
   return (
-    <>
+    <div style={{ paddingBottom: "3rem" }}>
       <Header />
       <div className="editor-background--container">
-        <LanguageSelector outputRetry={outputRetry} onClickReload={onClickReload} mode={lightMode} setLightMode={changeMode} language={language} onSelect={onSelectLanguage} />
+        <LanguageSelector
+          mode={lightMode}
+          setLightMode={changeMode}
+          languageId={languageId}
+          onChangeSelectedLanguage={onChangeSelectedLanguage}
+        />
         <main className="editor-main--container">
-          <div style={{backgroundColor:lightMode?"#fff":"#000", borderRadius: "0.3rem", border: "2px solid #227a8a" }}>
-            <div className="editor-btns--container">
+          <div
+            style={{
+              backgroundColor: lightMode ? "#fff" : "#1E1E1E",
+              borderRadius: "0.3rem",
+              border: lightMode ? "2px solid #227a8a" : "2px solid gray",
+            }}
+          >
+            <div
+              className="editor-btns--container"
+              style={{
+                borderBottom: lightMode
+                  ? "2px solid #227A8A"
+                  : "2px solid gray",
+              }}
+            >
               <div className="files-title--container">
                 {files.map((file) => (
                   <button
                     key={file.id}
                     onClick={() => setActiveFile(file)}
                     style={{
-                      // marginRight: "1rem",
                       padding: "0.2rem 1rem",
                       backgroundColor:
                         file.id === activeFile.id ? "#007BFF" : "#f0f0f0",
                       color: file.id === activeFile.id ? "#fff" : "#000",
-                      // color: file.id === activeFile.id ? "#1A1A1A" : "#000",
-                      // border: "1px solid #ccc",
-                      // borderRadius:"0.3rem",
                       border: "none",
                       display: "flex",
                       alignItems: "center",
@@ -169,13 +252,17 @@ const CodeEditor = () => {
                 ))}
                 <span
                   onClick={createNewFile}
-                  style={{ marginLeft: "1rem", cursor: "pointer" }}
+                  style={{
+                    color: lightMode ? "black" : "white",
+                    marginLeft: "1rem",
+                    cursor: "pointer",
+                  }}
                 >
                   +
                 </span>
               </div>
               {isLoading ? (
-                <Spinner boxSize="18px" />
+                <Spinner color={lightMode ? "black" : "white"} boxSize="18px" />
               ) : (
                 <button
                   style={{
@@ -186,7 +273,9 @@ const CodeEditor = () => {
                     border: "none",
                     borderTopRightRadius: "0.3rem",
                   }}
-                  onClick={runCode}
+                  // onClick={runCode}
+
+                  onClick={handleCompile}
                 >
                   Run
                 </button>
@@ -204,22 +293,30 @@ const CodeEditor = () => {
               />
             </div>
           </div>
-        <div style={{backgroundColor:lightMode ? "white":"#1E1E1E",color:!lightMode?"white":"black"}}>
-          <Output          
-          onClickReload={onClickReload}
-          outputRetry={outputRetry}
-          onClickRetry={onClickRetry}
-          isError={isError}
-          setIsError={setIsError}
-            setOutput={setOutput}
-            output={output}
-            editorRef={editorRef}
-            language={language}
-          />
+          <div
+            style={{
+              backgroundColor: lightMode ? "white" : "#1E1E1E",
+              color: !lightMode ? "white" : "black",
+              borderRadius: "0.3rem",
+              border: lightMode ? "2px solid #227a8a" : "",
+            }}
+          >
+            <Output
+              lightMode={lightMode}
+              onClickReload={onClickReload}
+              outputRetry={outputRetry}
+              onClickRetry={onClickRetry}
+              isError={isError}
+              setIsError={setIsError}
+              setOutput={setOutput}
+              output={output}
+              editorRef={editorRef}
+              language={language}
+            />
           </div>
         </main>
       </div>
-    </>
+    </div>
   );
 };
 

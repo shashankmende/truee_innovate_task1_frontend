@@ -2,7 +2,7 @@
 .output-home--container{
     display: flex;
     flex-direction: column;
-    border: 2px solid #227a8a;
+    /* border: 2px solid #227a8a; */
     border-radius: 0.3rem;
     -webkit-border-radius: 0.3rem;
     -moz-border-radius: 0.3rem;

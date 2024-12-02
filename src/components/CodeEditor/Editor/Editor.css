@@ -1,50 +1,53 @@
 
 
-.editor-background--container{
-    padding: 2rem;
-}
-
-.editor-main--container {
-    /* border: 1px solid #227A8A; */
-    margin-top: 1rem;
-    border-radius: 0.3rem;
-    -webkit-border-radius: 0.3rem;
-    -moz-border-radius: 0.3rem;
-    -ms-border-radius: 0.3rem;
-    -o-border-radius: 0.3rem;
-    display: grid;
-    grid-template-columns: 50% 50%;
-    height: 75vh;
-    gap: 1rem;
-    transition: background-color 0.3s, color 0.3s;
-    
-}
-
-.editor-btns--container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    /* border: 1px solid green; */
-    border-bottom: 2px solid #227A8A;
-    border-collapse: collapse;
-}
-
-.files-title--container {
-    display: flex;
-    align-items: center;
-
-    & button{
-        border-top-left-radius: 0.3rem;
+    .editor-background--container{
+        padding: 2rem;
     }
+
+    .editor-main--container {
+        /*border: 1px solid #227A8A;
+        */margin-top: 1rem;
+        border-radius: 0.3rem;
+        -webkit-border-radius: 0.3rem;
+        -moz-border-radius: 0.3rem;
+        -ms-border-radius: 0.3rem;
+        -o-border-radius: 0.3rem;
+        display: grid;
+        grid-template-columns: 50% 50%;
+        height: 75vh;
+        gap: 1rem;
+        transition: background-color 0.3s, color 0.3s;
+        -webkit-transition: background-color 0.3s, color 0.3s;
+        -moz-transition: background-color 0.3s, color 0.3s;
+        -ms-transition: background-color 0.3s, color 0.3s;
+        -o-transition: background-color 0.3s, color 0.3s;
 }
 
-.monaco-editor {
-    /*border: 1px solid #ccc;
-    */border-radius: 0.3rem;
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    -ms-border-radius: 8px;
-    -o-border-radius: 8px;
-    padding-left:-1rem;
-}
+    .editor-btns--container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        /* border: 1px solid green; */
+        
+        border-collapse: collapse;
+    }
+
+    .files-title--container {
+        display: flex;
+        align-items: center;
+
+        & button{
+            border-top-left-radius: 0.3rem;
+        }
+    }
+
+    .monaco-editor {
+        /*border: 1px solid #ccc;
+        */border-radius: 0.3rem;
+        -webkit-border-radius: 8px;
+        -moz-border-radius: 8px;
+        -ms-border-radius: 8px;
+        -o-border-radius: 8px;
+        padding-left:-1rem;
+    }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { LANGUAGE_VERSIONS } from "./Constants";
+import { LANGUAGE_VERSIONS ,languageOptions} from "./Constants";
 import { darkModeIcon, lightModeIcon } from "../../IconsData";
 
 const languages = Object.entries(LANGUAGE_VERSIONS);
@@ -17,7 +17,7 @@ const themesOptions = {
   cursor: "pointer",
 };
 
-const LanguageSelector = ({outputRetry,onClickReload, mode,setLightMode, language, onSelect }) => {
+const LanguageSelector = ({onChangeSelectedLanguage,languageId,mode,setLightMode,language }) => {
   return (
     <div style={options}>
       <select
@@ -27,10 +27,12 @@ const LanguageSelector = ({outputRetry,onClickReload, mode,setLightMode, languag
           border: "1px solid #227a8a",
           outline: "none",
         }}
+
         value={language}
         name="language"
         id="language"
         onChange={(e) => onSelect(e.target.value)}
+
       >
         {languages.map(([language, version]) => (
           <option key={language} value={language}>

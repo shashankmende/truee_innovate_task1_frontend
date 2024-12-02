@@ -5,11 +5,11 @@ import { reloadIcon } from "../../../IconsData";
 import { Spinner } from "@chakra-ui/spinner";
 
 
-const Output = ({onClickReload, outputRetry,isError, output }) => {
+const Output = ({lightMode,onClickReload, outputRetry,isError, output }) => {
 
   return (
     <div className="output-home--container">
-      <div className="output-top--container">
+      <div style={{borderBottom:lightMode?"":"2px solid gray"}} className="output-top--container">
         <p>Output</p>
         { outputRetry ? <Spinner  boxSize="18px" /> : <span style={{cursor:'pointer'}} onClick={()=>onClickReload()}>{reloadIcon}</span>}
       </div>
@@ -21,6 +21,7 @@ const Output = ({onClickReload, outputRetry,isError, output }) => {
         !outputRetry ? (
         output
           ? output.map((line, indx) => <p key={indx}>{line}</p>)
+          // ? output
           : "Click Run Code to see the output here"
           
           ):(<Spinner  boxSize="18px" />)}
