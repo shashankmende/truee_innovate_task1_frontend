@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import Header from "../../Header/Header";
 import Editor from "@monaco-editor/react";
 import LanguageSelector from "../LanguageSelector";
-import { CODE_SNIPPETS, languageOptions } from "../Constants";
+import { CODE_SNIPPETS } from "../Constants";
 import Output from "../Output/Output";
 import { closeIcon } from "../../../IconsData";
 import { executeCode } from "../api";
@@ -11,6 +11,7 @@ import axios from "axios";
 import "./Editor.css";
 
 import { Spinner } from "@chakra-ui/spinner";
+import HtmlCssJsExecutor from "../WebEditor/WebEditor";
 
 const CodeEditor = () => {
   const [files, setFiles] = useState([
@@ -100,6 +101,18 @@ const CodeEditor = () => {
     }
   };
 
+
+  const onSelectLanguage = (language) => {
+    setLanguage(language);
+    const updatedFiles = files.map((file) =>
+      file.id === activeFile.id
+        ? { ...file, content: CODE_SNIPPETS[language] }
+        : file
+    );
+    setFiles(updatedFiles);
+    setActiveFile({ ...activeFile, content: CODE_SNIPPETS[language] });
+  };
+
   const options = {
     // theme: "vs", // Built-in themes: "vs", "vs-dark", "hc-black"
     theme: lightMode ? "vs" : "vs-dark", // Built-in themes: "vs", "vs-dark", "hc-black"
@@ -123,92 +136,19 @@ const CodeEditor = () => {
     setOutputRetry(!outputRetry);
   };
 
-  const handleCompile = async () => {
-    const formData = {
-      language_id: languageId,
-      source_code: btoa(activeFile.content),
-    };
 
-    const options = {
-      method: "POST",
-      url: process.env.REACT_APP_RAPID_API_URL,
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        "content-type": "application/json",
-        "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-      },
-      data: formData,
-    };
-    try {
-      const response = await axios.request(options);
-      console.log(response);
-      const token = response.data.token;
-      checkStatus(token);
-    } catch (error) {
-      console.log("error in test editror", error);
-    }
-  };
-
-  const checkStatus = async (token) => {
-    const options = {
-      method: "GET",
-      url: process.env.REACT_APP_RAPID_API_URL + "/" + token,
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-      },
-    };
-    try {
-      const response = await axios.request(options);
-      const statusId = response.data.status?.id;
-      if (statusId === 1 || statusId === 2) {
-        alert("processing");
-        setTimeout(() => {
-          checkStatus(token);
-        }, 2000);
-      } else if (statusId === 3) {
-        // setNewOutput(atob(response.data.stdout))
-    
-        setOutput(atob(response.data.stdout).split('\n'));
-
-      } else {
-        console.log("response.data", response);
-      }
-    } catch (error) {
-      console.log("err", error);
-    }
-  };
-
-
-  const onChangeSelectedLanguage = (id) => {
-    
-    const languageObj = languageOptions.filter((each) => each.id === +id);
-  
-    setLanguageId(+id);
-    const updatedFiles = files.map((file) =>
-      file.id === activeFile.id
-        ? { ...file, content: CODE_SNIPPETS[languageObj[0].value] }
-        : file
-    );
-    setFiles(updatedFiles);
-    setActiveFile({
-      ...activeFile,
-      content: CODE_SNIPPETS[languageObj[0].value],
-    });
-  };
 
   return (
     <div style={{ paddingBottom: "3rem" }}>
       <Header />
-      <div className="editor-background--container">
-        <LanguageSelector
+      <LanguageSelector
           mode={lightMode}
           setLightMode={changeMode}
           languageId={languageId}
-          onChangeSelectedLanguage={onChangeSelectedLanguage}
+          onSelect={onSelectLanguage}
         />
+      { language==="html"? (<HtmlCssJsExecutor themeMode ={lightMode} setTheme={setLightMode}/>):
+       <div className="editor-background--container">
         <main className="editor-main--container">
           <div
             style={{
@@ -273,9 +213,7 @@ const CodeEditor = () => {
                     border: "none",
                     borderTopRightRadius: "0.3rem",
                   }}
-                  // onClick={runCode}
-
-                  onClick={handleCompile}
+                  onClick={runCode}
                 >
                   Run
                 </button>
@@ -315,7 +253,7 @@ const CodeEditor = () => {
             />
           </div>
         </main>
-      </div>
+      </div>}
     </div>
   );
 };

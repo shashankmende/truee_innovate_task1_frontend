@@ -8,6 +8,7 @@ const options = {
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
+  padding:"2rem 2rem 0"
 };
 
 const themesOptions = {
@@ -17,7 +18,7 @@ const themesOptions = {
   cursor: "pointer",
 };
 
-const LanguageSelector = ({onChangeSelectedLanguage,languageId,mode,setLightMode,language }) => {
+const LanguageSelector = ({onChangeSelectedLanguage,languageId,mode,setLightMode,language ,onSelect}) => {
   return (
     <div style={options}>
       <select

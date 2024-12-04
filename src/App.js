@@ -9,6 +9,7 @@ import CandidateViewPage from "./components/CandidateViewPage/CandidateViewPage"
 import Support from "./components/Support/SupportTable/SupportTable";
 import SupportViewPage from "./components/Support/SupportViewPage/SupportViewPage";
 import CodeEditor from "./components/CodeEditor/Editor/Editor";
+import HtmlCssJsExecutor from "./components/CodeEditor/WebEditor/WebEditor";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/support" element={<Support />} />
           <Route path="/support/:id" element={<SupportViewPage />} />
           <Route path="/editor" element={<CodeEditor />} />
+          <Route path="/web" element={<HtmlCssJsExecutor/>}/>
         </Routes>
       </BrowserRouter>
     </div>
