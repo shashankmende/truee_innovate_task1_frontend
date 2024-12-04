@@ -17,7 +17,19 @@ import { IoReload } from "react-icons/io5";
 import { TbCameraPlus } from "react-icons/tb";
 import { IoMoonOutline } from "react-icons/io5";
 import { CiLight } from "react-icons/ci";
+import { IoLogoJavascript } from "react-icons/io5";
+import { SiTypescript } from "react-icons/si";
+import { FaPython } from "react-icons/fa";
+import { FaJava } from "react-icons/fa";
+import { IoDiscSharp } from "react-icons/io5";
+import { FaPhp } from "react-icons/fa";
 
+export const jsIcon = <IoLogoJavascript fill="white" size={14}/>
+export const tsIcon = <SiTypescript  fill="yellow"/>
+export const pythonIcon = <FaPython  fill="yellow"/>
+export const javaIcon = <FaJava  fill="yellow"/>
+export const csharpIcon = <IoDiscSharp  fill="yellow"/>
+export const phpIcon = <FaPhp  fill="yellow"/>
 
 
 export const searchIcon = <FaSearch />;

@@ -17,8 +17,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    
 }
 
 .output-main-container {
     padding: 0.9rem;
+    height: 100%;
+    overflow: auto;
 }

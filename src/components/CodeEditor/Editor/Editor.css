@@ -31,16 +31,46 @@
         /* border: 1px solid green; */
         
         border-collapse: collapse;
+        height: 2.2rem;
     }
 
     .files-title--container {
         display: flex;
         align-items: center;
-
+        overflow-x: auto;
+        height: 100%;
+        width: 90%;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        scrollbar-color: #227a8a transparent;
         & button{
-            border-top-left-radius: 0.3rem;
+            border-top-left-radius: 0.2rem;
+            padding: 0.2rem 1rem;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            height: 100%;
+            /* overflow: hidden; */
+
         }
     }
+
+
+    .files-title--container::-webkit-scrollbar {
+        height: 4px; /* Horizontal scrollbar height */
+      }
+      
+      .files-title--container::-webkit-scrollbar-thumb {
+        background: #227A8A; /* Thumb color */
+        border-radius: 4px;
+      }
+      
+      .files-title--container::-webkit-scrollbar-track {
+        background: transparent; /* Track color */
+      }
 
     .monaco-editor {
         /*border: 1px solid #ccc;

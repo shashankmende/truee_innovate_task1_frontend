@@ -1,23 +1,38 @@
 
 export const LANGUAGE_VERSIONS = {
-  javascript: "18.15.0",
-  typescript: "5.0.3",
-  python: "3.10.0",
   java: "15.0.2",
-  csharp: "6.12.0",
-  php: "8.2.3",
+  javascript: "18.15.0",
+  python: "3.10.0",
   html: "5.0",
-  // css: "3.0",
-  cpp: "17",
-  ruby: "3.2.0",
-  swift: "5.8.0",
-  kotlin: "1.8.0",
-  scala: "3.3.0",
-  objective_c: "2.0"
+  c:"10.2.0",
+  "c++": "10.2.0",
+  ruby: "3.0.1",
+  php: "8.2.3",
+  typescript: "5.0.3",
+  swift: "5.3.3",
+  kotlin: "1.8.20",
+  csharp: "6.12.0",
+  // "csharp.net":"5.0.201",
+  scala: "3.2.2",
+  "objective-c":"2.0.0"
 };
 
 
 export const CODE_SNIPPETS = {
+  csharp:`
+  using System;
+namespace HelloWorld
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello, World!");
+        }
+    }
+}
+
+  `,
   javascript: `
 function greet(name) {
     console.log("Hello, " + name + "!");
@@ -97,14 +112,7 @@ echo "Hello, " . $name . "!";
 ?>
 `,
 
-  swift: `
-import Foundation
-
-func greet(name: String) {
-    print("Hello, \\(name)!")
-}
-
-greet(name: "Alex")
+  swift: `print("Hello, World!")
 `,
 
   kotlin: `
@@ -121,7 +129,7 @@ object HelloWorld {
 }
 `,
 
-  objective_c: `
+  "objective-c": `
 #import <Foundation/Foundation.h>
 
 int main(int argc, const char * argv[]) {
