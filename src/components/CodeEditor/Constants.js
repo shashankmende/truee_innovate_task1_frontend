@@ -12,7 +12,6 @@ export const LANGUAGE_VERSIONS = {
   swift: "5.3.3",
   kotlin: "1.8.20",
   csharp: "6.12.0",
-  // "csharp.net":"5.0.201",
   scala: "3.2.2",
   "objective-c":"2.0.0"
 };

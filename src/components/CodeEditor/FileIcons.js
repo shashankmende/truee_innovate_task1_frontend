@@ -1,6 +1,6 @@
 
 import React from 'react'
-import { javaIcon, jsIcon, phpIcon, pythonIcon, tsIcon } from '../../IconsData'
+import { cppIcon, csharpIcon, javaIcon, jsIcon, phpIcon, pythonIcon, rubyIcon, scalaIcon, swiftIcon, tsIcon } from '../../IconsData'
 
 const FileIcons = ({language}) => {
     const returnIcon = ()=>{
@@ -15,6 +15,21 @@ const FileIcons = ({language}) => {
                 return javaIcon
             case "php":
                 return phpIcon
+            case "ruby":
+                return rubyIcon
+
+            case "swfit":
+                return swiftIcon
+            case "kotlin":
+                return swiftIcon
+            case "csharp":
+                return csharpIcon
+            case "scala":
+                return scalaIcon
+            case "c++":
+                return cppIcon
+            case "c":
+                return "C"
             default:
                 return null
 

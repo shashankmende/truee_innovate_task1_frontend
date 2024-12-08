@@ -23,6 +23,19 @@ import { FaPython } from "react-icons/fa";
 import { FaJava } from "react-icons/fa";
 import { IoDiscSharp } from "react-icons/io5";
 import { FaPhp } from "react-icons/fa";
+import { DiRubyRough } from "react-icons/di";
+import { FaSwift } from "react-icons/fa6";
+import { TbBrandKotlin } from "react-icons/tb";
+import { DiScala } from "react-icons/di";
+import { TbBrandCpp } from "react-icons/tb";
+import { IoMdStarOutline } from "react-icons/io";
+import { SlLike } from "react-icons/sl";
+import { SlDislike } from "react-icons/sl";
+
+import { IoStar } from "react-icons/io5";
+
+
+
 
 export const jsIcon = <IoLogoJavascript fill="white" size={14}/>
 export const tsIcon = <SiTypescript  fill="yellow"/>
@@ -30,7 +43,18 @@ export const pythonIcon = <FaPython  fill="yellow"/>
 export const javaIcon = <FaJava  fill="yellow"/>
 export const csharpIcon = <IoDiscSharp  fill="yellow"/>
 export const phpIcon = <FaPhp  fill="yellow"/>
+export const rubyIcon = <DiRubyRough/>
+export const swiftIcon = <FaSwift/>
+export const  kotlinIcon = <TbBrandKotlin/>
+export const scalaIcon = <DiScala/>
+export const cppIcon = <TbBrandCpp/>
 
+
+// export const starsIcon = <IoMdStarOutline/>
+export const starsIcon = <IoStar/>
+
+export const likeIcon = <SlLike/>
+export const dislikeIcon = <SlDislike/>
 
 export const searchIcon = <FaSearch />;
 export const HomeIcon = <IoHomeOutline />;
