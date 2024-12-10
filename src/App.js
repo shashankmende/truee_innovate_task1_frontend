@@ -1,27 +1,28 @@
 
 import "./App.css";
-import Layout from "./components/Layout/Layout";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Form from "./components/Form/Form";
-import Position from "./components/Position/Position";
-import Candidate from "./components/Candidate/Candidate";
-import CandidateViewPage from "./components/CandidateViewPage/CandidateViewPage";
-import Support from "./components/Support/SupportTable/SupportTable";
-import SupportViewPage from "./components/Support/SupportViewPage/SupportViewPage";
-import CodeEditor from "./components/CodeEditor/Editor/Editor";
-import HtmlCssJsExecutor from "./components/CodeEditor/WebEditor/WebEditor";
 import Feedback from "./components/InterviewTab/Feedback/Feedback";
+import PositionViewPage from "./components/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
+import Form from "./components/MoreTab/PositionPage/Form/Form";
+import Candidate from "./components/MoreTab/CandidatePage/Candidate/Candidate";
+// import CandidateTableView from "./components/MoreTab/CandidatePage/CandidateTableView/CandidateTableView";
+import Support from "./components/MoreTab/SupportPage/SupportTable/SupportTable";
+import SupportViewPage from "./components/MoreTab/SupportPage/SupportViewPage/SupportViewPage";
+import CodeEditor from "./components/MoreTab/CodeEditorPage/Editor/Editor";
+import HtmlCssJsExecutor from "./components/MoreTab/CodeEditorPage/WebEditor/WebEditor";
+import Position from "./components/MoreTab/PositionPage/Position/Position";
+import CandidateViewPage from "./components/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout />} />
+          <Route path="/" element={<Position />} />
           <Route path="/form" element={<Form />} />
-          <Route path="/position/:id" element={<Position />} />
+          <Route path="/position/:id" element={<PositionViewPage />} />
           <Route path="/candidate" element={<Candidate />} />
-          <Route path="/candidate/:id" element={<CandidateViewPage />} />
+          <Route path="/candidate/:id" element={<CandidateViewPage/>} />
           <Route path="/support" element={<Support />} />
           <Route path="/support/:id" element={<SupportViewPage />} />
           <Route path="/editor" element={<CodeEditor />} />
@@ -32,6 +33,9 @@ function App() {
       </BrowserRouter>
     </div>
   );
+
+
+  
 }
 
 export default App;

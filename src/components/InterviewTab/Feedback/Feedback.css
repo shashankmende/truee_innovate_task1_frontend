@@ -2,7 +2,7 @@
   color: #227a8a;
   border-bottom: 2px solid rgba(128, 128, 128, 0.322);
   padding-left: 2rem;
-  padding-top:0.5rem;
+  padding-top: 0.5rem;
 }
 
 .next-button--container {
@@ -19,7 +19,7 @@
     border: none;
     border-radius: 0.3rem;
     cursor: pointer;
-}
+  }
 }
 
 .interview-tabs--container {
@@ -45,6 +45,7 @@
   -moz-border-radius: 0.3rem;
   -ms-border-radius: 0.3rem;
   -o-border-radius: 0.3rem;
+  scrollbar-width: 0px;
 }
 
 .candidate-top-items--container {
@@ -104,12 +105,10 @@
       /* border: 1px solid red; */
       & p {
         width: 200px;
-
       }
     }
   }
 }
-
 
 .Interviews-mini-tab--container {
   display: flex;
@@ -117,50 +116,48 @@
   gap: 5rem;
   cursor: pointer;
 
-  & li{
+  & li {
     font-weight: bold;
   }
-
 }
-
 
 .add-note-share-like-dislike--container {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
-.note-container{
+.note-container {
   display: flex;
   align-items: start;
   gap: 1rem;
   margin-top: 1rem;
 }
 
-.para-value{
+.para-value {
   color: gray;
 }
 
-.interview-questions--container{
+.interview-questions--container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   margin-top: 1rem;
 
-  & >div  {
+  & > div {
     padding: 1rem;
     border-radius: 0.3rem;
     -webkit-border-radius: 0.3rem;
     -moz-border-radius: 0.3rem;
     -ms-border-radius: 0.3rem;
     -o-border-radius: 0.3rem;
-}
+  }
 
   & summary {
     cursor: pointer;
   }
 }
 
-.question-down-arrow--container{
+.question-down-arrow--container {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -170,26 +167,27 @@
 .rotate-arrow {
   transform: rotate(180deg);
   transition: transform 0.3s ease;
+  -webkit-transition: transform 0.3s ease;
+  -moz-transition: transform 0.3s ease;
+  -ms-transition: transform 0.3s ease;
+  -o-transition: transform 0.3s ease;
 }
-
 
 .rating-note-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin:  1rem 0;
+  margin: 1rem 0;
   /* border: 1px solid red; */
 }
 
-.rating-container{
+.rating-container {
   display: flex;
   gap: 1rem;
   align-items: center;
-  
-
 }
 
-.question-add-note-button{
+.question-add-note-button {
   cursor: pointer;
   font-weight: bold;
   box-shadow: 0 0.2px 1px 0.1px #227a8a;
@@ -218,7 +216,6 @@
   transform: scale(1.1);
 }
 
-
 .note-input-container {
   margin-top: 10px;
   display: flex;
@@ -233,7 +230,7 @@
   padding: 8px;
   margin-right: 5px;
   border: 1px solid gray;
-  
+
   border-radius: 0.3rem;
   -webkit-border-radius: 0.3rem;
   -moz-border-radius: 0.3rem;
@@ -241,13 +238,13 @@
   -o-border-radius: 0.3rem;
   position: relative;
 
-  & input{
+  & input {
     width: 100%;
     outline: none;
     border: none;
   }
 
-  & span{
+  & span {
     position: absolute;
     bottom: -2rem;
     right: 0.15rem;
@@ -259,27 +256,22 @@
   margin-left: 5px;
 }
 
-
-.radio-input--container{
+.radio-input--container {
   display: flex;
   align-items: center;
   gap: 3rem;
   margin-top: 1rem;
 
-  & span{
+  & span {
     display: flex;
 
     gap: 0.5rem;
   }
 }
 
-.interview-questions-mini-tab--container {
-  
-}
-
-.interview-questions-mini-note{
-display: flex;
-align-items: center;
-margin-top: 1rem;
-gap: 1rem;
+.interview-questions-mini-note {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 1rem;
 }

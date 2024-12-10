@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./Feedback.css";
-import Header from "../../Header/Header";
+import Header from "../../Navbar/Header/Header";
 import {
   starsIcon,
   likeIcon,
@@ -98,6 +98,7 @@ const Feedback = () => {
     interviewQuestionsList
   );
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const questionRef = useRef();
 
   const displayData = () => {
     switch (tab) {
@@ -132,14 +133,15 @@ const Feedback = () => {
     );
   };
 
-
-  const onClickAddOrDeleteNoteBtn =(questionId)=>{
-    setInterviewQuestionsState(prev=>(
-      prev.map(question=>(
-        question.id===questionId ? {...question,notesBool:!question.notesBool}:question
-      ))
-    ))
-  }
+  const onClickAddOrDeleteNoteBtn = (questionId) => {
+    setInterviewQuestionsState((prev) =>
+      prev.map((question) =>
+        question.id === questionId
+          ? { ...question, notesBool: !question.notesBool }
+          : question
+      )
+    );
+  };
 
   const SchedulerSection = () => {
     return (
@@ -163,7 +165,12 @@ const Feedback = () => {
             <div
               style={{
                 border: each.mandatory ? "1px solid red" : "1px solid green",
+                height : selectedQuestion===each.id ? `180px`:"50px",
+                
+                transition: "height  0.2s linear",
+                overflow: "hidden",
               }}
+              ref={questionRef}
               key={each.id}
             >
               <div
@@ -187,25 +194,6 @@ const Feedback = () => {
                 <div>
                   <p className="para-value">{each.answer}</p>
                   <div className="rating-note-container">
-                    {/* <div className="rating-container">
-                    <p>
-                      <b>Rating</b>
-                    </p>
-                    {Array.from({ length: 5 }, (_, index) => (
-                      <span
-                        key={index}
-                        className={
-                          index < each.rating
-                            ? "icon-colored"
-                            : "icon-uncolored"
-                        }
-                        onClick={() => onClickRatingIcon(each.id, index + 1)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        {starsIcon}
-                      </span>
-                    ))}
-                  </div> */}
                     <div className="radio-input--container">
                       <span>
                         <input
@@ -255,15 +243,13 @@ const Feedback = () => {
                     </div>
 
                     <div className="add-note-share-like-dislike--container">
-                      
-                        <button
-                          className="question-add-note-button"
-                          // onClick={() => setSelectedQuestion(each.id)}
-                          onClick={() => onClickAddOrDeleteNoteBtn(each.id)}
-                        >
-                          {!each.notesBool ? "Add a Note":"Delete Note"}
-                        </button>
-                    
+                      <button
+                        className="question-add-note-button"
+                        // onClick={() => setSelectedQuestion(each.id)}
+                        onClick={() => onClickAddOrDeleteNoteBtn(each.id)}
+                      >
+                        {!each.notesBool ? "Add a Note" : "Delete Note"}
+                      </button>
 
                       <span style={{ color: "#227a8a", fontWeight: "bold" }}>
                         Share
