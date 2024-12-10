@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import "./Feedback.css";
 import Header from "../../Header/Header";
-import { starsIcon,likeIcon,dislikeIcon } from "../../../IconsData";
+import {
+  starsIcon,
+  likeIcon,
+  dislikeIcon,
+  downArrow,
+} from "../../../IconsData";
+
+import { FaAngleDown } from "react-icons/fa6";
 
 const tabsList = [
   {
@@ -29,7 +36,7 @@ const interviewMiniTabsList = [
   },
   {
     id: 2,
-    name: "Interview Questions",
+    name: "Interviewer Questions",
   },
 ];
 
@@ -44,6 +51,7 @@ const interviewQuestionsList = [
     rating: 0,
     notes: "",
     isAnswered: "",
+    notesBool: false,
   },
   {
     id: 2,
@@ -55,6 +63,7 @@ const interviewQuestionsList = [
     rating: 0,
     notes: "",
     isAnswered: "",
+    notesBool: false,
   },
   {
     id: 3,
@@ -66,6 +75,7 @@ const interviewQuestionsList = [
     rating: 0,
     notes: "",
     isAnswered: "",
+    notesBool: false,
   },
   {
     id: 4,
@@ -77,29 +87,7 @@ const interviewQuestionsList = [
     rating: 0,
     notes: "",
     isAnswered: "",
-  },
-];
-
-const ratingList = [
-  {
-    id: 1,
-    rating: 1,
-  },
-  {
-    id: 2,
-    rating: 2,
-  },
-  {
-    id: 3,
-    rating: 3,
-  },
-  {
-    id: 4,
-    rating: 4,
-  },
-  {
-    id: 5,
-    rating: 5,
+    notesBool: false,
   },
 ];
 
@@ -110,7 +98,6 @@ const Feedback = () => {
     interviewQuestionsList
   );
   const [selectedQuestion, setSelectedQuestion] = useState(null);
-  const [noteText, setNoteText] = useState("");
 
   const displayData = () => {
     switch (tab) {
@@ -127,21 +114,29 @@ const Feedback = () => {
     }
   };
 
-  const onClickRatingIcon = (questionId, rating) => {
-    const newList = interviewQuestionsState.map((each) => {
-      if (each.id === questionId) {
-        return { ...each, rating };
-      }
-      return each;
-    });
-    setInterviewQuestionsState(newList);
+  const onChangeRadioInput = (questionId, value) => {
+    setInterviewQuestionsState((prev) =>
+      prev.map((question) =>
+        question.id === questionId
+          ? { ...question, isAnswered: value }
+          : question
+      )
+    );
+  };
+
+  const onChangeInterviewQuestionNotes = (questionId, notes) => {
+    setInterviewQuestionsState((prev) =>
+      prev.map((question) =>
+        question.id === questionId ? { ...question, notes: notes } : question
+      )
+    );
   };
 
 
-  const onChangeRadioInput =(questionId,value)=>{
+  const onClickAddOrDeleteNoteBtn =(questionId)=>{
     setInterviewQuestionsState(prev=>(
       prev.map(question=>(
-        question.id === questionId ? {...question,isAnswered:value}:question
+        question.id===questionId ? {...question,notesBool:!question.notesBool}:question
       ))
     ))
   }
@@ -165,17 +160,34 @@ const Feedback = () => {
         </div>
         <div className="interview-questions--container">
           {interviewQuestionsState.map((each) => (
-            <details
+            <div
               style={{
                 border: each.mandatory ? "1px solid red" : "1px solid green",
               }}
               key={each.id}
             >
-              <summary>{each.question}</summary>
-              <div>
-                <p className="para-value">{each.answer}</p>
-                <div className="rating-note-container">
-                  <div className="rating-container">
+              <div
+                className="question-down-arrow--container"
+                onClick={() => {
+                  selectedQuestion
+                    ? setSelectedQuestion(null)
+                    : setSelectedQuestion(each.id);
+                }}
+              >
+                <p>{each.question}</p>
+                <span>
+                  <FaAngleDown
+                    className={
+                      selectedQuestion === each.id ? "rotate-arrow" : ""
+                    }
+                  />
+                </span>
+              </div>
+              {selectedQuestion === each.id && (
+                <div>
+                  <p className="para-value">{each.answer}</p>
+                  <div className="rating-note-container">
+                    {/* <div className="rating-container">
                     <p>
                       <b>Rating</b>
                     </p>
@@ -193,95 +205,100 @@ const Feedback = () => {
                         {starsIcon}
                       </span>
                     ))}
-                  </div>
-
-                  <div className="add-note-share-like-dislike--container">
-                  
-                    
-                      {selectedQuestion === each.id ?<button  className="question-add-note-button" onClick={() => setSelectedQuestion(null)}>Delete Note</button>:<button  className="question-add-note-button"  onClick={() => setSelectedQuestion(each.id)}>Add a Note</button>}
-                    
-                    <span style={{color:"#227a8a",fontWeight:'bold'}}>Share</span>
-                    <span style={{cursor:'pointer'}}>{likeIcon}</span>
-                    <span style={{cursor:'pointer'}}> {dislikeIcon}</span>
-                  </div>
-                </div>
-                {(selectedQuestion === each.id) && (
-                  <div className="note-input-container">
-                    <label htmlFor="note-input">Note</label>
-                    <div>
-                    <input
-                      id="note-input"
-                      type="text"
-                      value={each.notes ? each.notes : noteText}
-                      onChange={(e) => setNoteText(e.target.value.slice(0,250))}
-                      placeholder="Add your note here"
-                    />
-                    <span>{noteText.length}/250</span>
+                  </div> */}
+                    <div className="radio-input--container">
+                      <span>
+                        <input
+                          checked={each.isAnswered === "Not Answered"}
+                          value="Not Answered"
+                          name={`isAnswered-${each.id}`}
+                          type="radio"
+                          id={`not-answered-${each.id}`}
+                          onChange={(e) =>
+                            onChangeRadioInput(each.id, e.target.value)
+                          }
+                        />
+                        <label htmlFor={`not-answered-${each.id}`}>
+                          Not Answered
+                        </label>
+                      </span>
+                      <span>
+                        <input
+                          value="Partially Answered"
+                          name={`isAnswered-${each.id}`}
+                          type="radio"
+                          id={`partially-${each.id}`}
+                          checked={each.isAnswered === "Partially Answered"}
+                          onChange={(e) =>
+                            onChangeRadioInput(each.id, e.target.value)
+                          }
+                        />
+                        <label htmlFor={`partially-${each.id}`}>
+                          Partially Answered
+                        </label>
+                      </span>
+                      <span>
+                        <input
+                          checked={each.isAnswered === "Fully Answered"}
+                          value="Fully Answered"
+                          name={`isAnswered-${each.id}`}
+                          type="radio"
+                          id={`fully-${each.id}`}
+                          onChange={(e) =>
+                            onChangeRadioInput(each.id, e.target.value)
+                          }
+                        />
+                        <label htmlFor={`fully-${each.id}`}>
+                          Fully Answered
+                        </label>
+                      </span>
                     </div>
-                    <button className="question-add-note-button" onClick={onSaveNote}>Save</button>
-                    {/* <button onClick={() => setSelectedQuestion(null)}>
-                      Cancel
-                    </button> */}
+
+                    <div className="add-note-share-like-dislike--container">
+                      
+                        <button
+                          className="question-add-note-button"
+                          // onClick={() => setSelectedQuestion(each.id)}
+                          onClick={() => onClickAddOrDeleteNoteBtn(each.id)}
+                        >
+                          {!each.notesBool ? "Add a Note":"Delete Note"}
+                        </button>
+                    
+
+                      <span style={{ color: "#227a8a", fontWeight: "bold" }}>
+                        Share
+                      </span>
+                      <span style={{ cursor: "pointer" }}>{likeIcon}</span>
+                      <span style={{ cursor: "pointer" }}> {dislikeIcon}</span>
+                    </div>
                   </div>
-                )}
-                <div className="radio-input--container">
-                  <span>
-                    <input
-                    checked={each.isAnswered==="Not Answered"}
-                    value="Not Answered"
-                      name={`isAnswered-${each.id}`}
-                      type="radio"
-                      id={`not-answered-${each.id}`}
-                      onChange={(e)=>onChangeRadioInput(each.id,e.target.value)}
-                    />
-                    <label htmlFor={`not-answered-${each.id}`}>
-                      Not Answered
-                    </label>
-                  </span>
-                  <span>
-                    <input
-                    value="Partially Answered"
-                      name={`isAnswered-${each.id}`}
-                      type="radio"
-                      id={`partially-${each.id}`}
-                      checked={each.isAnswered==="Partially Answered"}
-                      onChange={(e)=>onChangeRadioInput(each.id,e.target.value)}
-                    />
-                    <label htmlFor={`partially-${each.id}`}>
-                      Partially Answered
-                    </label>
-                  </span>
-                  <span>
-                    <input
-                    checked={each.isAnswered==="Fully Answered"}
-                    value="Fully Answered"
-                      name={`isAnswered-${each.id}`}
-                      type="radio"
-                      id={`fully-${each.id}`}
-                      onChange={(e)=>onChangeRadioInput(each.id,e.target.value)}
-                    />
-                    <label htmlFor={`fully-${each.id}`}>Fully Answered</label>
-                  </span>
+                  {each.notesBool && (
+                    <div className="note-input-container">
+                      <label htmlFor="note-input">Note</label>
+                      <div>
+                        <input
+                          id="note-input"
+                          type="text"
+                          value={each.notes}
+                          onChange={(e) =>
+                            onChangeInterviewQuestionNotes(
+                              each.id,
+                              e.target.value
+                            )
+                          }
+                          placeholder="Add your note here"
+                        />
+                        <span>{each.notes.length}/250</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </details>
+              )}
+            </div>
           ))}
         </div>
       </div>
     );
-  };
-
-
-  const onSaveNote = () => {
-    const updatedQuestions = interviewQuestionsState.map((question) => {
-      if (question.id === selectedQuestion) {
-        return { ...question, notes: noteText }; 
-      }
-      return question;
-    });
-    setInterviewQuestionsState(updatedQuestions);
-    setSelectedQuestion(null);
-    setNoteText(""); 
   };
 
   const InterviewDisplayData = () => {
@@ -289,20 +306,24 @@ const Feedback = () => {
       case 1:
         return SchedulerSection();
       case 2:
-        return InterviewerQuestionsMiniTab()
+        return InterviewerQuestionsMiniTab();
     }
   };
 
-  const InterviewerQuestionsMiniTab =()=>{
+  const InterviewerQuestionsMiniTab = () => {
     return (
       <div className="interview-questions-mini-tab--container">
-          <div className="interview-questions-mini-note">
-              <p><b>Note:</b></p>
-              <p className="para-value">The questions listed below are interviewer's choice.</p>
-          </div>
+        <div className="interview-questions-mini-note">
+          <p>
+            <b>Note:</b>
+          </p>
+          <p className="para-value">
+            The questions listed below are interviewer's choice.
+          </p>
+        </div>
       </div>
-    )
-  }
+    );
+  };
 
   const InterviewsTab = () => {
     return (
@@ -333,43 +354,31 @@ const Feedback = () => {
           gap: "1rem",
         }}
       >
-        <h2>Candidate Details:</h2>
+        <h3>Candidate Details:</h3>
         <div className="candidate-top-items--container">
           <div>
-            <p>
-              <b>Candidate Name</b>
-            </p>
+            <p>Candidate Name</p>
             <p className="para-value">Shashank</p>
           </div>
           <div>
-            <p>
-              <b>Position</b>
-            </p>
+            <p>Position</p>
             <p className="para-value">Position</p>
           </div>
           <div>
-            <p>
-              <b>Interviewers</b>
-            </p>
+            <p>Interviewers</p>
             <p className="para-value">Raju,Ravi,Uma</p>
           </div>
           <div>
-            <p>
-              <b>Interview Date</b>
-            </p>
+            <p>Interview Date</p>
             <p className="para-value">Interview Date</p>
           </div>
           <div>
-            <p>
-              <b>Interview Type</b>
-            </p>
+            <p>Interview Type</p>
             <p className="para-value">Virtual</p>
           </div>
         </div>
         <div className="candidate-instructions-container">
-          <p>
-            <b>Instructions</b>
-          </p>
+          <h3>Instructions:</h3>
           <ul>
             <li className="para-value">
               Access the Link: Click the provided link at least 5 minutes before
@@ -390,18 +399,14 @@ const Feedback = () => {
           </ul>
         </div>
         <div className="candidate-question-details--container">
-          <h2>Question Details:</h2>
+          <h3>Question Details:</h3>
           <div className="questions-items-container">
             <div>
-              <p>
-                <b>Mandatory Questions</b>
-              </p>
+              <p>Mandatory Questions</p>
               <p className="para-value">10</p>
             </div>
             <div>
-              <p>
-                <b>Optional Questions</b>
-              </p>
+              <p>Optional Questions</p>
               <p className="para-value">N/A</p>
             </div>
           </div>

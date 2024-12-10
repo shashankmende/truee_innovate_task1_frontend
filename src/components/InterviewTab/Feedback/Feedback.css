@@ -1,6 +1,6 @@
 .feedback-main-heading {
   color: #227a8a;
-  border-bottom: 1px solid #227a8a;
+  border-bottom: 2px solid rgba(128, 128, 128, 0.322);
   padding-left: 2rem;
   padding-top:0.5rem;
 }
@@ -39,7 +39,7 @@
   margin: 0 2rem;
   height: 65vh;
   overflow-y: auto;
-  border: 2px solid gray;
+  border: 2px solid rgba(128, 128, 128, 0.31);
   border-radius: 0.3rem;
   -webkit-border-radius: 0.3rem;
   -moz-border-radius: 0.3rem;
@@ -52,7 +52,7 @@
   padding-bottom: 1rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 1.0rem;
+  gap: 1.5rem;
   border-bottom: 1px solid gray;
 
   & > div {
@@ -60,6 +60,7 @@
     align-items: center;
     width: 45%;
     gap: 2rem;
+    /* border: 1px solid red; */
 
     & p {
       width: 200px;
@@ -74,7 +75,7 @@
   gap: 3rem;
   border-bottom: 1px solid gray;
 
-  & p {
+  & h3 {
     width: 200px;
   }
 
@@ -88,17 +89,19 @@
   /* margin-top: 1rem; */
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 
   & .questions-items-container {
     display: flex;
     /* justify-content: space-between; */
+    gap: 2rem;
 
     & > div {
-      width: 50%;
+      width: 45%;
       display: flex;
       align-items: center;
       gap: 2rem;
+      /* border: 1px solid red; */
       & p {
         width: 200px;
 
@@ -143,7 +146,7 @@
   gap: 1rem;
   margin-top: 1rem;
 
-  & details{
+  & >div  {
     padding: 1rem;
     border-radius: 0.3rem;
     -webkit-border-radius: 0.3rem;
@@ -157,11 +160,25 @@
   }
 }
 
+.question-down-arrow--container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.rotate-arrow {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+
 .rating-note-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 1rem;
+  margin:  1rem 0;
+  /* border: 1px solid red; */
 }
 
 .rating-container{
@@ -205,8 +222,10 @@
 .note-input-container {
   margin-top: 10px;
   display: flex;
-  align-items: center;
+  align-items: start;
   gap: 2rem;
+  /* border: 1px solid red; */
+  height: 60px;
 }
 
 .note-input-container div {
