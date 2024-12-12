@@ -65,12 +65,11 @@
     background-color: white;
     animation: popup 0.5s linear;
     /*-webkit-animation: popup 0.3s linear;
-    */
-    -webkit-animation: popup 0.3s linear;
+    */-webkit-animation: popup 0.3s linear;
     border-bottom-left-radius: 0.8rem;
     border-top-left-radius: 0.8rem;
-    -webkit-animation: popup 0.2s linear;
-  }
+    -webkit-animation: popup 0.5s linear;
+}
 }
 
 @keyframes popup {

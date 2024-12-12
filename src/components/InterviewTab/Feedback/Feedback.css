@@ -61,8 +61,6 @@
     align-items: center;
     width: 45%;
     gap: 2rem;
-    /* border: 1px solid red; */
-
     & p {
       width: 200px;
     }
@@ -70,8 +68,6 @@
 }
 
 .candidate-instructions-container {
-  /* margin-top: 2rem; */
-  /* padding-bottom: 1rem; */
   display: flex;
   gap: 3rem;
   border-bottom: 1px solid gray;

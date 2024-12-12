@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from "react";
-import "./Position.css";
+// import "./Position.css";
+import classNames from "classnames";
+
 import { listViewIcon, kanbanViewIcon } from "../../../../IconsData";
 import Filter from "../Filter/Filter";
 import TableView from "../TableView/TableView";
@@ -73,16 +75,17 @@ const Position = () => {
   };
 
   return (
-    <div className="layout">
+    <div>
       <Header />
 
-      <div className="layout-top--container">
-        <h2>Positions</h2>
+      <div className="flex justify-between items-center md:px-8 py-7">
+      {/* <div> */}
+        <h2 className="text-2xl font-bold">Positions</h2>
         <div className="popup--container">
-          <button onClick={() => setIsopen(true)}>Add</button>
+          <button className="border-none bg-teal-700 py-2 px-8 rounded-md text-white text-base cursor-pointer" onClick={() => setIsopen(true)}>Add</button>
           {isOpen && (
-            <div className="layout-popup-overlay">
-              <div className="layout-popup-content">
+            <div className="layout-popup-overlay fixed  top-0 bottom-0 right-0  bg-black/50 w-full flex justify-end transition-all duration-[2s]">
+              <div className="w-1/2 bg-white rounded bl-lg rounded-tl-lg" style={{animation: "popup 0.2s linear"}}>
                 <Form setIsopen={setIsopen} />
               </div>
             </div>
@@ -90,26 +93,26 @@ const Position = () => {
         </div>
       </div>
 
-      <div className="toggle-contaiiner">
-        <ul>
-          <li
-            onClick={() => setView(0)}
-            style={{ color: view === 0 ? "#227A8A" : "" }}
-          >
-            {kanbanViewIcon}{" "}
-          </li>
-          <li
-            onClick={() => setView(1)}
-            style={{ color: view === 1 ? "#227A8A" : "" }}
-          >
-            {listViewIcon}
-          </li>
+      <div className="flex justify-between px-8 pb-1 mb-2">
+        <ul className="flex items-center gap-12">
+        {[
+            { icon: kanbanViewIcon, id: 0 },
+            { icon: listViewIcon, id: 1 },
+          ].map(({ icon, id }) => (
+            <li
+              key={id}
+              className={classNames("cursor-pointer", { "text-teal-700": view === id },"text-3xl")}
+              onClick={() => setView(id)}
+            >
+              {icon}
+            </li>
+          ))}
         </ul>
 
         <Sorting open={isFilterOpen} setFilter={setIsfilteropen} />
       </div>
 
-      <div className="data-container">
+      <div className="flex justify-between w-full h-[70vh]">
         {displayData()}
         {isFilterOpen && (
           <Filter

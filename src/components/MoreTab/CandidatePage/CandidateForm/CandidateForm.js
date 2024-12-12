@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./CandidateForm.css";
+// import "./CandidateForm.css";
 import axios from "axios";
 import { closeIcon, cameraIcon } from "../../../../IconsData";
 import { useCustomContext } from "../../../../context/context";
