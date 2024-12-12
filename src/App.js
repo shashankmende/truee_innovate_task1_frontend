@@ -1,7 +1,7 @@
 
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Feedback from "./components/InterviewTab/Feedback/Feedback";
+import Feedback from "./components/InterviewTab/Feedback";
 import PositionViewPage from "./components/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
 import Form from "./components/MoreTab/PositionPage/Form/Form";
 import Candidate from "./components/MoreTab/CandidatePage/Candidate/Candidate";

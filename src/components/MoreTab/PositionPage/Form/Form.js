@@ -21,6 +21,8 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
     jobDescription: "",
     additionalNotes: "",
     skills: "",
+    expMin:"",
+    expMax:"",
     rounds: "",
   });
   const { fetchPositions } = useCustomContext();
@@ -94,8 +96,9 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
   const onSubmitForm = async (e) => {
     e.preventDefault();
 
+    console.log('form validation started')
     const addFormCustomMsgFunction = (field, errMsg) => {
-      console.log(field, errMsg);
+      // console.log(field, errMsg);
       setFormFieldsError((prev) => ({
         ...prev,
         [field]: errMsg,
@@ -106,6 +109,7 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
       formData,
       addFormCustomMsgFunction
     );
+    console.log('form validated',isValid)
 
     if (isValid) {
       const reqBody = {
@@ -114,6 +118,7 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
       };
       try {
         console.log(formData);
+        
         const response = await axios.post(
           `${process.env.REACT_APP_URL}/api/position`,
           reqBody
@@ -121,7 +126,7 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
         console.log(response);
         if (response.data.success) {
           const position = formData.title;
-          const id = response.data.success.position._id;
+          const id = response.data.success.position?._id;
 
           alert(response.data.message || "Failed to add position");
           fetchPositions();
@@ -245,10 +250,10 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
                   onChange={onChangeInput}
                 />
 
-                {formFieldsErrorMsg.minExp && (
+                {formFieldsErrorMsg.expMin && (
                   <p className="text-red-700">
                     {/* {formFieldsErrorMsg.minExp ? formFieldsErrorMsg.minExp : ""} */}
-                    {formFieldsErrorMsg.minExp}
+                    {formFieldsErrorMsg.expMin}
                   </p>
                 )}
               </div>
@@ -262,8 +267,8 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
                   placeholder="max experience"
                   onChange={onChangeInput}
                 />
-                {formFieldsErrorMsg.maxExp && (
-                  <p className="text-red-700">{formFieldsErrorMsg.maxExp}</p>
+                {formFieldsErrorMsg.expMax && (
+                  <p className="text-red-700">{formFieldsErrorMsg.expMax}</p>
                 )}
               </div>
             </div>

@@ -4,71 +4,69 @@ const PositionAddFromValidation = (formData, addFormCustomMsgFunction) => {
     "jobDescription",
     "company",
     "skills",
-    "expMin",
-    "expMax",
+    "experience",
     "additionalNotes",
     "rounds",
   ];
+  const { min:minExp, max:maxExp } = formData.experience;
 
   let hasError = false;
+  requiredFields.forEach((field) => {
+    if (field === "experience") {
+      if (!minExp) {
+        hasError = true;
+        addFormCustomMsgFunction("expMin", "min experience is required");
+      } else {
+        console.log("min exp is set to null");
+        addFormCustomMsgFunction("expMin", "");
+      }
 
-  requiredFields.forEach(field=>{
-    if (!formData[field] || (Array.isArray(formData[field]) && formData[field].length ===0)){
-        hasError = true
-        addFormCustomMsgFunction(field,`${field} is required`)
-    }
-    else{
-      addFormCustomMsgFunction(field,``)
-    }
-  })
-  
-  
-    
-    console.log('experience fields are required')
-
-    if (formData.experience && formData.experience.min === "") {
+      if (maxExp === "") {
+        hasError = true;
+        console.log("max exp is set to required");
+        addFormCustomMsgFunction("expMax", "max experience is required");
+      } else {
+        console.log("max exp is set to null");
+        addFormCustomMsgFunction("expMax", "");
+      }
+    } else if (
+      !formData[field] ||
+      (Array.isArray(formData[field]) && formData[field].length === 0)
+    ) {
       hasError = true;
-      addFormCustomMsgFunction("minExp", "min experience is required");
+      addFormCustomMsgFunction(field, `${field} is required`);
     } else {
-      console.log("entered into empyt min exp section")
-      addFormCustomMsgFunction("minExp", "");
+      addFormCustomMsgFunction(field, ``);
     }
-  
-    if (formData.experience && formData.experience.max === "") {
-      hasError = true;
-      addFormCustomMsgFunction("maxExp", "max experience is required");
-    } else{
-      addFormCustomMsgFunction("maxExp","")
-    }
-  
-  
-  
+  });
 
-  return !hasError
+  return !hasError;
+};
 
+const AddCustomQuestionValidation = (questionObj, CustomQuestionErrFunction) => {
+  console.log("Validation started");
+  let hasError = false;
 
+  const { question, answer } = questionObj;
+
+  // Validate question field
+  if (!question.trim()) {
+    hasError = true;
+    CustomQuestionErrFunction("question", "Question is required");
+  } else {
+    CustomQuestionErrFunction("question", "");
+  }
+
+  // Validate answer field
+  if (!answer.trim()) {
+    hasError = true;
+    CustomQuestionErrFunction("answer", "Answer is required");
+  } else {
+    CustomQuestionErrFunction("answer", "");
+  }
+
+  return !hasError;
 };
 
 
-const AddCustomQuestionValidation = (questionObj,CustomQuestionErrFunction)=>{
-console.log('validation filed')
-  let hasError = false
-  const {question,answer}=questionObj
-  console.log(questionObj)
-
-  if (!question){
-    hasError=true
-    CustomQuestionErrFunction('question',"question is required")
-    
-  }
-
-  if (!answer){
-    hasError=true
-    CustomQuestionErrFunction('answer',"answer is required")
-    
-  }
-  return !hasError
-}
-
-
-module.exports = { PositionAddFromValidation,AddCustomQuestionValidation };
+module.exports = { PositionAddFromValidation, AddCustomQuestionValidation };

@@ -45,7 +45,7 @@ const CandidateMiniTab = () => {
             </li>
             <li className="para-value mb-4 list-disc text-gray-500">
               Prepare Your Setups: Ensure a quiet, well-lit environment with a
-              stable internet connection . Use headphones if possible.{" "}
+              stable internet connection . Use headphones if possible.
             </li>
             <li className="para-value mb-4 list-disc text-gray-500">
               Have Essentials Ready: Keep your resume , ID , and any neccessary
