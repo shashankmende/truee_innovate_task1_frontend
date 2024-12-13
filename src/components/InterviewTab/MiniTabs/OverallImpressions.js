@@ -60,11 +60,13 @@ const OverallImpressions = () => {
           </li>
         ))}
       </ul>
+
       <div className="flex  w-1/2 justify-between items-center">
         <p>
           Overall Rating<span className="text-red-500">*</span>
         </p>
-        <div className="flex gap-4">
+        <div className="flex w-1/2 justify-between">
+        <div className="flex gap-3">
         {Array.from({ length: 5 }, (_, index) => {
           const isSelected = index + 1 <= rating;
           return (
@@ -80,13 +82,14 @@ const OverallImpressions = () => {
           );
         })}
         </div>
-        <button className="border border-[#227a8a] text-[#227a8a] p-2 rounded-md" onClick={()=>setNoteBool(!noteBool)}>{!noteBool ? "Add a Note":"Delete Note"}</button>
+        <button className="border border-[#227a8a] text-[#227a8a] p-1 rounded-md w-[120px]" onClick={()=>setNoteBool(!noteBool)}>{!noteBool ? "Add a Note":"Delete Note"}</button>
+        </div>
       </div>
       {
         noteBool && (
-            <div className="flex   gap-4    ">
-                <label htmlFor="overall-note">Note</label>
-                <input onChange={(e)=>setNote(e.target.value)} value={note} id="overall-note" type="text" className="border border-gray-500 w-1/2 p-2 rounded-md" placeholder="Add Note" />
+            <div className="flex w-1/2">
+                <label htmlFor="overall-note" className="w-1/2">Note</label>
+                <input onChange={(e)=>setNote(e.target.value)} value={note} id="overall-note" type="text" className="border border-gray-500 w-1/2 p-2 rounded-md outline-none" placeholder="Add Note" />
             </div>
         )
       }

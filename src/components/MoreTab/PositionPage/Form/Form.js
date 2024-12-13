@@ -12,7 +12,7 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
     experience: { min: "", max: "" },
     jobDescription: "",
     additionalNotes: "",
-    skills: [],
+    skills: ["html"],
     rounds: [],
   });
   const [formFieldsErrorMsg, setFormFieldsError] = useState({
@@ -21,8 +21,8 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
     jobDescription: "",
     additionalNotes: "",
     skills: "",
-    expMin:"",
-    expMax:"",
+    expMin: "",
+    expMax: "",
     rounds: "",
   });
   const { fetchPositions } = useCustomContext();
@@ -65,51 +65,59 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
   const onChangeInput = (e) => {
     const { name, value } = e.target;
 
+
     setFormData((prevData) => {
       if (name === "experience_min") {
-        return {
+        const newData = {
           ...prevData,
           experience: { ...prevData.experience, min: value },
-        };
+        }
+        PositionAddFromValidation(newData,addFormCustomMsgFunction)
+        return newData;
       } else if (name === "experience_max") {
-        return {
+        const newData = {
           ...prevData,
           experience: { ...prevData.experience, max: value },
-        };
+        }
+        PositionAddFromValidation(newData,addFormCustomMsgFunction)
+        return newData;
       } else if (name === "rounds") {
-        return {
+        const newData = {
           ...prevData,
-          // rounds: value.split(",").map((round) => round.trim()),
-          rounds: value.split(","),
+          rounds: value.split(",").map(round=>round.trim()),
         };
+        PositionAddFromValidation(newData,addFormCustomMsgFunction)
+        return newData;
       } else if (name === "skills") {
-        return {
+        const newData ={
           ...prevData,
           skills: value.split(",").map((skill) => skill.trim()),
         };
+        PositionAddFromValidation(newData,addFormCustomMsgFunction)
+        return newData;
       } else {
-        return { ...prevData, [name]: value };
+        const newData = { ...prevData, [name]: value };
+        PositionAddFromValidation(newData,addFormCustomMsgFunction)
+        return newData;
       }
     });
   };
 
+  const addFormCustomMsgFunction = (field, errMsg) => {
+    setFormFieldsError((prev) => ({
+      ...prev,
+      [field]: errMsg,
+    }));
+  };
+
   const onSubmitForm = async (e) => {
     e.preventDefault();
-
-    console.log('form validation started')
-    const addFormCustomMsgFunction = (field, errMsg) => {
-      // console.log(field, errMsg);
-      setFormFieldsError((prev) => ({
-        ...prev,
-        [field]: errMsg,
-      }));
-    };
-
+    console.log("form validation started");
     const isValid = PositionAddFromValidation(
       formData,
       addFormCustomMsgFunction
     );
-    console.log('form validated',isValid)
+    console.log("form validated", isValid);
 
     if (isValid) {
       const reqBody = {
@@ -118,7 +126,7 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
       };
       try {
         console.log(formData);
-        
+
         const response = await axios.post(
           `${process.env.REACT_APP_URL}/api/position`,
           reqBody
@@ -257,7 +265,7 @@ const Form = ({ popupTab, setIsopen, setPopupTab }) => {
                   </p>
                 )}
               </div>
-              <div className="flex flex-col w-[40%]">
+              <div className="flex flex-col w-[50%]">
                 <input
                   name="experience_max"
                   value={formData.experience.max}

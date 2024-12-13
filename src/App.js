@@ -12,6 +12,7 @@ import CodeEditor from "./components/MoreTab/CodeEditorPage/Editor/Editor";
 import HtmlCssJsExecutor from "./components/MoreTab/CodeEditorPage/WebEditor/WebEditor";
 import Position from "./components/MoreTab/PositionPage/Position/Position";
 import CandidateViewPage from "./components/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
+import Preview from "./components/InterviewTab/Preview";
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
           <Route path="/editor" element={<CodeEditor />} />
           <Route path="/web" element={<HtmlCssJsExecutor/>}/>
           <Route path="/feedback" element={<Feedback/>}/>
-
+          <Route path="/interview-feedback" element={<Preview/>}/>
         </Routes>
       </BrowserRouter>
     </div>

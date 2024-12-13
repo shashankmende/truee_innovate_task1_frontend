@@ -17,23 +17,22 @@ const PositionAddFromValidation = (formData, addFormCustomMsgFunction) => {
         hasError = true;
         addFormCustomMsgFunction("expMin", "min experience is required");
       } else {
-        console.log("min exp is set to null");
         addFormCustomMsgFunction("expMin", "");
       }
 
       if (maxExp === "") {
         hasError = true;
-        console.log("max exp is set to required");
         addFormCustomMsgFunction("expMax", "max experience is required");
       } else {
-        console.log("max exp is set to null");
         addFormCustomMsgFunction("expMax", "");
       }
-    } else if (
+    }
+     else if (
       !formData[field] ||
       (Array.isArray(formData[field]) && formData[field].length === 0)
     ) {
       hasError = true;
+      console.log('list',formData[field])
       addFormCustomMsgFunction(field, `${field} is required`);
     } else {
       addFormCustomMsgFunction(field, ``);
@@ -43,11 +42,10 @@ const PositionAddFromValidation = (formData, addFormCustomMsgFunction) => {
   return !hasError;
 };
 
-const AddCustomQuestionValidation = (questionObj, CustomQuestionErrFunction) => {
+const AddCustomQuestionValidation = (question,answer, CustomQuestionErrFunction) => {
   console.log("Validation started");
   let hasError = false;
 
-  const { question, answer } = questionObj;
 
   // Validate question field
   if (!question.trim()) {

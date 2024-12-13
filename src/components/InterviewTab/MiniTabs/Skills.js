@@ -80,28 +80,28 @@ const SkillsTabComponent = () => {
     );
   };
 
-  const [noteId,setNoteId]=useState(null)
+  const [noteId, setNoteId] = useState(null);
 
   const getColorByRating = (rating) => {
     const ratingItem = ratingLst.find((r) => r.stars === rating);
     return ratingItem ? ratingItem.color : "gray";
   };
 
-  const onChangeNoteText =(catId,skillIndex,value)=>{
-    setSkillsCategoryList(prev=>(
-        prev.map(category=>{
-            if (category.id===catId){
-                return {
-                    ...category,
-                    skillsList: category.skillsList.map((skill,index)=>(
-                        index===skillIndex?{...skill,note:value}:skill
-                    ))
-                }
-            }
-            return category
-        })
-    ))
-  }
+  const onChangeNoteText = (catId, skillIndex, value) => {
+    setSkillsCategoryList((prev) =>
+      prev.map((category) => {
+        if (category.id === catId) {
+          return {
+            ...category,
+            skillsList: category.skillsList.map((skill, index) =>
+              index === skillIndex ? { ...skill, note: value } : skill
+            ),
+          };
+        }
+        return category;
+      })
+    );
+  };
 
   return (
     <div className="">
@@ -130,41 +130,67 @@ const SkillsTabComponent = () => {
             <h2 className="font-bold">{skillCat.category}:</h2>
             <ul className="flex flex-col gap-4 w-[700px]">
               {skillCat.skillsList.map((skill, skillIndex) => (
-                <li
-                  key={skill.name}
-                  className="flex flex-col gap-4"
-                >
-                <div className="flex gap-4 justify-between items-center">
-                  <p className="w-[200px]">{skill.name}</p>
-                  <div className="flex gap-2">
-                    {Array.from({ length: 5 }, (_, index) => {
-                      const isSelected = index + 1 <= skill.rating;
-                      return (
-                        <IoIosStar
-                          onClick={() =>
-                            onClickRating(skillCat.id, skillIndex, index + 1)
-                          }
-                        //   className={`cursor-pointer hover:scale(1.1)`}
-                          className={`cursor-pointer transform transition-transform hover:scale-110`}
-                          size={20}
-                          style={{
-                            color: isSelected
-                              ? getColorByRating(skill.rating)
-                              : "gray",
-                          }}
-                          key={index}
-                        />
-                      );
-                    })}
+                <li key={skill.name} className="flex flex-col gap-4 ">
+                  <div className="flex  justify-between items-center ">
+                    <p className="w-[50%]">{skill.name}</p>
+                    <div className="flex w-[50%] justify-between ">
+                    <div className="flex gap-2">
+                      {Array.from({ length: 5 }, (_, index) => {
+                        const isSelected = index + 1 <= skill.rating;
+                        return (
+                          <IoIosStar
+                            onClick={() =>
+                              onClickRating(skillCat.id, skillIndex, index + 1)
+                            }
+                            className={`cursor-pointer transform transition-transform hover:scale-110`}
+                            size={20}
+                            style={{
+                              color: isSelected
+                                ? getColorByRating(skill.rating)
+                                : "gray",
+                            }}
+                            key={index}
+                          />
+                        );
+                      })}
+                    </div>
+
+                    {noteId === skill.name ? (
+                      <button
+                        className="p-1 text-[#227a8a]  border border-[#227a8a] rounded-md w-[120px]"
+                        onClick={() => setNoteId(null)}
+                      >
+                        Delete Note
+                      </button>
+                    ) : (
+                      <button
+                        className=" p-1 text-[#227a8a]  border border-[#227a8a] rounded-md w-[120px]"
+                        onClick={() => setNoteId(skill.name)}
+                      >
+                        Add a Note
+                      </button>
+                    )}
+                    </div>
                   </div>
-                  
-                    {noteId===skill.name ? <button className="px-2 py-1 text-[#227a8a] font-bold border border-[#227a8a] rounded-md" onClick={()=>setNoteId(null)}>Delete Note</button>:<button className="px-2 py-1 text-[#227a8a] font-bold border border-[#227a8a] rounded-md" onClick={()=>setNoteId(skill.name)}>Add a Note</button>}
-                  
-                  </div>
-                  { noteId ===skill.name &&  <div className=" flex justify-between">
-                    <label htmlFor="skill-id">Note</label>
-                    <input value={skill.note? skill.note :""} onChange={(e)=>onChangeNoteText(skillCat.id,skillIndex,e.target.value)} id="skill-id" type="text" placeholder="Enter Note" className="w-[80%] border p-2 rounded-md border-gray-500 outline-none text-gray-500" />
-                  </div>}
+                  {noteId === skill.name && (
+                    <div className=" flex justify-between ">
+                      <label htmlFor="skill-id" className="w-1/2">Note</label>
+                      <input
+                        value={skill.note ? skill.note : ""}
+                        onChange={(e) =>
+                          onChangeNoteText(
+                            skillCat.id,
+                            skillIndex,
+                            e.target.value
+                          )
+                        }
+                        id="skill-id"
+                        type="text"
+                        placeholder="Enter Note"
+                        className="w-1/2 border p-1 rounded-md border-gray-500 outline-none text-gray-500"
+                      />
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

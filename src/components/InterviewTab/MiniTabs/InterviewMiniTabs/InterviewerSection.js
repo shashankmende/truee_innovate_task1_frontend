@@ -22,34 +22,42 @@ const InterviewerSectionComponent = () => {
   const [customInterviewerQuestionList, setCustomInterviewerQuestionList] =
     useState([
       {
-        "id": 1,
-        "question": "Explain the difference between an interface and an abstract class in Java.",
-        "answer": "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables."
+        id: 1,
+        question:
+          "Explain the difference between an interface and an abstract class in Java.",
+        answer:
+          "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
       },
       {
-        "question": "What is the difference between is and == in Python?",
-        "answer": "is checks for identity, i.e., whether two objects refer to the same memory location.,== checks for equality, i.e., whether the values of two objects are the same.",
-        "notes": "",
-        "id": 2
+        question: "What is the difference between is and == in Python?",
+        answer:
+          "is checks for identity, i.e., whether two objects refer to the same memory location.,== checks for equality, i.e., whether the values of two objects are the same.",
+        notes: "",
+        id: 2,
       },
       {
-        "question": "What is the difference between a shallow copy and a deep copy in Python?",
-        "answer": "A shallow copy creates a new object but references the original objects for nested elements. A deep copy creates a new object and recursively copies all objects inside it.",
-        "notes": "",
-        "id": 3
+        question:
+          "What is the difference between a shallow copy and a deep copy in Python?",
+        answer:
+          "A shallow copy creates a new object but references the original objects for nested elements. A deep copy creates a new object and recursively copies all objects inside it.",
+        notes: "",
+        id: 3,
       },
       {
-        "question": "What is a Python lambda function?",
-        "answer": "A lambda function is an anonymous function defined using the lambda keyword. It can have any number of arguments but only one expression.",
-        "notes": "",
-        "id": 4
+        question: "What is a Python lambda function?",
+        answer:
+          "A lambda function is an anonymous function defined using the lambda keyword. It can have any number of arguments but only one expression.",
+        notes: "",
+        id: 4,
       },
       {
-        "question": "What is the difference between @staticmethod and @classmethod?",
-        "answer": "@staticmethod defines a method that doesn't operate on the class or instance. @classmethod defines a method that operates on the class and receives the class as the first parameter (cls).",
-        "notes": "",
-        "id": 5
-      }
+        question:
+          "What is the difference between @staticmethod and @classmethod?",
+        answer:
+          "@staticmethod defines a method that doesn't operate on the class or instance. @classmethod defines a method that operates on the class and receives the class as the first parameter (cls).",
+        notes: "",
+        id: 5,
+      },
     ]);
 
   const [selectedQuestion, setSelectedQuestion] = useState(null);
@@ -57,9 +65,9 @@ const InterviewerSectionComponent = () => {
 
   const onClickSaveCustomQuestion = (closeNestedPopup) => {
     console.log("Save custom question clicked");
-
+    const {answer,question}=interviewerQuestion
     const isValid = AddCustomQuestionValidation(
-      interviewerQuestion,
+      question,answer,
       CustomQuestionErrFunction
     );
 
@@ -104,16 +112,6 @@ const InterviewerSectionComponent = () => {
     );
   };
 
-  const onClickAddOrDeleteNoteBtn = (questionId) => {
-    setCustomInterviewerQuestionList((prev) =>
-      prev.map((question) =>
-        question.id === questionId
-          ? { ...question, notesBool: !question.notesBool }
-          : question
-      )
-    );
-  };
-
   const onChangeInterviewQuestionNotes = (questionId, notes) => {
     setCustomInterviewerQuestionList((prev) =>
       prev.map((question) =>
@@ -121,6 +119,24 @@ const InterviewerSectionComponent = () => {
       )
     );
   };
+
+  const onChangeQuestion =(e)=>{
+    const {answer}=interviewerQuestion
+    AddCustomQuestionValidation(e.target.value,answer,CustomQuestionErrFunction)
+    setInterviewerQuestion((prev) => ({
+      ...prev,
+      question: e.target.value,
+    }))
+  }
+
+  const onChangeAnswer =(e)=>{
+    const {question}=interviewerQuestion
+    AddCustomQuestionValidation(question,e.target.value,CustomQuestionErrFunction)
+    setInterviewerQuestion((prev) => ({
+      ...prev,
+      answer: e.target.value,
+    }))
+  }
 
   return (
     <div className="interview-questions-mini-tab--container relative h-[53vh]">
@@ -185,12 +201,13 @@ const InterviewerSectionComponent = () => {
                         <div className="w-[100%] flex flex-col ">
                           <div className="flex justify-between w-[100%] border-b-2 border-solid-gray">
                             <input
-                              onChange={(e) =>
-                                setInterviewerQuestion((prev) => ({
-                                  ...prev,
-                                  question: e.target.value,
-                                }))
-                              }
+                              // onChange={(e) =>
+                                // setInterviewerQuestion((prev) => ({
+                                //   ...prev,
+                                //   question: e.target.value,
+                                // }))
+                              // }
+                              onChange={(e)=>onChangeQuestion(e)}
                               value={interviewerQuestion.question}
                               id="customQuestion"
                               className="w-[80%] outline-none text-gray-500"
@@ -219,12 +236,13 @@ const InterviewerSectionComponent = () => {
                           <div className="flex flex-col justify-between w-[100%] ">
                             <div className="flex justify-between w-[100%] border-b-2 border-solid-gray">
                               <input
-                                onChange={(e) =>
-                                  setInterviewerQuestion((prev) => ({
-                                    ...prev,
-                                    answer: e.target.value,
-                                  }))
-                                }
+                              onChange={e=>onChangeAnswer(e)}
+                                // onChange={(e) =>
+                                //   setInterviewerQuestion((prev) => ({
+                                //     ...prev,
+                                //     answer: e.target.value,
+                                //   }))
+                                // }
                                 value={interviewerQuestion.answer}
                                 id="customQuestion"
                                 className="w-[80%] outline-none text-gray-500"
@@ -293,12 +311,10 @@ const InterviewerSectionComponent = () => {
           >
             <div
               className=" flex justify-between"
-              onClick={() =>{
-
-                setSelectedQuestion(selectedQuestion ? null : EachQuestion.id)
-                setNotesId(null)
-              }
-              }
+              onClick={() => {
+                setSelectedQuestion(selectedQuestion ? null : EachQuestion.id);
+                setNotesId(null);
+              }}
             >
               <p>{`${EachQuestion.id}. ${EachQuestion.question}`}</p>
               {selectedQuestion === EachQuestion.id ? (
@@ -365,19 +381,32 @@ const InterviewerSectionComponent = () => {
                   </div>
                   <div className="add-note-share-like-dislike--container flex items-center gap-4">
                     <button
-                      className="question-add-note-button cursor-pointer font-bold py-[0.2rem] px-[0.8rem] text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]"  
-                      onClick={()=>setNotesId( notesId ? null: EachQuestion.id)}
+                      className="question-add-note-button cursor-pointer font-bold py-[0.2rem] px-[0.8rem] text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]"
+                      onClick={() =>
+                        setNotesId(notesId ? null : EachQuestion.id)
+                      }
                     >
-                      {!(notesId===EachQuestion.id) ? "Add a Note" : "Delete Note"}
+                      {!(notesId === EachQuestion.id)
+                        ? "Add a Note"
+                        : "Delete Note"}
                     </button>
 
-                    <span style={{ color: "#227a8a", fontWeight: "bold" }}>
-                      Share
-                    </span>
+                    <Popup
+                      trigger={
+                        <button className="text-[#227a8a] font-bold">
+                          Share
+                        </button>
+                      }
+                      on={"hover"}
+                    >
+                      Share with candidates
+                    </Popup>
                     <span>{likeIcon}</span>
                     <span
                       className={`${
-                        dislikeQuestionId === EachQuestion.id ? "text-red-500" : ""
+                        dislikeQuestionId === EachQuestion.id
+                          ? "text-red-500"
+                          : ""
                       } cursor-pointer`}
                       onClick={() => {
                         setDislikeQuestionId(
@@ -394,26 +423,26 @@ const InterviewerSectionComponent = () => {
 
             {notesId === EachQuestion.id && (
               <div className="note-input-container flex justify-start gap-8 mt-4">
-              <label htmlFor="note-input">Note</label>
-              <div className="w-full relative mr-5 rounded-md h-[80px]">
-                <input
-                  className="w-full outline-none b-none border border-gray-500 p-2"
-                  id="note-input"
-                  type="text"
-                  value={EachQuestion.notes}
-                  onChange={(e) =>
-                    onChangeInterviewQuestionNotes(
-                      EachQuestion.id,
-                      e.target.value.slice(0, 250)
-                    )
-                  }
-                  placeholder="Add your note here"
-                />
-                <span className="absolute right-[1rem] bottom-[0.2rem]  text-gray-500">
-                  {EachQuestion.notes?.length || 0}/250
-                </span>
+                <label htmlFor="note-input">Note</label>
+                <div className="w-full relative mr-5 rounded-md h-[80px]">
+                  <input
+                    className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"
+                    id="note-input"
+                    type="text"
+                    value={EachQuestion.notes}
+                    onChange={(e) =>
+                      onChangeInterviewQuestionNotes(
+                        EachQuestion.id,
+                        e.target.value.slice(0, 250)
+                      )
+                    }
+                    placeholder="Add your note here"
+                  />
+                  <span className="absolute right-[1rem] bottom-[0.2rem]  text-gray-500">
+                    {EachQuestion.notes?.length || 0}/250
+                  </span>
+                </div>
               </div>
-            </div>
             )}
           </li>
         ))}

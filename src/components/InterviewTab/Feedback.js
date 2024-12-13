@@ -5,6 +5,7 @@ import CandidateMiniTab from "./MiniTabs/Candidate";
 import InterviewsMiniTabComponent from "./MiniTabs/Interviews";
 import SkillsTabComponent from "./MiniTabs/Skills";
 import OverallImpressions from "./MiniTabs/OverallImpressions";
+import { useNavigate } from "react-router-dom";
 
 const tabsList = [
   {
@@ -27,6 +28,7 @@ const tabsList = [
 
 const Feedback = () => {
   const [tab, setTab] = useState(1);
+  const navigate = useNavigate()
 
   const displayData = () => {
     switch (tab) {
@@ -69,7 +71,10 @@ const Feedback = () => {
         <div className="interview-feedback-body--container px-8 py-4  mb-8 h-[65vh] overflow-y-auto border-2 border-solid rounded-md mx-8" style={{ borderColor: "rgba(128, 128, 128, 0.31)" }}>
           {displayData()}
         </div>
-        <div className="next-button--container flex justify-end p-3 pr-8 " style={{ borderTop: "1px solid gray" }}>
+        <div className="next-button--container flex justify-end p-3 pr-8 gap-4" style={{ borderTop: "1px solid gray" }}>
+        {tab===4 && <button onClick={()=>navigate('/interview-feedback')} className="bg-[gray] text-white py-[0.5rem] px-[2rem] b-none rounded-lg cursor-pointer">
+            Preview
+          </button>}
           <button className="bg-[#227a8a] text-white py-[0.5rem] px-[2rem] b-none rounded-lg cursor-pointer">
             Next
           </button>
