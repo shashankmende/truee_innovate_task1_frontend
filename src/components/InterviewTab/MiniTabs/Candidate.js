@@ -4,11 +4,12 @@ import React from 'react'
 
 const CandidateMiniTab = () => {
   return (
-    <div className="h-[70vh] flex flex-col gap-4">
+    <>
+    <div className="h-[70vh] flex flex-col gap-4 ">
         <h2 className="text-black font-bold">Candidate Details:</h2>
         <div
-          className="candidate-top-items--container pb-4 flex flex-wrap gap-6 "
-          style={{ borderBottom: "1px solid gray " }}
+          className="candidate-top-items--container pb-4 flex flex-col flex-wrap gap-6 border-b-2 border-[#8080808a]"
+          // style={{ borderBottom: "1px solid gray " }}
         >
           <div className="flex items-center w-[45%] ">
             <p className="w-[250px]">Candidate Name</p>
@@ -34,10 +35,8 @@ const CandidateMiniTab = () => {
           </div>
         </div>
         <div
-          className="candidate-instructions-container  flex gap-16 "
-          style={{ borderBottom: "1px solid gray" }}
-        >
-          <h3 className="w-[200px] font-bold">Instructions:</h3>
+          className="candidate-instructions-container flex  border-b-2 border-[#8080808a] ">
+          <h3 className="w-[250px] font-bold">Instructions:</h3>
           <ul>
             <li className="para-value mb-4 list-disc  text-gray-500">
               Access the Link: Click the provided link at least 5 minutes before
@@ -57,20 +56,22 @@ const CandidateMiniTab = () => {
             </li>
           </ul>
         </div>
-        <div className="candidate-question-details--container flex flex-col gap-4 ">
-          <h3 className="w-[200px] font-bold">Question Details:</h3>
+        <div className="candidate-question-details--container flex flex-col gap-4 pb-4">
+          <h3 className="w-[250px] font-bold">Question Details:</h3>
           <div className="questions-items-container flex gap-8">
-            <div className="w-[45%] flex items-center gap-8">
-              <p className="w-[200px]">Mandatory Questions</p>
+            <div className="w-[45%] flex items-center ">
+              <p className="w-[250px]">Mandatory Questions</p>
               <p className="para-value w-[200px] text-gray-500">10</p>
             </div>
-            <div className="w-[45%] flex items-center gap-8">
-              <p className="w-[200px] ">Optional Questions</p>
+            <div className="w-[45%] flex items-center">
+              <p className="w-[250px] ">Optional Questions</p>
               <p className="para-value w-[200px] text-gray-500">N/A</p>
             </div>
           </div>
         </div>
       </div>
+    
+    </>
   )
 }
 

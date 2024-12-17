@@ -29,9 +29,7 @@ const Header = () => {
           trigger={<button>{hamburgerIcon}</button>}
           contentStyle={{
             background: "#fff",
-            // background: "transparent",
             width: "220px",
-            // marginTop: "20px",
             padding: "1rem",
             borderRadius: "0.3rem",
           }}
@@ -42,7 +40,6 @@ const Header = () => {
             <Dropdown tab={"Assignments"} data={AssignmentDropDownData} />
             <Dropdown tab={"Analytics"} data={AnalyticstDropDownData} />
             <Dropdown tab={"More"} data={moreDropDownData} />
-           
           </div>
         </Popup>
       </div>

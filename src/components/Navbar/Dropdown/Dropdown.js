@@ -33,8 +33,14 @@ const Dropdown = ({ tab, data }) => {
         onOpen={() => setIsopen(true)}
         onClose={() => setIsopen(false)}
         on={"click"}
+        offsetY={8}
+        arrowStyle={{
+          color:'white',
+          fontSize:'2rem'
+           
+        }}
       >
-        <ul className="dropdown-item-popup">
+        <ul className="dropdown-item-popup shadow-md w-[200px] border border-gray-50">
           {data.map((each, index) => {
             return <NavLink  key={index} to={each.link}><li>{each.name}</li></NavLink>
           })}

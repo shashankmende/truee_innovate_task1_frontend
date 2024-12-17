@@ -1,15 +1,15 @@
 import React from "react";
-import "./Output.css";
-import { reloadIcon } from "../../../../IconsData";
+// import "./Output.css";
+import { reloadIcon } from "../../../IconsData";
 
 import { Spinner } from "@chakra-ui/spinner";
 
 const Output = ({ lightMode, onClickReload, outputRetry, isError, output }) => {
   return (
-    <div className="output-home--container">
+    <div className="output-home--container flex flex-col rounded-[0.3rem] h-[75vh]">
       <div
         style={{ borderBottom: lightMode ? "" : "2px solid gray" }}
-        className="output-top--container"
+        className="output-top--container py-[0.3rem] px-[0.9rem] border-b border-[#227a8a] flex justify-between items-center"
       >
         <p>Output</p>
         {outputRetry ? (
@@ -22,7 +22,7 @@ const Output = ({ lightMode, onClickReload, outputRetry, isError, output }) => {
       </div>
       <div
         style={{ color: isError && "red" }}
-        className="output-main-container"
+        className="output-main-container p-[0.9rem] h-full overflow-auto"
       >
         {!outputRetry ? (
           output ? (

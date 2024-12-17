@@ -16,13 +16,13 @@ const interviewMiniTabsList = [
   ];
 
  
-  const InterviewsMiniTabComponent = () => {
+  const InterviewsMiniTabComponent = ({setValidateCurrentTab}) => {
     const [interviewMiniTab, setInterviewMiniTab] = useState(1);
 
     const InterviewDisplayData = () => {
         switch (interviewMiniTab) {
           case 1:
-            return <SchedulerSectionComponent/>;
+            return <SchedulerSectionComponent setValidateCurrentTab={setValidateCurrentTab}/>;
           case 2:
             return <InterviewerSectionComponent/>;
         default:
@@ -32,7 +32,7 @@ const interviewMiniTabsList = [
 
   return (
     <div>
-        <ul className="Interviews-mini-tab--container flex items-center gap-20 cursor-pointer">
+        <ul className="flex items-center gap-20 cursor-pointer md:text-sm">
           {interviewMiniTabsList.map((each) => (
             <li
               className={"font-bold"}

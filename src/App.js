@@ -8,11 +8,13 @@ import Candidate from "./components/MoreTab/CandidatePage/Candidate/Candidate";
 // import CandidateTableView from "./components/MoreTab/CandidatePage/CandidateTableView/CandidateTableView";
 import Support from "./components/MoreTab/SupportPage/SupportTable/SupportTable";
 import SupportViewPage from "./components/MoreTab/SupportPage/SupportViewPage/SupportViewPage";
-import CodeEditor from "./components/MoreTab/CodeEditorPage/Editor/Editor";
-import HtmlCssJsExecutor from "./components/MoreTab/CodeEditorPage/WebEditor/WebEditor";
+import CodeEditor from "./components/MoreTab/CodeEditorPage/Editor";
+import HtmlCssJsExecutor from "./components/MoreTab/CodeEditorPage/WebEditor";
 import Position from "./components/MoreTab/PositionPage/Position/Position";
 import CandidateViewPage from "./components/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
 import Preview from "./components/InterviewTab/Preview";
+import InterviewPage from "./components/InterviewTab/InterviewPage";
+import FeedbackHome from "./components/InterviewTab/FeedbackHome";
 
 function App() {
   return (
@@ -28,8 +30,10 @@ function App() {
           <Route path="/support/:id" element={<SupportViewPage />} />
           <Route path="/editor" element={<CodeEditor />} />
           <Route path="/web" element={<HtmlCssJsExecutor/>}/>
-          <Route path="/feedback" element={<Feedback/>}/>
-          <Route path="/interview-feedback" element={<Preview/>}/>
+          {/* <Route path="/feedback" element={<Feedback/>}/> */}
+          <Route path="/feedback" element={<FeedbackHome/>}/>
+          <Route path="/feedback-preview" element={<Preview/>}/>
+          <Route path="/interview-page" element={<InterviewPage/>}/>
         </Routes>
       </BrowserRouter>
     </div>

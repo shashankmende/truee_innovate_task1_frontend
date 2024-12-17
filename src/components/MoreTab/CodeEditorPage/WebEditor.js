@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./WebEditor.css";
+// import "./WebEditor.css";
 import Editor from "@monaco-editor/react";
 
 // Default HTML content
@@ -67,13 +67,13 @@ const HtmlCssJsExecutor = ({ themeMode, setTheme }) => {
   return (
     <>
       {/* <Header /> */}
-      <div className="web-development-bg">
-        <div className="web-development-input--container">
-          <h2>HTML, CSS & JavaScript Executor</h2>
+      <div className="web-development-bg grid grid-cols-[60%_40%] px-8 gap-[0.1rem] mt-4">
+        <div className="web-development-input--container flex flex-col gap-4">
+          <h2 className="text-[#227a8a] font-semibold">HTML, CSS & JavaScript Executor</h2>
 
           {/* HTML Editor */}
           <div
-            className="code-input--container"
+            className="code-input--container w-full h-[70vh] border-[1px] border-[gray] rounded-[0.3rem]"
             style={{ border: "2px solid #227A8A" }}
           >
             <Editor
@@ -87,61 +87,27 @@ const HtmlCssJsExecutor = ({ themeMode, setTheme }) => {
               onChange={(value) => setHtml(value)}
             />
           </div>
-
-          {/* CSS Editor */}
-
-          {/* <div className="code-input--container">
-            <Editor
-            defaultValue="write css Code"
-              value={css}
-              height="30vh"
-              language="css"
-              theme="vs-dark"
-              onChange={(value) => setCss(value)}
-              options={{
-                minimap: { enabled: false },
-                lineNumbers: "on",
-              }}
-            />
-          </div> */}
-
-          {/* JavaScript Editor */}
-          {/* <div className="code-input--container">
-            <Editor
-            defaultValue="//write js Code"
-              value={js}
-              height="30vh"
-              language="javascript"
-              theme="vs-dark"
-              onChange={(value) => setJs(value)}
-              options={{
-                minimap: { enabled: false },
-                lineNumbers: "on",
-              }}
-            />
-          </div> */}
         </div>
 
         {/* Output Section */}
-        <div className="web-development-output--container">
-          <h2>Output</h2>
+        <div className="web-development-output--container rounded-[0.3rem] flex flex-col gap-4">
+          <h2  className="text-[#227a8a] font-semibold">Output</h2>
           <div
             style={{
               backgroundColor: themeMode ? "white" : "#1E1E1E",
               border: "2px solid #227A8A",
               borderRadius: "0.3rem",
             }}
+            className="border-[2px] border-[#227a8a] rounded-[0.3rem]"
           >
             <iframe
               title="output"
               sandbox="allow-scripts"
               srcDoc={renderContent}
               style={{
-                width: "100%",
-                height: "69vh",
-                border: "none",
                 color: themeMode ? "black" : "white",
               }}
+              className="w-full h-[69vh] b-none"
             />
           </div>
         </div>

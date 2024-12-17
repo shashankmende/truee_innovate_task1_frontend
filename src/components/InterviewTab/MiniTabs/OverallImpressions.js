@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { IoIosStar } from "react-icons/io";
+import { useCustomContext } from "../../../context/context";
 
 const ratingLst = [
   {
@@ -28,20 +29,46 @@ const ratingLst = [
   },
 ];
 
-const OverallImpressions = () => {
+const OverallImpressions = ({ tab ,page}) => {
+  const { interviewTabData, setInterviewTabData } = useCustomContext();
+  const { rating, note, recommendation } =
+    interviewTabData.overallImpressionTabData;
+  // const [noteBool, setNoteBool] = useState(false);
+  const getColorByRating = (rating) => {
+    const ratingItem = ratingLst.find((r) => r.stars === rating);
+    return ratingItem ? ratingItem.color : "gray";
+  };
 
-    const [rating,setRating]=useState(0)
-    const [note,setNote]=useState('')
-    const [overallRecommendation,setOverallRecommendations]=useState("")
-    const [noteBool,setNoteBool]=useState(false)
-    const getColorByRating=(rating)=>{
-        const ratingItem = ratingLst.find(r=>r.stars===rating)
-        return ratingItem? ratingItem.color:"gray"
-    }
+  const onClickAddNote = () => {
+    console.log("Add Note clicked");
+    setInterviewTabData((prev) => ({
+      ...prev,
+      overallImpressionTabData: {
+        ...prev.overallImpressionTabData,
+        notesBool: true,
+      },
+    }));
+  };
+  
+  const onClickDeleteNote = () => {
+    console.log("Delete Note clicked");
+    setInterviewTabData((prev) => ({
+      ...prev,
+      overallImpressionTabData: {
+        ...prev.overallImpressionTabData,
+        notesBool: false,
+        note: "",
+      },
+    }));
+  };
+  
+
+  const { notesBool } = interviewTabData.overallImpressionTabData;
+
 
   return (
     <div className="flex flex-col gap-8">
-      <ul className="flex gap-8">
+     {tab&& <ul className="flex gap-8">
         {ratingLst.map((rating) => (
           <li
             key={rating.id}
@@ -59,59 +86,188 @@ const OverallImpressions = () => {
             <p>{rating.name}</p>
           </li>
         ))}
-      </ul>
+      </ul>}
 
-      <div className="flex  w-1/2 justify-between items-center">
+      <div className=" flex justify-between items-center" style={{width:page==="Popup"?"100%":"50%"}}>
         <p>
           Overall Rating<span className="text-red-500">*</span>
         </p>
         <div className="flex w-1/2 justify-between">
-        <div className="flex gap-3">
-        {Array.from({ length: 5 }, (_, index) => {
-          const isSelected = index + 1 <= rating;
-          return (
-            <IoIosStar
-              onClick={()=>setRating(index+1)}
-              className={`cursor-pointer transform transition-transform hover:scale-110`}
-              size={20}
-              style={{
-                color: isSelected ? getColorByRating(rating) : "gray",
-              }}
-              key={index}
-            />
-          );
-        })}
-        </div>
-        <button className="border border-[#227a8a] text-[#227a8a] p-1 rounded-md w-[120px]" onClick={()=>setNoteBool(!noteBool)}>{!noteBool ? "Add a Note":"Delete Note"}</button>
+          <div className="flex gap-3">
+            {Array.from({ length: 5 }, (_, index) => {
+              const isSelected = index + 1 <= rating;
+              return (
+                <IoIosStar
+                  onClick={
+                    tab
+                      ? () =>
+                          setInterviewTabData((prev) => ({
+                            ...prev,
+                            overallImpressionTabData: {
+                              ...prev.overallImpressionTabData,
+                              rating: index + 1,
+                            },
+                          }))
+                      : null
+                  }
+                  className={`cursor-pointer transform transition-transform hover:scale-110`}
+                  size={20}
+                  style={{
+                    color: isSelected ? getColorByRating(rating) : "gray",
+                  }}
+                  key={index}
+                />
+              );
+            })}
+          </div>
+          
+            
+          {notesBool ? (
+  <button onClick={onClickDeleteNote} className="p-1 text-[#227a8a] border border-[#227a8a] rounded-md w-[120px]">Delete Note</button>
+) : (
+  <button onClick={onClickAddNote} className="p-1 text-[#227a8a] border border-[#227a8a] rounded-md w-[120px]">Add Note</button>
+)}
+
+          
         </div>
       </div>
-      {
-        noteBool && (
-            <div className="flex w-1/2">
-                <label htmlFor="overall-note" className="w-1/2">Note</label>
-                <input onChange={(e)=>setNote(e.target.value)} value={note} id="overall-note" type="text" className="border border-gray-500 w-1/2 p-2 rounded-md outline-none" placeholder="Add Note" />
-            </div>
-        )
-      }
-      <div className="flex justify-between w-1/2">
-        <label htmlFor="">Recommendation<span className="text-red-700">*</span></label>
+      {!notesBool && (
+        <div className="flex justify-between"   style={{width:page==="Popup"?"100%":"50%"}}>
+          <label htmlFor="overall-note"   >
+            Note
+          </label>
+          <div className="flex  w-1/2 items-center border border-gray-500 p-2 rounded-md">
+          <input
+            onChange={(e) => {
+              setInterviewTabData((prev) => ({
+                ...prev,
+                overallImpressionTabData: {
+                  ...prev.overallImpressionTabData,
+                  note: e.target.value.slice(0,250),
+                },
+              }));
+            }}
+            value={note}
+            id="overall-note"
+            type="text"
+            className=" w-[100%] outline-none"
+            placeholder="Add Note"
+          />
+          <span className="text-gray-500">{note.length|| 0}/250</span>
+          </div>
+        </div>
+      )}
+      <div className="flex justify-between" style={{width:page==="Popup"?"100%":"50%"}}>
+        <label htmlFor="">
+          Recommendation<span className="text-red-700">*</span>
+        </label>
         <ul className="flex justify-between w-1/2">
-            <li key="hire" className="flex gap-2">
-                <input onChange={(e)=>setOverallRecommendations(e.target.value)} name="recommendation" id="hire-id" type="radio" value={"hire"}/>
-                <label htmlFor="hire-id">Hire</label>
-            </li>
-            <li key="no-hire" className="flex gap-2">
-                <input onChange={(e)=>setOverallRecommendations(e.target.value)} name="recommendation" id="no-hire-id" type="radio" value="no-hire"/>
-                <label htmlFor="no-hire-id">No-Hire</label>
-            </li>
-            <li key="Maybe" className="flex gap-2">
-                <input onChange={(e)=>setOverallRecommendations(e.target.value)} name="recommendation" id="maybe-id" type="radio" value="Maybe"/>
-                <label htmlFor="maybe-id">Maybe</label>
-            </li>
+          <li key="hire" className="flex gap-2 items-center">
+            <input
+              disabled={!tab && recommendation !== "hire"}
+              checked={recommendation === "hire"}
+              onChange={(e) => {
+                setInterviewTabData((prev) => ({
+                  ...prev,
+                  overallImpressionTabData: {
+                    ...prev.overallImpressionTabData,
+                    recommendation: e.target.value,
+                  },
+                }));
+              }}
+              name="recommendation"
+              id="hire-id"
+              type="radio"
+              value="hire"
+              className={`${
+                !tab && recommendation !== "hire"
+                  ? "text-gray-400"
+                  : "text-black"
+              }`}
+            />
+            <label
+              htmlFor="hire-id"
+              className={`${
+                !tab && recommendation !== "hire"
+                  ? "text-gray-400"
+                  : "text-black"
+              }`}
+            >
+              Hire
+            </label>
+          </li>
+          <li key="no-hire" className="flex gap-2">
+            <input
+              disabled={!tab && recommendation !== "no-hire"}
+              checked={recommendation === "no-hire"}
+              onChange={(e) => {
+                setInterviewTabData((prev) => ({
+                  ...prev,
+                  overallImpressionTabData: {
+                    ...prev.overallImpressionTabData,
+                    recommendation: e.target.value,
+                  },
+                }));
+              }}
+              name="recommendation"
+              id="no-hire-id"
+              type="radio"
+              value="no-hire"
+              className={`${
+                !tab && recommendation !== "no-hire"
+                  ? "text-gray-400"
+                  : "text-black"
+              }`}
+            />
+            <label
+              htmlFor="no-hire-id"
+              className={`${
+                !tab && recommendation !== "no-hire"
+                  ? "text-gray-400"
+                  : "text-black"
+              }`}
+            >
+              No-Hire
+            </label>
+          </li>
+          <li key="Maybe" className="flex gap-2">
+            <input
+              disabled={!tab && recommendation !== "Maybe"}
+              checked={recommendation === "Maybe"}
+              onChange={(e) => {
+                setInterviewTabData((prev) => ({
+                  ...prev,
+                  overallImpressionTabData: {
+                    ...prev.overallImpressionTabData,
+                    recommendation: e.target.value,
+                  },
+                }));
+              }}
+              name="recommendation"
+              id="maybe-id"
+              type="radio"
+              value="Maybe"
+              className={`${
+                !tab && recommendation !== "Maybe"
+                  ? "text-gray-400"
+                  : "text-black"
+              }`}
+            />
+            <label
+              htmlFor="maybe-id"
+              className={`${
+                !tab && recommendation !== "Maybe"
+                  ? "text-gray-400"
+                  : "text-black"
+              }`}
+            >
+              Maybe
+            </label>
+          </li>
         </ul>
       </div>
     </div>
   );
 };
 
-export default OverallImpressions;
+export default OverallImpressions

@@ -66,5 +66,20 @@ const AddCustomQuestionValidation = (question,answer, CustomQuestionErrFunction)
   return !hasError;
 };
 
+// const validateMandatoryQuestions = (interviewQuestionsState,setInterviewQuestionsState) => {
+//   let hasErrors = false;
+
+//   const updatedQuestions = interviewQuestionsState?.map((question) => {
+//     if (question.mandatory && !question.isAnswered) {
+//       hasErrors = true;
+//       return { ...question, error: true }; // Mark error
+//     }
+//     return { ...question, error: false }; // Clear error if valid
+//   });
+
+//   setInterviewQuestionsState(updatedQuestions);
+//   return !hasErrors; // Return validation result
+// };
+
 
 module.exports = { PositionAddFromValidation, AddCustomQuestionValidation };

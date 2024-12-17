@@ -31,11 +31,15 @@ import { TbBrandCpp } from "react-icons/tb";
 import { IoMdStarOutline } from "react-icons/io";
 import { SlLike } from "react-icons/sl";
 import { SlDislike } from "react-icons/sl";
+import { MdOutlineRemoveRedEye } from "react-icons/md";
+import { TiEdit } from "react-icons/ti";
 
 import { IoStar } from "react-icons/io5";
 
 
 
+export const viewIcon = <MdOutlineRemoveRedEye/>
+export const editIcon = <TiEdit/>
 
 export const jsIcon = <IoLogoJavascript fill="white" size={14}/>
 export const tsIcon = <SiTypescript  fill="yellow"/>

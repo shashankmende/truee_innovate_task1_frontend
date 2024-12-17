@@ -79,7 +79,6 @@ const Position = () => {
       <Header />
 
       <div className="flex justify-between items-center md:px-8 py-7">
-      {/* <div> */}
         <h2 className="text-2xl font-bold">Positions</h2>
         <div className="popup--container">
           <button className="border-none bg-teal-700 py-2 px-8 rounded-md text-white text-base cursor-pointer" onClick={() => setIsopen(true)}>Add</button>

@@ -1,19 +1,18 @@
 import React, { useState, useRef } from "react";
-// import Header from "../../Header/Header";
 import Editor from "@monaco-editor/react";
-import LanguageSelector from "../LanguageSelector";
-import { CODE_SNIPPETS } from "../Constants";
-import Output from "../Output/Output";
-import { closeIcon } from "../../../../IconsData";
-import { executeCode } from "../api";
+import LanguageSelector from "./LanguageSelector";
+import { CODE_SNIPPETS } from "./Constants";
+import Output from "./Output";
+import { closeIcon } from "../../../IconsData";
+import { executeCode } from "./api";
 import toast from "react-hot-toast";
-import "./Editor.css";
+// import "./Editor.css";
 
 import { Spinner } from "@chakra-ui/spinner";
-import HtmlCssJsExecutor from "../WebEditor/WebEditor";
+import HtmlCssJsExecutor from "./WebEditor";
 import Popup from "reactjs-popup";
-import FileIcons from "../FileIcons";
-import Header from "../../../Navbar/Header/Header";
+import FileIcons from "./FileIcons";
+import Header from "../../Navbar/Header/Header";
 
 const languageExtensions = {
   javascript: "js",
@@ -201,7 +200,7 @@ const CodeEditor = () => {
 
 
   return (
-    <div style={{ paddingBottom: "3rem" }}>
+    <div style={{ paddingBottom: "3rem" }} className="pb-12">
       <Header />
       <LanguageSelector
         mode={lightMode}
@@ -212,31 +211,26 @@ const CodeEditor = () => {
       {language === "html" ? (
         <HtmlCssJsExecutor themeMode={lightMode} setTheme={setLightMode} />
       ) : (
-        <div className="editor-background--container">
-          <main className="editor-main--container">
+        <div className="editor-background--container px-8">
+          <main className="editor-main--container mt-4 rounded grid grid-cols-[60%_40%] h-[75vh] gap-0.5 transition-colors duration-300">
             <div
-              style={{
-                backgroundColor: lightMode ? "#fff" : "#1E1E1E",
-                borderRadius: "0.3rem",
-                border: lightMode ? "2px solid #227a8a" : "2px solid gray",
-              }}
-            >
+            className={`rounded-[0.3rem] bg-${lightMode ? "#fff":"#1e1e1e"} border-2 border-[${lightMode ?"#227a8a":"gray"}]`}            >
               <div
-                className="editor-btns--container"
+                className={` border-b-2 border-${lightMode?"#227a8a":"gray"} editor-btns--container flex items-center justify-between border-collapse h-[2.2rem]`}
                 style={{
                   borderBottom: lightMode
                     ? "2px solid #227A8A"
                     : "2px solid gray",
                 }}
               >
-                <div className="files-title--container">
+                <div className="files-title--container flex items-center overflow-x-auto h-full w-[90%] scroll-smooth scrollbar-none scrollbar-thumb-[#227A8A] scrollbar-track-transparent">
                   {files.map((file) => (
                     
                     <Popup
                     key={file.id}
                       trigger={
                         <button
-                          // key={file.id}
+                        className="rounded-t-[0.2rem] py-[0.2rem] px-[1rem] b-none flex items-center gap-2 whitespace-nowrap h-full"
                           onClick={() => setActiveFile(file)}
                           style={{
                             backgroundColor:
@@ -249,7 +243,7 @@ const CodeEditor = () => {
                           </span>
                           {file.name.length <15 ? file.name : `${file.name.slice(0,15)}...`}
                           <span
-                            style={{ cursor: "pointer" }}
+                            className="cursor-pointer"
                             onClick={() => onClickCloseFile(file.id)}
                           >
                             {closeIcon}
@@ -284,9 +278,8 @@ const CodeEditor = () => {
                     onClick={createNewFile}
                     style={{
                       color: lightMode ? "black" : "white",
-                      marginLeft: "1rem",
-                      cursor: "pointer",
                     }}
+                    className="cursor-pointer ml-4"
                   >
                     +
                   </span>
@@ -297,16 +290,7 @@ const CodeEditor = () => {
                     boxSize="18px"
                   />
                 ) : (
-                  <button
-                    style={{
-                      background: "#227a8a",
-                      color: "white",
-                      padding: "0.2rem 1rem",
-                      cursor: "pointer",
-                      border: "none",
-                      borderTopRightRadius: "0.2rem",
-                      height:"100%"
-                    }}
+                  <button className="bg-[#227a8a] text-white py-[0.2rem] px-[1rem] cursor-pointer b-none rounded-tr-[0.2rem] h-full"
                     onClick={runCode}
                   >
                     Run
@@ -329,9 +313,9 @@ const CodeEditor = () => {
               style={{
                 backgroundColor: lightMode ? "white" : "#1E1E1E",
                 color: !lightMode ? "white" : "black",
-                borderRadius: "0.3rem",
                 border: lightMode ? "2px solid #227a8a" : "",
               }}
+              className="rounded-[0.3rem]"
             >
               <Output
                 lightMode={lightMode}
