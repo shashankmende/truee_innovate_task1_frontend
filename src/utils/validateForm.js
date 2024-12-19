@@ -66,20 +66,63 @@ const AddCustomQuestionValidation = (question,answer, CustomQuestionErrFunction)
   return !hasError;
 };
 
-// const validateMandatoryQuestions = (interviewQuestionsState,setInterviewQuestionsState) => {
-//   let hasErrors = false;
 
-//   const updatedQuestions = interviewQuestionsState?.map((question) => {
-//     if (question.mandatory && !question.isAnswered) {
-//       hasErrors = true;
-//       return { ...question, error: true }; // Mark error
-//     }
-//     return { ...question, error: false }; // Clear error if valid
-//   });
+  const SchedulerQuestionsValidation = (SchedulerSectionData,setSchedulerSectionData) => {
+  let isValid = true;
+  const updatedData = SchedulerSectionData.map((question) => {
+    if (question.mandatory && !question.isAnswered) {
+      isValid = false;
+      return { ...question, error: true };
+    }
+    return { ...question, error: false };
+  });
+  setSchedulerSectionData(updatedData);
+  return isValid;
+};
 
-//   setInterviewQuestionsState(updatedQuestions);
-//   return !hasErrors; // Return validation result
-// };
+
+const ValidateSkills = (skillsTabData,setInterviewTabData) => {
+  let isValid = true; // Assume valid unless an error is found
+
+  const updatedData = skillsTabData.map((tabItem) => ({
+    ...tabItem,
+    skillsList: tabItem.skillsList.map((skill) => {
+      if (skill.required && skill.rating <= 1) { // Fix the condition
+        isValid = false; // Mark as invalid if a required skill's rating is <= 1
+        return { ...skill, error: true };
+      }
+      return { ...skill, error: false };
+    }),
+  }));
+
+  setInterviewTabData((prev) => ({
+    ...prev,
+    skillsTabData: updatedData, // Update only the skillsTabData part
+  }));
+
+  return isValid;
+};
+
+const validateOverallImpression = (overallImpressionTabData, setInterviewTabData) => {
+  const { rating, note, recommendation, required } = overallImpressionTabData;
+
+  // Determine if there's an error in the data
+  const hasError = required && (rating <= 1 || note.trim() === "" || recommendation.trim() === "");
+
+  // Update the state with the error
+  setInterviewTabData((prev) => ({
+    ...prev,
+    overallImpressionTabData: {
+      ...prev.overallImpressionTabData,
+      error: hasError, // Update error state
+    },
+  }));
+
+  // Return validation result (optional, in case you want to use this as a boolean flag)
+  return !hasError;
+};
 
 
-module.exports = { PositionAddFromValidation, AddCustomQuestionValidation };
+
+  
+module.exports = { PositionAddFromValidation, AddCustomQuestionValidation,SchedulerQuestionsValidation ,ValidateSkills,validateOverallImpression};

@@ -33,11 +33,13 @@ import { SlLike } from "react-icons/sl";
 import { SlDislike } from "react-icons/sl";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { TiEdit } from "react-icons/ti";
+import { TbArrowsMaximize } from "react-icons/tb";
+import { FiMinimize } from "react-icons/fi";
 
 import { IoStar } from "react-icons/io5";
 
-
-
+export const minimizeScreenIcon = <FiMinimize/>
+export const maximizeScreenIcon = <TbArrowsMaximize/>
 export const viewIcon = <MdOutlineRemoveRedEye/>
 export const editIcon = <TiEdit/>
 

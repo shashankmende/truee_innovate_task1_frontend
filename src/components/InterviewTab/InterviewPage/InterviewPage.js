@@ -12,7 +12,9 @@ import {
   mdiPhoneHangup
 } from '@mdi/js';
 import Popup from 'reactjs-popup';
-import Feedback from './Feedback';
+import Feedback from '../Feedback';
+import { useCustomContext } from '../../../context/context';
+import { useEffect } from 'react';
  
 // eslint-disable-next-line react/prop-types
 const IconButton = ({ icon, label, color = "text-gray-700" }) => (
@@ -23,6 +25,10 @@ const IconButton = ({ icon, label, color = "text-gray-700" }) => (
 );
  
 const InterviewPage = () => {
+  const {page,setPage}=useCustomContext()
+  useEffect(()=>{
+    setPage("Popup")
+  },[])
   return (
     <div className="h-screen flex flex-col">
       {/* Header Icons*/}
@@ -34,12 +40,16 @@ const InterviewPage = () => {
       <div className="flex items-center space-x-6">
         <div className="flex items-center space-x-6">
           
-        <Popup trigger={<button><IconButton icon={mdiMessageTextOutline} label="Feedback" /></button>}>
-          <div className=" fixed top-0 bottom-0 right-0 w-full h-full flex justify-end bg-[#80808067]">
-            <div className="w-1/2 bg-white text-sm ">
-              <Feedback page={"Popup"}/>
+        <Popup nested closeOnDocumentClick={false} trigger={<button><IconButton icon={mdiMessageTextOutline} label="Feedback" /></button>}>
+          {closePopup =><div className=" fixed top-0 bottom-0 right-0 w-full h-full flex justify-end bg-[#80808067]">
+            <div style={{width:page==="Home"?"100%":"50%"}} 
+              className={`bg-white ${
+                page === "Popup" ? "text-sm" : "text-md"
+              } transition-all duration-500 ease-in-out transform`}
+            >
+              <Feedback closePopup={closePopup}  page={page}/>
             </div>
-          </div>
+          </div>}
         </Popup>
           
           <IconButton icon={mdiHelpCircleOutline} label="Questions" />

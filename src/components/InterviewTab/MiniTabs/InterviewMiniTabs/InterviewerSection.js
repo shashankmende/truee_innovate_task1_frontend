@@ -5,6 +5,7 @@ import { RxText } from "react-icons/rx";
 import { AddCustomQuestionValidation } from "../../../../utils/validateForm";
 import { closeIcon, dislikeIcon, likeIcon } from "../../../../IconsData";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { useCustomContext } from "../../../../context/context";
 
 const InterviewerSectionComponent = () => {
   const [interviewerQuestion, setInterviewerQuestion] = useState({
@@ -18,78 +19,64 @@ const InterviewerSectionComponent = () => {
     notes: "",
   });
 
-  const [dislikeQuestionId, setDislikeQuestionId] = useState("");
-  const [customInterviewerQuestionList, setCustomInterviewerQuestionList] =
-    useState([
-      {
-        id: 1,
-        question:
-          "Explain the difference between an interface and an abstract class in Java.",
-        answer:
-          "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
-        note:"",
-        notesBool:false,
-        isLiked:false,
-      },
-      {
-        question: "What is the difference between is and == in Python?",
-        answer:
-          "is checks for identity, i.e., whether two objects refer to the same memory location.,== checks for equality, i.e., whether the values of two objects are the same.",
-        notes: "",
-        id: 2,
-        note:"",
-        notesBool:false,isLiked:false,
-      },
-      {
-        question:
-          "What is the difference between a shallow copy and a deep copy in Python?",
-        answer:
-          "A shallow copy creates a new object but references the original objects for nested elements. A deep copy creates a new object and recursively copies all objects inside it.",
-        notes: "",
-        id: 3,
-        notes:"",
-        notesBool:false,isLiked:false,
-      },
-      {
-        question: "What is a Python lambda function?",
-        answer:
-          "A lambda function is an anonymous function defined using the lambda keyword. It can have any number of arguments but only one expression.",
-        notes: "",
-        id: 4,
-        note:"",
-        notesBool:false,isLiked:false,
-      },
-      {
-        question:
-          "What is the difference between @staticmethod and @classmethod?",
-        answer:
-          "@staticmethod defines a method that doesn't operate on the class or instance. @classmethod defines a method that operates on the class and receives the class as the first parameter (cls).",
-        notes: "",
-        id: 5,
-        note:"",
-        notesBool:false,isLiked:false,
-      },
-    ]);
+  const { interviewerSectionData, setInterviewerSectionData } =
+    useCustomContext();
 
   const [selectedQuestion, setSelectedQuestion] = useState(null);
-  const [notesId, setNotesId] = useState(null);
 
-  const onClickSaveCustomQuestion = (closeNestedPopup) => {
+  // const QuestionSaveLogic = ()=>{
+  //   console.log("Save custom question clicked");
+  //   const { answer, question } = interviewerQuestion;
+  //   const isValid = AddCustomQuestionValidation(
+  //     question,
+  //     answer,
+  //     CustomQuestionErrFunction
+  //   );
+
+  //   console.log("Validation result:", isValid);
+
+  //   if (isValid) {
+  //     setInterviewerSectionData((prev) => [
+  //       ...prev,
+  //       {
+  //         ...interviewerQuestion,
+  //         id: interviewerSectionData.length + 1,
+  //       },
+  //     ]);
+  //     setInterviewerQuestion({
+  //       question: "",
+  //       answer: "",
+  //       notes: "",
+  //     });
+      
+  //   closeNestedPopup();
+  //   closePlusPopup()
+
+  //     alert("Question added to local storage");
+  //     console.log("Validation passed. Proceed to save data.");
+  //   } else {
+  //     console.log("Validation failed. Fix the errors.");
+  //   }
+  // }
+
+  const onClickSaveCustomQuestion = (closeNestedPopup,closePlusPopup) => {
+    // QuestionSaveLogic()
     console.log("Save custom question clicked");
-    const {answer,question}=interviewerQuestion
+    const { answer, question } = interviewerQuestion;
     const isValid = AddCustomQuestionValidation(
-      question,answer,
+      question,
+      answer,
       CustomQuestionErrFunction
     );
 
     console.log("Validation result:", isValid);
 
     if (isValid) {
-      setCustomInterviewerQuestionList((prev) => [
+      setInterviewerSectionData((prev) => [
         ...prev,
         {
           ...interviewerQuestion,
-          id: customInterviewerQuestionList.length + 1,
+          id: interviewerSectionData.length + 1,
         },
       ]);
       setInterviewerQuestion({
@@ -97,7 +84,42 @@ const InterviewerSectionComponent = () => {
         answer: "",
         notes: "",
       });
-      closeNestedPopup();
+      
+    closeNestedPopup();
+    closePlusPopup()
+
+      alert("Question added to local storage");
+      console.log("Validation passed. Proceed to save data.");
+    } else {
+      console.log("Validation failed. Fix the errors.");
+    }
+  };
+
+  const onClickSaveAndNext = () => {
+    console.log("Save custom question clicked");
+    const { answer, question } = interviewerQuestion;
+    const isValid = AddCustomQuestionValidation(
+      question,
+      answer,
+      CustomQuestionErrFunction
+    );
+
+    console.log("Validation result:", isValid);
+
+    if (isValid) {
+      setInterviewerSectionData((prev) => [
+        ...prev,
+        {
+          ...interviewerQuestion,
+          id: interviewerSectionData.length + 1,
+        },
+      ]);
+      setInterviewerQuestion({
+        question: "",
+        answer: "",
+        notes: "",
+      });
+      
 
       alert("Question added to local storage");
       console.log("Validation passed. Proceed to save data.");
@@ -114,7 +136,7 @@ const InterviewerSectionComponent = () => {
   };
 
   const onChangeRadioInput = (questionId, value) => {
-    setCustomInterviewerQuestionList((prev) =>
+    setInterviewerSectionData((prev) =>
       prev.map((question) =>
         question.id === questionId
           ? { ...question, isAnswered: value }
@@ -124,67 +146,74 @@ const InterviewerSectionComponent = () => {
   };
 
   const onChangeInterviewQuestionNotes = (questionId, notes) => {
-    setCustomInterviewerQuestionList((prev) =>
+    setInterviewerSectionData((prev) =>
       prev.map((question) =>
         question.id === questionId ? { ...question, note: notes } : question
       )
     );
   };
 
-  const onChangeQuestion =(e)=>{
-    const {answer}=interviewerQuestion
-    AddCustomQuestionValidation(e.target.value,answer,CustomQuestionErrFunction)
+  const onChangeQuestion = (e) => {
+    const { answer } = interviewerQuestion;
+    AddCustomQuestionValidation(
+      e.target.value,
+      answer,
+      CustomQuestionErrFunction
+    );
     setInterviewerQuestion((prev) => ({
       ...prev,
       question: e.target.value,
-    }))
-  }
+    }));
+  };
 
-  const onChangeAnswer =(e)=>{
-    const {question}=interviewerQuestion
-    AddCustomQuestionValidation(question,e.target.value,CustomQuestionErrFunction)
+  const onChangeAnswer = (e) => {
+    const { question } = interviewerQuestion;
+    AddCustomQuestionValidation(
+      question,
+      e.target.value,
+      CustomQuestionErrFunction
+    );
     setInterviewerQuestion((prev) => ({
       ...prev,
       answer: e.target.value,
-    }))
-  }
+    }));
+  };
 
-  const onClickAddNote = (id)=>{
-    setCustomInterviewerQuestionList(prev=>
-      prev.map(question=>
-        question.id===id ? {...question,notesBool:true}:question
+  const onClickAddNote = (id) => {
+    setInterviewerSectionData((prev) =>
+      prev.map((question) =>
+        question.id === id ? { ...question, notesBool: true } : question
       )
+    );
+  };
 
-    )
-  }
-
-  const onClickDeleteNote =(id)=>{
-    setCustomInterviewerQuestionList(prev=>
-      prev.map(question=>
-        question.id===id?{...question,notesBool:false,note:""}:question
+  const onClickDeleteNote = (id) => {
+    setInterviewerSectionData((prev) =>
+      prev.map((question) =>
+        question.id === id
+          ? { ...question, notesBool: false, note: "" }
+          : question
       )
-    )
-  }
+    );
+  };
 
-  const onClickLikeIcon =(id)=>{
-    setCustomInterviewerQuestionList(prev=>
-      prev.map(question=>
-        question.id===id?{...question,isLiked:true}:question
+  const onClickLikeIcon = (id) => {
+    setInterviewerSectionData((prev) =>
+      prev.map((question) =>
+        question.id === id ? { ...question, isLiked: true } : question
       )
-    )
-  }
+    );
+  };
 
-  const onClickDisLikeIcon= (id)=>{
-    setCustomInterviewerQuestionList(prev=>
-      prev.map(question=>
-        question.id===id ?{...question,isLiked:false}:question
+  const onClickDisLikeIcon = (id) => {
+    setInterviewerSectionData((prev) =>
+      prev.map((question) =>
+        question.id === id ? { ...question, isLiked: false } : question
       )
-    )
-
-  }
+    );
+  };
 
   return (
-
     <div className="relative h-[53vh]">
       <div className="flex items-center gap-4 mt-4">
         <p>
@@ -194,6 +223,7 @@ const InterviewerSectionComponent = () => {
           The questions listed below are interviewer's choice.
         </p>
       </div>
+
       <Popup
         trigger={
           <button className="absolute text-white bottom-0 right-0 aspect-square rounded-full bg-[#227a8a] w-8 flex justify-center items-center cursor-pointer">
@@ -205,7 +235,7 @@ const InterviewerSectionComponent = () => {
         arrow
         contentStyle={{
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
-          backgroundColor:'white'
+          backgroundColor: "white",
         }}
         arrowStyle={{
           color: "gray",
@@ -221,13 +251,13 @@ const InterviewerSectionComponent = () => {
               trigger={
                 <button
                   onClick={() => {
-                    console.log('custom popup clicked')
+                    console.log("custom popup clicked");
                     closePlusPopup();
                   }}
                   contentStyle={{
                     boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
-                    background:'white',
-                    display:"block"
+                    background: "white",
+                    display: "block",
                   }}
                 >
                   Custom Questions
@@ -244,14 +274,14 @@ const InterviewerSectionComponent = () => {
                       <button
                         className="text-xl"
                         onClick={() => {
-                          closeNestedPopup()
+                          closeNestedPopup();
                           closePlusPopup();
                         }}
                       >
                         {closeIcon}
                       </button>
                     </div>
-                    <form className="h-[70vh]  m-auto w-[90%] flex flex-col gap-12">
+                    <form className="h-[68vh]  m-auto w-[90%] flex flex-col gap-12" >
                       <div className="flex w-full gap-8">
                         <div className="w-[20%]">
                           <label htmlFor="customQuestion">Question</label>
@@ -261,7 +291,7 @@ const InterviewerSectionComponent = () => {
                         <div className="w-[100%] flex flex-col ">
                           <div className="flex justify-between w-[100%] border-b-2 border-solid-gray">
                             <input
-                              onChange={(e)=>onChangeQuestion(e)}
+                              onChange={(e) => onChangeQuestion(e)}
                               value={interviewerQuestion.question}
                               id="customQuestion"
                               className="w-[80%] outline-none text-gray-500"
@@ -290,7 +320,7 @@ const InterviewerSectionComponent = () => {
                           <div className="flex flex-col justify-between w-[100%] ">
                             <div className="flex justify-between w-[100%] border-b-2 border-solid-gray">
                               <input
-                              onChange={e=>onChangeAnswer(e)}
+                                onChange={(e) => onChangeAnswer(e)}
                                 value={interviewerQuestion.answer}
                                 id="customQuestion"
                                 className="w-[80%] outline-none text-gray-500"
@@ -315,6 +345,7 @@ const InterviewerSectionComponent = () => {
                         <label className="w-[20%]">Note</label>
                         <div className="w-[80%] relative ">
                           <textarea
+                            // onChange={(e) => onChangeInterviewQuestionNotes(e)}
                             onChange={(e) =>
                               setInterviewerQuestion((prev) => ({
                                 ...prev,
@@ -331,16 +362,19 @@ const InterviewerSectionComponent = () => {
                         </div>
                       </div>
                     </form>
+                    <div className="flex justify-center mb-1">
+                    <span className="bg-[#227a8a] px-0.5 py-0.5 rounded-sm text-white w-[30px] text-center">{interviewerSectionData.length+1}</span>
+                    </div>
                     <div className="border-t-2 border-gray-500 flex justify-end p-3 gap-4">
                       <button
                         className="bg-[#227a8a] text-white px-6 py-2 rounded-md"
                         onClick={() =>
-                          onClickSaveCustomQuestion(closeNestedPopup)
+                          onClickSaveCustomQuestion(closeNestedPopup,closePlusPopup)
                         }
                       >
                         Save
                       </button>
-                      <button className="bg-[#227a8a] text-white px-6 py-2 rounded-md">
+                      <button className="bg-[#227a8a] text-white px-6 py-2 rounded-md" onClick={onClickSaveAndNext}>
                         Save & Next
                       </button>
                     </div>
@@ -352,7 +386,7 @@ const InterviewerSectionComponent = () => {
         )}
       </Popup>
       <ul className="mt-4 flex flex-col gap-4 h-[45vh] overflow-auto pr-2">
-        {customInterviewerQuestionList.map((EachQuestion) => (
+        {interviewerSectionData.map((EachQuestion) => (
           <li
             key={EachQuestion.id}
             className="border border-gray-500 rounded-md p-4 cursor-pointer flex flex-col gap-3"
@@ -360,8 +394,9 @@ const InterviewerSectionComponent = () => {
             <div
               className="flex justify-between"
               onClick={() => {
-                setSelectedQuestion( selectedQuestion === EachQuestion.id ? null:EachQuestion.id);
-                setNotesId(null);
+                setSelectedQuestion(
+                  selectedQuestion === EachQuestion.id ? null : EachQuestion.id
+                );
               }}
             >
               <p>{`${EachQuestion.id}. ${EachQuestion.question}`}</p>
@@ -375,74 +410,60 @@ const InterviewerSectionComponent = () => {
               <div>
                 <p className="text-gray-500">{EachQuestion.answer}</p>
                 <div className="flex justify-between mt-4 flex-wrap gap-4">
-                <div className="md:gap-2 flex items-center  rounded-md">
+                  {/* Response Type Section */}
+                  <div className="flex rounded-md">
                     <p className="w-[200px] font-bold text-gray-700">
-                      Response Type<span className="text-[red]">*</span>
+                      Response Type
+                      {EachQuestion.mandatory && (
+                        <span className="text-red-500">*</span>
+                      )}
                     </p>
-                    <div className="w-full radio-input--container flex flex-row items-center gap-8">
-                      <span className="flex items-center gap-2">
-                        <input
-                          checked={EachQuestion.isAnswered === "Not Answered"}
-                          value="Not Answered"
-                          name={`isAnswered-${EachQuestion.id}`}
-                          type="radio"
-                          id={`not-answered-${EachQuestion.id}`}
-                          onChange={(e) =>
-                            onChangeRadioInput(EachQuestion.id, e.target.value)
-                          }
-                        />
-                        <label
-                          className="cursor-pointer"
-                          htmlFor={`not-answered-${EachQuestion.id}`}
-                        >
-                          Not Answered
-                        </label>
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <input
-                          value="Partially Answered"
-                          name={`isAnswered-${EachQuestion.id}`}
-                          type="radio"
-                          id={`partially-${EachQuestion.id}`}
-                          checked={EachQuestion.isAnswered === "Partially Answered"}
-                          onChange={(e) =>
-                            onChangeRadioInput(EachQuestion.id, e.target.value)
-                          }
-                        />
-                        <label htmlFor={`partially-${EachQuestion.id}`}>
-                          Partially Answered
-                        </label>
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <input
-                          checked={EachQuestion.isAnswered === "Fully Answered"}
-                          value="Fully Answered"
-                          name={`isAnswered-${EachQuestion.id}`}
-                          type="radio"
-                          id={`fully-${EachQuestion.id}`}
-                          onChange={(e) =>
-                            onChangeRadioInput(EachQuestion.id, e.target.value)
-                          }
-                        />
-                        <label htmlFor={`fully-${EachQuestion.id}`}>
-                          Fully Answered
-                        </label>
-                      </span>
+                    <div className="w-full flex flex-wrap items-center gap-y-2 gap-x-8">
+                      {[
+                        "Not Answered",
+                        "Partially Answered",
+                        "Fully Answered",
+                      ].map((status) => (
+                        <span key={status} className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            id={`${status.toLowerCase().replace(" ", "-")}-${
+                              EachQuestion.id
+                            }`}
+                            name={`isAnswered-${EachQuestion.id}`}
+                            value={status}
+                            checked={EachQuestion.isAnswered === status}
+                            onChange={(e) =>
+                              onChangeRadioInput(
+                                EachQuestion.id,
+                                e.target.value
+                              )
+                            }
+                          />
+                          <label
+                            htmlFor={`${status
+                              .toLowerCase()
+                              .replace(" ", "-")}-${EachQuestion.id}`}
+                            className="cursor-pointer"
+                          >
+                            {status}
+                          </label>
+                        </span>
+                      ))}
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    {!EachQuestion.notesBool && <button
-                      className=" cursor-pointer font-bold py-[0.2rem] px-[0.8rem] text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]"
-                      onClick={() =>
-                        // setNotesId(notesId ? null : EachQuestion.id)
-                        onClickAddNote(EachQuestion.id)
-                      }
-                    >Add a Note
-                    </button>}
-                    {EachQuestion.notesBool && <button 
-                     className=" cursor-pointer font-bold py-[0.2rem] px-[0.8rem] text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]" 
-                     onClick={()=>onClickDeleteNote(EachQuestion.id)}>Delete Note</button>}
 
+                  <div className="flex items-center gap-4">
+                    <button
+                      className="cursor-pointer font-bold py-1 px-4 text-[#227a8a] bg-transparent rounded-md shadow-sm border border-[#227a8a]"
+                      onClick={() =>
+                        EachQuestion.notesBool
+                          ? onClickDeleteNote(EachQuestion.id)
+                          : onClickAddNote(EachQuestion.id)
+                      }
+                    >
+                      {EachQuestion.notesBool ? "Delete Note" : "Add a Note"}
+                    </button>
                     <Popup
                       trigger={
                         <button className="text-[#227a8a] font-bold">
@@ -450,55 +471,61 @@ const InterviewerSectionComponent = () => {
                         </button>
                       }
                       arrow={true}
-                      on={"hover"}
-                      position={"top center"}
+                      on="hover"
+                      position="top center"
                       offsetY={5}
-                      arrowStyle={{
-                        color: "gray",
-                      }}
+                      arrowStyle={{ color: "gray" }}
                     >
-                      <p className="bg-[gray] text-xs text-white px-2 p-1 rounded-md">share with candidate</p>
+                      <p className="bg-gray-700 text-xs text-white px-2 py-1 rounded-md">
+                        Share with candidate
+                      </p>
                     </Popup>
-                    <span className={`${EachQuestion.isLiked? 'text-[green]':""} transition-transform hover:scale-110 duration-300 ease-in-out`} 
-                    onClick={()=>onClickLikeIcon(EachQuestion.id)}>{likeIcon}</span>
                     <span
                       className={`${
-                        !EachQuestion.isLiked ? "text-red-500": ""
+                        EachQuestion.isLiked ? "text-green-500" : ""
                       } cursor-pointer transition-transform hover:scale-110 duration-300 ease-in-out`}
-                      onClick={()=>onClickDisLikeIcon(EachQuestion.id)}
+                      onClick={() => onClickLikeIcon(EachQuestion.id)}
+                    >
+                      {likeIcon}
+                    </span>
+                    <span
+                      className={`${
+                        !EachQuestion.isLiked ? "text-red-500" : ""
+                      } cursor-pointer transition-transform hover:scale-110 duration-300 ease-in-out`}
+                      onClick={() => onClickDisLikeIcon(EachQuestion.id)}
                     >
                       {dislikeIcon}
                     </span>
                   </div>
                 </div>
-              
-              {EachQuestion.notesBool && (
-                <div className="flex justify-start mt-4">
-                  <label htmlFor="note-input" className="w-[200px]">Note</label>
-                  <div className="w-full relative mr-5 rounded-md h-[80px]">
-                    <input
-                      className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"
-                      id="note-input"
-                      type="text"
-                      value={EachQuestion.note}
-                      onChange={(e) =>
-                        onChangeInterviewQuestionNotes(
-                          EachQuestion.id,
-                          e.target.value.slice(0, 250)
-                        )
-                      }
-                      placeholder="Add your note here"
-                    />
-                    <span className="absolute right-[1rem] bottom-[0.2rem]  text-gray-500">
-                      {EachQuestion.note?.length || 0}/250
-                    </span>
+
+                {EachQuestion.notesBool && (
+                  <div className="flex justify-start mt-4">
+                    <label htmlFor="note-input" className="w-[200px]">
+                      Note
+                    </label>
+                    <div className="w-full relative mr-5 rounded-md h-[80px]">
+                      <input
+                        className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"
+                        id="note-input"
+                        type="text"
+                        value={EachQuestion.note}
+                        onChange={(e) =>
+                          onChangeInterviewQuestionNotes(
+                            EachQuestion.id,
+                            e.target.value.slice(0, 250)
+                          )
+                        }
+                        placeholder="Add your note here"
+                      />
+                      <span className="absolute right-[1rem] bottom-[0.2rem]  text-gray-500">
+                        {EachQuestion.note?.length || 0}/250
+                      </span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
               </div>
             )}
-
-            
           </li>
         ))}
       </ul>

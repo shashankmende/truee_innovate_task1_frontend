@@ -13,8 +13,9 @@ import HtmlCssJsExecutor from "./components/MoreTab/CodeEditorPage/WebEditor";
 import Position from "./components/MoreTab/PositionPage/Position/Position";
 import CandidateViewPage from "./components/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
 import Preview from "./components/InterviewTab/Preview";
-import InterviewPage from "./components/InterviewTab/InterviewPage";
+// import InterviewPage from "./components/InterviewTab/InterviewPage";
 import FeedbackHome from "./components/InterviewTab/FeedbackHome";
+import InterviewPage from "./components/InterviewTab/InterviewPage/InterviewPage";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/feedback" element={<FeedbackHome/>}/>
           <Route path="/feedback-preview" element={<Preview/>}/>
           <Route path="/interview-page" element={<InterviewPage/>}/>
+          <Route path="/feedback-new" element={<Feedback/>}/>
         </Routes>
       </BrowserRouter>
     </div>

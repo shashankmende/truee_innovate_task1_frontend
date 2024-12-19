@@ -7,8 +7,6 @@ import { useLocation } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { IoIosStar } from "react-icons/io";
-import Popup from "reactjs-popup";
-import Feedback from "./Feedback";
 
 const ratingLst = [
   { id: 1, name: "Poor", stars: 2, color: "red" },
@@ -23,8 +21,6 @@ const Preview = () => {
 
   const previewRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const [openFeedbackPopup, setOpenFeedbackPopup] = useState(false);
 
   const handleDownload = async () => {
     setIsLoading(true); // Show loader
@@ -60,12 +56,18 @@ const Preview = () => {
           Interview Feedback - Preview
         </h2>
         <div className="p-8 border border-gray-500 rounded-md m-8">
-          <CandidateMiniTab />
-          <hr className="w-full h-[1px] bg-gray-500 mb-8" />
-          {/* <div className="flex flex-col  ">
-            <div className="w-full flex justify-between ">
+          <div className="border-b-2 border-[gray] pb-12">
+            <CandidateMiniTab />
+          </div>
+          <div className="grid grid-cols-5 gap-4 my-4 border-b-gray-500 pb-12">
+            {/* Left column (60%) */}
+            <div className="col-span-3">
               <h2 className="font-semibold text-xl">Skills:</h2>
-            
+              <SkillsTabComponent tab={state?.tab} />
+            </div>
+
+            {/* Right column (40%) */}
+            <div className="col-span-2 flex flex-col items-center">
               <ul className="stars-container flex gap-8">
                 {ratingLst.map((rating) => (
                   <li
@@ -86,36 +88,10 @@ const Preview = () => {
                 ))}
               </ul>
             </div>
-            <SkillsTabComponent tab={state?.tab} />
-          </div> */}
-          <div className="flex items-center justify-between">
-            <div className="w-full">
-              <h2 className="font-semibold text-xl">Skills:</h2>
-              <SkillsTabComponent tab={state?.tab} />
-            </div>
-            <ul className="stars-container flex gap-8">
-              {ratingLst.map((rating) => (
-                <li
-                  key={rating.id}
-                  className={`text-${rating.color} flex flex-col items-center cursor-pointer gap-3`}
-                >
-                  <div className="flex">
-                    {Array.from({ length: rating.stars }, (_, index) => (
-                      <IoIosStar
-                        key={index}
-                        style={{ color: rating.color }}
-                        className="text-2xl"
-                      />
-                    ))}
-                  </div>
-                  <p>{rating.name}</p>
-                </li>
-              ))}
-            </ul>
           </div>
-          <hr className="w-full h-[2px] bg-gray-500 mb-8 mt-8" />
-          <div>
-            <h2 className="font-semibold text-xl mb-4">Overall Impressions:</h2>
+
+          <div className="w-[60%]">
+            <h2 className="font-semibold text-xl mb-4 w-[250px]">Overall Impressions:</h2>
             <OverallImpressions />
           </div>
         </div>

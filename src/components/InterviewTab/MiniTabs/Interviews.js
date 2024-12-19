@@ -16,13 +16,13 @@ const interviewMiniTabsList = [
   ];
 
  
-  const InterviewsMiniTabComponent = ({setValidateCurrentTab}) => {
+  const InterviewsMiniTabComponent = ({tab,setValidateCurrentTab}) => {
     const [interviewMiniTab, setInterviewMiniTab] = useState(1);
 
     const InterviewDisplayData = () => {
         switch (interviewMiniTab) {
           case 1:
-            return <SchedulerSectionComponent setValidateCurrentTab={setValidateCurrentTab}/>;
+            return <SchedulerSectionComponent tab={tab} setValidateCurrentTab={setValidateCurrentTab}/>;
           case 2:
             return <InterviewerSectionComponent/>;
         default:
