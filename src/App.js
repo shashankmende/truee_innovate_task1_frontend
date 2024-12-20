@@ -1,21 +1,19 @@
 
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Feedback from "./components/InterviewTab/Feedback";
-import PositionViewPage from "./components/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
-import Form from "./components/MoreTab/PositionPage/Form/Form";
-import Candidate from "./components/MoreTab/CandidatePage/Candidate/Candidate";
-// import CandidateTableView from "./components/MoreTab/CandidatePage/CandidateTableView/CandidateTableView";
-import Support from "./components/MoreTab/SupportPage/SupportTable/SupportTable";
-import SupportViewPage from "./components/MoreTab/SupportPage/SupportViewPage/SupportViewPage";
-import CodeEditor from "./components/MoreTab/CodeEditorPage/Editor";
-import HtmlCssJsExecutor from "./components/MoreTab/CodeEditorPage/WebEditor";
-import Position from "./components/MoreTab/PositionPage/Position/Position";
-import CandidateViewPage from "./components/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
-import Preview from "./components/InterviewTab/Preview";
-// import InterviewPage from "./components/InterviewTab/InterviewPage";
-import FeedbackHome from "./components/InterviewTab/FeedbackHome";
-import InterviewPage from "./components/InterviewTab/InterviewPage/InterviewPage";
+import Feedback from "./components/Tabs/InterviewTab/Feedback";
+import PositionViewPage from "./components/Tabs/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
+import Form from "./components/Tabs/MoreTab/PositionPage/Form/Form";
+import Candidate from "./components/Tabs/MoreTab/CandidatePage/Candidate/Candidate";
+import Support from "./components/Tabs/MoreTab/SupportPage/SupportTable/SupportTable";
+import SupportViewPage from "./components/Tabs/MoreTab/SupportPage/SupportViewPage/SupportViewPage";
+import CodeEditor from "./components/Tabs/MoreTab/CodeEditorPage/Editor";
+import HtmlCssJsExecutor from "./components/Tabs/MoreTab/CodeEditorPage/WebEditor";
+import Position from "./components/Tabs/MoreTab/PositionPage/Position/Position";
+import CandidateViewPage from "./components/Tabs/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
+import Preview from "./components/Tabs/InterviewTab/Preview";
+import FeedbackHome from "./components/Tabs/InterviewTab/FeedbackHome";
+import InterviewPage from "./components/Tabs/InterviewTab/InterviewPage/InterviewPage";
 
 function App() {
   return (

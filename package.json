@@ -24,11 +24,12 @@
     "react-dropdown": "^1.11.0",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^5.3.0",
-    "react-modal": "^3.16.1",
+    "react-modal": "^3.16.3",
     "react-router-dom": "^6.28.0",
     "react-scripts": "5.0.1",
     "react-select": "^5.8.3",
     "react-spinner": "^0.2.7",
+    "react-spinners": "^0.15.0",
     "react-toaster": "^0.0.3",
     "reactjs-popup": "^2.0.6",
     "web-vitals": "^2.1.4"

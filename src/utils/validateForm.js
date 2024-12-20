@@ -67,7 +67,7 @@ const AddCustomQuestionValidation = (question,answer, CustomQuestionErrFunction)
 };
 
 
-  const SchedulerQuestionsValidation = (SchedulerSectionData,setSchedulerSectionData) => {
+const SchedulerQuestionsValidation = (SchedulerSectionData,setSchedulerSectionData) => {
   let isValid = true;
   const updatedData = SchedulerSectionData.map((question) => {
     if (question.mandatory && !question.isAnswered) {
@@ -81,24 +81,21 @@ const AddCustomQuestionValidation = (question,answer, CustomQuestionErrFunction)
 };
 
 
-const ValidateSkills = (skillsTabData,setInterviewTabData) => {
+const ValidateSkills = (skillsTabData,setSkillsTabData) => {
   let isValid = true; // Assume valid unless an error is found
 
-  const updatedData = skillsTabData.map((tabItem) => ({
-    ...tabItem,
-    skillsList: tabItem.skillsList.map((skill) => {
-      if (skill.required && skill.rating <= 1) { // Fix the condition
-        isValid = false; // Mark as invalid if a required skill's rating is <= 1
-        return { ...skill, error: true };
+  const updatedData = skillsTabData.map(category=>
+  ({...category,
+    skillsList:category.skillsList.map(skill=>{
+      if (skill.required && skill.rating<=1){
+        isValid= false;
+        return {...skill,error:true}
       }
-      return { ...skill, error: false };
-    }),
-  }));
-
-  setInterviewTabData((prev) => ({
-    ...prev,
-    skillsTabData: updatedData, // Update only the skillsTabData part
-  }));
+      return {...skill,error:false}
+    })
+  })
+  )
+  setSkillsTabData(updatedData)
 
   return isValid;
 };

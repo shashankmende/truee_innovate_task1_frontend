@@ -13,11 +13,11 @@ const CustomProvider = ({ children }) => {
   const [page,setPage]=useState("Home")
 
   const [error, setError] = useState(null);
-  const [interviewTabData, setInterviewTabData] = useState({
-    skillsTabData: [
+  const [skillsTabData,setSkillsTabData]=useState([
       {
         id: 1,
         category: "Mandatory skills",
+        // required:true,
         skillsList: [
           { name: "Apex Programming", rating: 0,note:"",notesBool:false,required:true,error:false },
           { name: "SOQL/SOSL", rating: 0,note:"",notesBool:false,required:true,error:false},
@@ -27,15 +27,17 @@ const CustomProvider = ({ children }) => {
       {
         id: 2,
         category: "Optional skills",
+        // required:false,
         skillsList: [
-          { name: "Javascript", rating: 0,note:"",notesBool:false},
-          { name: "Mobile Development", rating: 0,note:"",notesBool:false },
-          { name: "Salesforce CPQ", rating: 0,note:"",notesBool:false },
+          { name: "Javascript", rating: 0,note:"",notesBool:false,required:false},
+          { name: "Mobile Development", rating: 0,note:"",notesBool:false,required:false, },
+          { name: "Salesforce CPQ", rating: 0,note:"",notesBool:false,required:false, },
         ],
       },
       {
         id: 3,
         category: "Technical skills",
+        // required:true,
         skillsList: [
           { name: "Coding", rating: 0,note:"",notesBool:false,required:true,error:false },
           { name: "Problem-Solving", rating: 0 ,note:"",notesBool:false ,required:true,error:false},
@@ -45,10 +47,12 @@ const CustomProvider = ({ children }) => {
       {
         id: 4,
         category: "Communication",
+        // required:true,
         skillsList: [{ name: "Mobile Teamwork", rating: 0,note:"",notesBool:false,required:true ,error:false}],
       },
-    ],
-    overallImpressionTabData: {
+    ])
+
+    const [overallImpressionTabData,setOverallImpressionTabData]=useState({
       rating: 0,
       note: "",
       recommendation: "",
@@ -56,8 +60,8 @@ const CustomProvider = ({ children }) => {
     required:true,
     error:false
     
-    },
-  });
+    })
+
 
   const [SchedulerSectionData,setSchedulerSectionData]=useState([
     {
@@ -72,6 +76,7 @@ const CustomProvider = ({ children }) => {
       isAnswered: "",
       notesBool: false,
       isLiked: true,
+      whyDislike:"",
       error: false,
     },
     {
@@ -86,6 +91,7 @@ const CustomProvider = ({ children }) => {
       isAnswered: "",
       notesBool: false,
       isLiked: false,
+      whyDislike:"",
       error: false,
     },
     {
@@ -101,6 +107,7 @@ const CustomProvider = ({ children }) => {
       notesBool: false,
       isLiked: false,
       error: false,
+      whyDislike:"",
     },
     {
       id: 4,
@@ -115,6 +122,7 @@ const CustomProvider = ({ children }) => {
       notesBool: false,
       isLiked: false,
       error: false,
+      whyDislike:"",
     },
   ])
 
@@ -168,10 +176,11 @@ const CustomProvider = ({ children }) => {
   ])
 
   const [feedbackTabErrors, setFeedbackTabError] = useState({
-    interviewQuestion: false,
-    skills: false,
-    overallImpression: false,
+    interviewQuestion: true,
+    skills: true,
+    overallImpression: true,
   });
+  
   const fetchPositions = async () => {
     try {
       const response = await axios.get(
@@ -213,17 +222,18 @@ const CustomProvider = ({ children }) => {
   return (
     <CustomContext.Provider
       value={{
+        overallImpressionTabData,
+        setOverallImpressionTabData,
+        skillsTabData,
+        setSkillsTabData,
         feedbackTabErrors,
         setFeedbackTabError,
-        setInterviewerSectionData,
         page,
         setPage,
         interviewerSectionData,
         setInterviewerSectionData,
         SchedulerSectionData,
         setSchedulerSectionData,
-        interviewTabData,
-        setInterviewTabData,
         fetchPositions,
         fetchCandidates,
         isOpen,
