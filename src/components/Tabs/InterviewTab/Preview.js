@@ -23,7 +23,8 @@ const Preview = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(()=>{
-    document.title="Job Portal - Feedback Preview"
+    document.title="Job Portal - Interview Feedback Preview"
+    
   },[])
 
   const handleDownload = async () => {
@@ -66,8 +67,8 @@ const Preview = () => {
         <h2 className="px-8 h-[40px] flex items-center border-b text-[#227a8a] text-xl font-semibold border-gray-300">
           Interview Feedback - Preview
         </h2>
-        <div className="p-8 border border-gray-500 rounded-md m-8">
-          <div className="border-b-2 border-[#80808075] pb-12">
+        <div className="p-8 border border-gray-500 rounded-md m-8 ">
+          <div className="border-b-2 border-[#80808075] pb-12 h-[82vh]">
             <CandidateMiniTab />
           </div>
           <div className="grid grid-cols-5 gap-4 my-4 border-b-2 border-[#80808075] pb-12">

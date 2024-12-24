@@ -1,6 +1,8 @@
 
 
 import React from 'react'
+// import PieChart from './PieChart';
+import DoughnutChart from './PieChart';
 
 const instructions = [
   "Access the Link: Click the provided link at least 5 minutes before the scheduled time to test your connection.",
@@ -9,7 +11,9 @@ const instructions = [
   "Join Promptly: Join the call on time and ensure your camera and microphone are working properly.",
 ]
 
-const CandidateMiniTab = () => {
+const CandidateMiniTab = ({tab}) => {
+
+
 
   const KeyValueRow = ({ label, value }) => (
     <div className="flex items-center w-[45%]">
@@ -38,15 +42,23 @@ const CandidateMiniTab = () => {
   return (
     <div className="h-[70vh] flex flex-col gap-4 ">
         <h2 className="text-black font-bold">Candidate Details:</h2>
-        <div  className="candidate-top-items--container pb-4 flex flex-col flex-wrap gap-6 border-b-2 border-[#8080808a]">
+      {/* <div  style={{border:'1px solid red'}}  className={`border-b-2 border-[#8080808a] grid items-center ${tab ? " grid-cols-1":"grid-cols-[50%_50%]"}`}> */}
+      <div    className={`border-b-2 border-[#8080808a] flex ${tab ? "flex-row":"flex-col"} relative`}>
+        <div className={`pb-4 flex  flex-wrap gap-6 ${tab ? "flex-row":"flex-col"}`}>
           <KeyValueRow label="Candidate Name" value="Shashank" />
           <KeyValueRow label="Position" value="Position" />
           <KeyValueRow label="Interviewers" value="Raju, Ravi, Uma" />
+          <KeyValueRow label="Interviewer ID" value="12345" />
           <KeyValueRow label="Interview Date" value="Interview Date" />
           <KeyValueRow label="Interview Type" value="Virtual" />
         </div>
+       {!tab && <div style={{ width: "500px",aspectRatio:"1" }} className='absolute right-0 top-[-150px]'>
+        <DoughnutChart/>
+        </div>}
+        {/* {!tab && <DoughnutChart/>} */}
+        </div>
         <InstructionsList instructions={InstructionsList}/>
-        <SectionWrapper title="Question Details">
+        <SectionWrapper title="Question Details:">
         <div className="questions-items-container flex gap-8">
           <KeyValueRow label="Mandatory Questions" value="10" />
           <KeyValueRow label="Optional Questions" value="N/A" />

@@ -6,7 +6,7 @@ export const moreDropDownData = [
 ];
 
 export const interviewDropDownData = [
-  { name: "Feedback", link: "/feedback"},{name:"Interview page",link:"/interview-page" },
+  { name: "Feedback", link: "/interview-feedback"},{name:"Interview page",link:"/interview-page" },
   
 
 ];

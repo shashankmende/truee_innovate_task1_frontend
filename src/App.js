@@ -30,10 +30,10 @@ function App() {
           <Route path="/editor" element={<CodeEditor />} />
           <Route path="/web" element={<HtmlCssJsExecutor/>}/>
           {/* <Route path="/feedback" element={<Feedback/>}/> */}
-          <Route path="/feedback" element={<FeedbackHome/>}/>
-          <Route path="/feedback-preview" element={<Preview/>}/>
+          <Route path="/interview-feedback" element={<FeedbackHome/>}/>
+          <Route path="/interview-feedback-preview" element={<Preview/>}/>
           <Route path="/interview-page" element={<InterviewPage/>}/>
-          <Route path="/feedback-new" element={<Feedback/>}/>
+          <Route path="/interview-feedback-new" element={<Feedback/>}/>
         </Routes>
       </BrowserRouter>
     </div>

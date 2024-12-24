@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "../../Navbar/Header/Header";
 import Feedback from "./Feedback";
 import { useCustomContext } from "../../../context/context";
 
 const FeedbackHome = () => {
-  const { page }=useCustomContext()
+  const { page,setPage }=useCustomContext()
+
+
+  useEffect(() => {
+    document.title = "Job Portal - Interview Feedback";
+    setPage("Home") 
+  }, []);
+
   return (
     <div>
       <Header />

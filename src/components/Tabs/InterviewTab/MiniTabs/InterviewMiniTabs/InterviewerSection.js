@@ -7,7 +7,7 @@ import { closeIcon, dislikeIcon, likeIcon } from "../../../../../IconsData";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { useCustomContext } from "../../../../../context/context";
 
-const InterviewerSectionComponent = () => {
+const InterviewerSectionComponent = ({page}) => {
   const [interviewerQuestion, setInterviewerQuestion] = useState({
     question: "",
     answer: "",
@@ -161,21 +161,27 @@ const InterviewerSectionComponent = () => {
     );
   };
 
-  const onClickLikeIcon = (id) => {
-    setInterviewerSectionData((prev) =>
-      prev.map((question) =>
-        question.id === id ? { ...question, isLiked: true } : question
-      )
-    );
-  };
-
-  const onClickDisLikeIcon = (id) => {
-    setInterviewerSectionData((prev) =>
-      prev.map((question) =>
-        question.id === id ? { ...question, isLiked: false } : question
-      )
-    );
-  };
+  
+  
+    const NoteTextArea = React.memo(({each})=>{
+      return <div className="flex justify-start mt-4">
+      <label htmlFor="note-input" className="w-[200px]">Note</label>
+      <div className="w-full relative mr-5 rounded-md h-[100px]">
+        <textarea
+       rows={3} 
+        value={each.note}
+          onChange={(e) =>
+            onChangeInterviewQuestionNotes(
+              each.id,
+              e.target.value.slice(0, 250)
+            )
+          } name="scheduler questions input" id="note-input" className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"></textarea>
+        <span className="absolute right-[0.3rem] bottom-[0.2rem]  text-gray-500">
+          {each.note?.length || 0}/250
+        </span>
+      </div>
+    </div>
+    })
 
   return (
     <div className="relative h-[53vh]">
@@ -277,7 +283,7 @@ const InterviewerSectionComponent = () => {
                       </div>
                       <div className="flex w-full gap-8">
                         <div className="w-[20%]">
-                          <label htmlFor="customQuestion">Answer</label>
+                          <label htmlFor="customAnswer">Answer</label>
                           <span className="text-red-500">*</span>
                         </div>
                         <div className="w-[100%] flex flex-col ">
@@ -286,7 +292,7 @@ const InterviewerSectionComponent = () => {
                               <input
                                 onChange={(e) => onChangeAnswer(e)}
                                 value={interviewerQuestion.answer}
-                                id="customQuestion"
+                                id="customAnswer"
                                 className="w-[80%] outline-none text-gray-500"
                                 type="text"
                                 placeholder="Enter your answer"
@@ -382,7 +388,9 @@ const InterviewerSectionComponent = () => {
                         <span className="text-red-500">*</span>
                       )}
                     </p>
-                    <div className="w-full flex flex-wrap items-center gap-y-2 gap-x-8">
+                    <div className={`w-full flex gap-x-8 gap-y-2 ${
+    page === "Home" ? "flex-row" : "flex-col"
+  }`}>
                       {[
                         "Not Answered",
                         "Partially Answered",
@@ -419,7 +427,8 @@ const InterviewerSectionComponent = () => {
 
                   <div className="flex items-center gap-4">
                     <button
-                      className="cursor-pointer font-bold py-1 px-4 text-[#227a8a] bg-transparent rounded-md shadow-sm border border-[#227a8a]"
+                      // className="cursor-pointer font-bold py-1 px-4 text-[#227a8a] bg-transparent rounded-md shadow-sm border border-[#227a8a]"
+                      className={`${page==="Home"?"py-[0.2rem] px-[0.8rem]":"p-1 "} question-add-note-button cursor-pointer font-bold  text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]`}  
                       onClick={() =>
                         EachQuestion.notesBool
                           ? onClickDeleteNote(EachQuestion.id)
@@ -444,27 +453,12 @@ const InterviewerSectionComponent = () => {
                         Share with candidate
                       </p>
                     </Popup>
-                    <span
-                      className={`${
-                        EachQuestion.isLiked ? "text-green-500" : ""
-                      } cursor-pointer transition-transform hover:scale-110 duration-300 ease-in-out`}
-                      onClick={() => onClickLikeIcon(EachQuestion.id)}
-                    >
-                      {likeIcon}
-                    </span>
-                    <span
-                      className={`${
-                        !EachQuestion.isLiked ? "text-red-500" : ""
-                      } cursor-pointer transition-transform hover:scale-110 duration-300 ease-in-out`}
-                      onClick={() => onClickDisLikeIcon(EachQuestion.id)}
-                    >
-                      {dislikeIcon}
-                    </span>
                   </div>
                 </div>
 
-                {EachQuestion.notesBool && (
-                  <div className="flex justify-start mt-4">
+                {EachQuestion.notesBool ?(
+                 page==="Home" ? (
+                 <div className="flex justify-start mt-4">
                     <label htmlFor="note-input" className="w-[200px]">
                       Note
                     </label>
@@ -486,8 +480,33 @@ const InterviewerSectionComponent = () => {
                         {EachQuestion.note?.length || 0}/250
                       </span>
                     </div>
-                  </div>
-                )}
+                  </div>):page==="Popup"?(
+                           <div className="flex justify-start mt-4">
+                           <label htmlFor="note-input" className="w-[200px]">
+                             Note
+                           </label>
+                           <div className="w-full relative mr-5 rounded-md h-[100px]">
+                             <textarea
+                             rows="3"
+                               className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"
+                               id="note-input"
+                               type="text"
+                               value={EachQuestion.note}
+                               onChange={(e) =>
+                                 onChangeInterviewQuestionNotes(
+                                   EachQuestion.id,
+                                   e.target.value.slice(0, 250)
+                                 )
+                               }
+                               placeholder="Add your note here"
+                             ></textarea>
+                             <span className="absolute right-[1rem] bottom-[0.2rem]  text-gray-500">
+                               {EachQuestion.note?.length || 0}/250
+                             </span>
+                           </div>
+                         </div>
+                  ):null
+                ):null}
               </div>
             )}
           </li>

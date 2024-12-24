@@ -14,7 +14,7 @@ const dislikeOptions = [
   { value: "Too basic", label: "Too basic" },
 ];
 
-const SchedulerSectionComponent = ({ tab }) => {
+const SchedulerSectionComponent = ({ tab,page }) => {
 
   const {setSchedulerSectionData,SchedulerSectionData,}= useCustomContext()
   const [selectedQuestion, setSelectedQuestion] = useState(null);
@@ -44,14 +44,16 @@ const SchedulerSectionComponent = ({ tab }) => {
   const handleDislikeToggle = (id) => {
     setDislikeQuestionId((prev) => (prev === id ? null : id));
     setSchedulerSectionData((prev) =>
-      prev.map((q) => (q.id === id ? { ...q, isLiked: false } : q))
+      // prev.map((q) => (q.id === id ? { ...q, isLiked: false } : q))
+      prev.map((q) => (q.id === id ? { ...q, isLiked: "disliked" } : q))
     );
   };
 
   const handleLikeToggle = useCallback((id) => {
     setSchedulerSectionData((prev) =>
       prev.map((q) =>
-        q.id === id ? { ...q, isLiked: !q.isLiked } : q
+        // q.id === id ? { ...q, isLiked: !q.isLiked } : q
+        q.id === id ? { ...q, isLiked: "liked" } : q
       )
     );
     if (dislikeQuestionId === id) setDislikeQuestionId(null);
@@ -116,7 +118,8 @@ const SchedulerSectionComponent = ({ tab }) => {
     return (
       <div className="border border-gray-500 w-full p-3 rounded-md">
         <div className="flex justify-between w-full mb-4">
-          <h1>Tell us more:</h1>
+          {/* <h1>Tell us more<span className="text-[red]">*</span>:</h1> */}
+          <h1>Tell us more :</h1>
           <button onClick={() => setDislikeQuestionId(null)}>{closeIcon}</button>
         </div>
         <ul className="flex flex-wrap gap-3">
@@ -139,6 +142,7 @@ const SchedulerSectionComponent = ({ tab }) => {
             </li>
           ))}
         </ul>
+        {/* {(each.isLiked ==='disliked' && each.whyDislike==="") && <p className="text-[red]">Please select reason for dislike</p>} */}
       </div>
     );
   });
@@ -167,45 +171,68 @@ const SchedulerSectionComponent = ({ tab }) => {
     return (
       <div className="flex rounded-md">
         <p className="w-[200px] font-bold text-gray-700">
-          Response Type{each.mandatory && <span className="text-[red]">*</span>}
+          Response Type {each.mandatory && <span className="text-[red]">*</span>}
         </p>
-        <div className={`w-full flex flex-grow-1 flex-wrap  gap-x-8 gap-y-2 `}>
-          {["Not Answered", "Partially Answered", "Fully Answered"].map(
-            (option) => (
-              <span key={option} className="flex items-center gap-2">
-                <input
-                  checked={each.isAnswered === option}
-                  value={option}
-                  name={`isAnswered-${each.id}`} // Grouped by the question id
-                  type="radio"
-                  id={`isAnswered-${each.id}-${option}`}
-                  onChange={(e) => onChangeRadioInput(each.id, e.target.value)}
-                  className="whitespace-nowrap"
-                />
-                <label
-                  htmlFor={`isAnswered-${each.id}-${option}`}
-                  className="cursor-pointer"
-                >
-                  {option}
-                </label>
-              </span>
-            )
-          )}
-        </div>
+        <div
+  className={`w-full flex gap-x-8 gap-y-2 ${
+    page === "Home" ? "flex-row" : "flex-col"
+  }`}>
+  {["Not Answered", "Partially Answered", "Fully Answered"].map((option) => (
+    <span key={option} className="flex items-center gap-2">
+      <input
+        checked={each.isAnswered === option}
+        value={option}
+        name={`isAnswered-${each.id}`} // Grouped by the question id
+        type="radio"
+        id={`isAnswered-${each.id}-${option}`}
+        onChange={(e) => onChangeRadioInput(each.id, e.target.value)}
+        className="whitespace-nowrap"
+      />
+      <label
+        htmlFor={`isAnswered-${each.id}-${option}`}
+        className="cursor-pointer"
+      >
+        {option}
+      </label>
+    </span>
+  ))}
+</div>
+
       </div>
     );
   });
+
+
+  const NoteTextArea = React.memo(({each})=>{
+    return <div className="flex justify-start mt-4">
+    <label htmlFor="note-input" className="w-[200px]">Note</label>
+    <div className="w-full relative mr-5 rounded-md h-[100px]">
+      <textarea
+     rows={3} 
+      value={each.note}
+        onChange={(e) =>
+          onChangeInterviewQuestionNotes(
+            each.id,
+            e.target.value.slice(0, 250)
+          )
+        } name="scheduler questions input" id="note-input" className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"></textarea>
+      <span className="absolute right-[0.3rem] bottom-[0.2rem]  text-gray-500">
+        {each.note?.length || 0}/250
+      </span>
+    </div>
+  </div>
+  })
 
 
   return (
     <div className="">
       <div className="flex items-start gap-4 mt-4">
         <p> <b>Note:</b> </p>
-        <p className="para-value text-gray-500">  This question was selected by the organizer during scheduling. Questions marked in<span className="font-bold text-red-600">Red</span> are mandatory andmust be answered by the candidates, while questions marked in{" "}<span className="font-bold text-green-600">Green</span> are optional.</p>
+        <p className="para-value text-gray-500">  This question was selected by the organizer during scheduling. Questions marked in <span className="font-bold text-[red]">Red</span> are mandatory and must be answered by the candidates, while questions marked in{" "}<span className="font-bold text-green-600">Green</span> are optional.</p>
       </div>
       <ul className="h-[45vh] overflow-auto pr-4 flex flex-col gap-4 mt-4">
         {SchedulerSectionData.map((each) => (
-          <li className={` p-2 py-4 rounded-md w-full   cursor-pointer border-[1px] ${each.mandatory ? " border-[red]":" border-[green]"}`} ref={questionRef}key={each.id}>
+          <li className={` p-2 py-4 rounded-md w-full   cursor-pointer border-[1px] ${each.mandatory ? "border-[red]":" border-[green]"}`} ref={questionRef}key={each.id}>
             <div  className="flex items-center justify-between cursor-pointer transition-transform duration-300s ease-in-out"onClick={()=>onClickQuestionItem(each)}  >
               <p>{each.question}</p>
               <span> {selectedQuestion === each.id ? <FaAngleUp /> : <FaAngleDown />}</span>
@@ -213,13 +240,13 @@ const SchedulerSectionComponent = ({ tab }) => {
             {selectedQuestion === each.id && (
               <div>
                 <p className="para-value text-gray-500">{each.answer}</p>
-                <div className="w-full flex justify-between items-center flex-wrap  my-4 gap-8">
+                <div className="w-full flex  justify-between items-start my-4 gap-8">
                   <RadioGroupInput each={each} />
 
-                  <div className="flex  items-center gap-4">
+                  <div className="flex  items-center gap-4 ">
                     {!each.notesBool && (
                       <button
-                        className="question-add-note-button cursor-pointer font-bold py-[0.2rem] px-[0.8rem] text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]"
+                        className={`${page==="Home"?"py-[0.2rem] px-[0.8rem]":"p-1 "} question-add-note-button cursor-pointer font-bold  text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]`}
                         onClick={() => onClickAddNote(each.id)}
                       >
                         Add a Note
@@ -228,14 +255,14 @@ const SchedulerSectionComponent = ({ tab }) => {
                     {each.notesBool && (
                       <button
                       onClick={()=>onClickDeleteNote(each.id)}
-                      className="question-add-note-button cursor-pointer font-bold py-[0.2rem] px-[0.8rem] text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]">
+                      className={`${page==="Home"?"py-[0.2rem] px-[0.8rem]":"p-1 "} question-add-note-button cursor-pointer font-bold  text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]`}>
                         Delete Note
                       </button>
                     )}
                     <SharePopupSection />
                     <span
                       className={`${
-                        each.isLiked ? "text-green-700" : ""
+                        each.isLiked ==="liked" ? "text-green-700" : ""
                       } transition-transform hover:scale-110 duration-300 ease-in-out`}
                       onClick={() => handleLikeToggle(each.id)}
                     >
@@ -243,7 +270,8 @@ const SchedulerSectionComponent = ({ tab }) => {
                     </span>
                     <span
                       className={`${
-                        dislikeQuestionId === each.id ? "text-red-500" : ""
+                        // dislikeQuestionId === each.id ? "text-red-500" : ""
+                        each.isLiked==="disliked" ? "text-red-500" : ""
                       } transition-transform hover:scale-110 duration-300 ease-in-out`}
                       style={{ cursor: "pointer" }}
                       onClick={() => handleDislikeToggle(each.id)}
@@ -252,7 +280,38 @@ const SchedulerSectionComponent = ({ tab }) => {
                     </span>
                   </div>
                 </div>
-                {each.notesBool && <NotesSection each={each} />}
+                {/* {each.notesBool && page==="Home"?<NotesSection each={each}/>: <NoteTextArea  each={each}/>} */}
+                {each.notesBool ? (
+  page === "Home" ? (
+    // <NotesComponent each={each} isHome={true} /> // Input element for "Home"
+    <NotesSection each={each}/>// Input element for "Home"
+  ) : page === "Popup" ? (
+    <div className="flex justify-start mt-4">
+    <label htmlFor="note-input" className="w-[200px]">
+      Note
+    </label>
+    <div className="w-full relative mr-5 rounded-md h-[100px]">
+      <textarea
+      rows="3"
+        className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"
+        id="note-input"
+        type="text"
+        value={each.note}
+        onChange={(e) =>
+          onChangeInterviewQuestionNotes(
+            each.id,
+            e.target.value.slice(0, 250)
+          )
+        }
+        placeholder="Add your note here"
+      ></textarea>
+      <span className="absolute right-[1rem] bottom-[0.2rem]  text-gray-500">
+        {each.note?.length || 0}/250
+      </span>
+    </div>
+  </div>
+  ) : null // Handle other cases if needed
+) : null}
 
                 {dislikeQuestionId === each.id && (
                   <DisLikeSection each={each} />

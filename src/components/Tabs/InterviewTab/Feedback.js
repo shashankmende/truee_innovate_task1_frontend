@@ -1,4 +1,4 @@
-import React, { useEffect,  useState } from "react";
+import React, { useEffect,  useLayoutEffect,  useState } from "react";
 import CandidateMiniTab from "./MiniTabs/Candidate";
 import InterviewsMiniTabComponent from "./MiniTabs/Interviews";
 import SkillsTabComponent from "./MiniTabs/Skills";
@@ -6,6 +6,8 @@ import OverallImpressions from "./MiniTabs/OverallImpressions";
 import { useNavigate } from "react-router-dom";
 import { useCustomContext } from "../../../context/context";
 import {ClipLoader} from 'react-spinners'
+import { IoMdClose } from "react-icons/io";
+
 import {
   
   SchedulerQuestionsValidation,
@@ -15,6 +17,7 @@ import {
 import { closeIcon, maximizeScreenIcon, upArrowIcon } from "../../../IconsData";
 import Popup from "reactjs-popup";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const tabsList = [
   {
@@ -37,11 +40,12 @@ const tabsList = [
 
 const Feedback = ({ page, closePopup }) => {
   const [tab, setTab] = useState(1);
+  const [isFormValid,setIsFormValid]=useState(false)
   const navigate = useNavigate();
   const {
     SchedulerSectionData,
     setSchedulerSectionData,
-   
+   setPage,
     feedbackTabErrors,
     setFeedbackTabError,
     setOverallImpressionTabData,
@@ -50,13 +54,15 @@ const Feedback = ({ page, closePopup }) => {
     setSkillsTabData,
   } = useCustomContext();
 
+
   const [customQuestionPopupLoader,setCustomQuestionPopupLoader]=useState(false)
 
-  useEffect(() => {
-    document.title = "Job Portal - Feedback";
-  }, []);
-
+ 
   let { interviewQuestion, skills, overallImpression } = feedbackTabErrors;
+
+  useLayoutEffect(()=>{
+    setIsFormValid(true)
+  },[])
 
   const areAllValidationsMet = () =>
     interviewQuestion && skills && overallImpression;
@@ -72,7 +78,8 @@ const Feedback = ({ page, closePopup }) => {
       interviewerFeedback:{
         liked:question.isLiked,
         // reason:question.whyDislike,
-        comments:question.note
+        dislikeReason: question.isLiked==="disliked"  ? question.whyDislike:"",
+        note:question.note
       },
       
     }));
@@ -111,7 +118,7 @@ const Feedback = ({ page, closePopup }) => {
     );
 
     const isValid = updatedOverallImpression && interviewQuestion && skills;
-
+    setIsFormValid(isValid)
     setFeedbackTabError((prev) => ({
       ...prev,
       overallImpression: updatedOverallImpression,
@@ -120,23 +127,39 @@ const Feedback = ({ page, closePopup }) => {
     if (!isValid) {
       const alertMessages = [];
       if (!interviewQuestion)
-        alertMessages.push("Interview Questions have an error.");
-      if (!skills) alertMessages.push("Skills have an error.");
+        // alertMessages.push("Interview Questions have an error.");
+        alertMessages.push("Interview Questions ");
+      // toast.error("Interview Questions have an error.")
+      if (!skills) alertMessages.push("Skills");
+      // if (!skills) alertMessages.push("Skills have an error.");
+      // if (!skills) toast.error("Skills have an error.");
       if (!updatedOverallImpression)
-        alertMessages.push("Overall Impression has an error.");
+        alertMessages.push("Overall Impression");
+        // toast.error("Overall Impression has an error.");
 
       // alert(alertMessages.length > 0 ? alertMessages.join("\n") : "All fields are valid!");
-      alert(alertMessages.join("\n"));
+      // toast.warn(alertMessages.join("\n"));
+      // toast(alertMessages.join("\n"));
+      // toast(`Mandatory fields are missing: ${alertMessages.join(", ")}`);
     } else {
       const data = PrepareFormData();
-
+      console.log('data',data)
+      try {
       console.log("form data", data);
       const url = `${process.env.REACT_APP_URL}/feedback/create`;
       const response = await axios.post(url, data);
       console.log("response from frontend", response);
       if (response.data.success) {
-        alert(response.data.message);
+        // alert(response.data.message);
+        toast.success(response.data.message)
       }
+      else{
+        toast.error(response.data.error.message|| "something went wrong")
+      }
+    } catch (error) {
+       toast.error(error.response.statusText || 'something went wrong') 
+      //  console.log(error)
+    }
     }
   };
   const handleValidationForTab = () => {
@@ -159,41 +182,37 @@ const Feedback = ({ page, closePopup }) => {
 
   const displayData = () => {
     switch (tab) {
-      case 1:
-        return <CandidateMiniTab />;
-      case 2:
-        return <InterviewsMiniTabComponent tab={tab} page={page} />;
-      case 3:
-        return <SkillsTabComponent tab={tab} page={page} />;
-      case 4:
-        return <OverallImpressions tab={tab} page={page} />;
-      default:
-        return null;
+      case 1: return <CandidateMiniTab tab={tab} page={page}/>;
+      case 2: return <InterviewsMiniTabComponent tab={tab} page={page} />;
+      case 3: return <SkillsTabComponent tab={tab} page={page} />;
+      case 4:  return <OverallImpressions tab={tab} page={page} />;
+      default: return null;
     }
   };
 
   const onClickMaximizeScreen =()=>{
     // setPage("Home");
-    const url = "/feedback-new";
+    const url = "/interview-feedback-new";
     window.open(url, "_blank");
   }
 
 
   const onClickPreviewButton =()=>{
-    navigate("/feedback-preview", { state: { tab: null } })
+    navigate("/interview-feedback-preview", { state: { tab: null } })
   }
 
 
-  const onClickCloseCustomPop =(closePopup,close)=>{
-    setCustomQuestionPopupLoader(true)
+  const onClickCloseCustomPop =async(closePopup,close)=>{
+    // setCustomQuestionPopupLoader(true)
     setTimeout(()=>{
-      setCustomQuestionPopupLoader(false)
+      // setCustomQuestionPopupLoader(false)
       close()
       closePopup()
+      setPage("Home")
     },0)
-    
-
   }
+
+
 
   //sections
 
@@ -214,45 +233,6 @@ const Feedback = ({ page, closePopup }) => {
       </ul>
     );
   };
-
-  // const PopupConfirmation = () => {
-  //   return (
-  //     <Popup
-  //       trigger={
-  //         <button className="bg-none b-none text-lg">{closeIcon}</button>
-  //       }
-  //       arrow={false}
-  //       offsetX={-130}
-  //       closeOnDocumentClick={false}
-  //     >
-  //       {(close) => (
-  //         <div className="flex flex-col gap-[-1]">
-  //           <span className="self-end bg-white">{upArrowIcon}</span>
-  //           <div className="bg-white shadow-md p-2 flex flex-col gap-4 text-center w-[300px] border-[1px] border-[gray] rounded-md">
-  //             <h2 className="font-semibold">Are you sure to close the form?</h2>
-  //             <div className="text-center flex gap-4 justify-center">
-  //               <button
-  //                 className="bg-white border-[1px] rounded-md px-2 py-1 border-[#227a8a] "
-  //                 onClick={() => close()}
-  //               >
-  //                 cancel  
-  //               </button>
-  //               <button
-  //                 className="bg-red-500 text-white px-2 py-1 rounded-md"
-  //                 // onClick={() => closePopup()}
-  //                 // onClick={()=>close()}
-  //                 onClick={()=>onClickCloseCustomPop(closePopup,close)}
-  //               >
-  //                { customQuestionPopupLoader ? <ClipLoader size={20} color="#ffffff"/>:"close"}
-  //                {/* {<ClipLoader size={20} color="#ffffff"/>} */}
-  //               </button>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       )}
-  //     </Popup>
-  //   );
-  // };
 
   const PopupConfirmation = () => {
     return (
@@ -278,22 +258,12 @@ const Feedback = ({ page, closePopup }) => {
                   {/* Cancel */}
                   No
                 </button>
-                {/* <button
-                  className="bg-red-500 text-white px-2 py-1 rounded-md"
-                  onClick={() => onClickCloseCustomPop(closePopup, close)} // Custom handler
-                >
-                  {customQuestionPopupLoader ? (
-                    <ClipLoader size={20} color="#ffffff" />
-                  ) : (
-                    "Close"
-                  )}
-                </button> */}
-                {customQuestionPopupLoader ? <button className="bg-red-500 text-white px-2 py-1 rounded-md "
+                {customQuestionPopupLoader ? <button className="bg-[#227a8a] text-white px-2 py-1 rounded-md "
                    >
                   
                     <ClipLoader size={20} color="#ffffff" />
                    
-                </button> :<button className="bg-red-500 text-white px-2 py-1 rounded-md  w-[70px]"
+                </button> :<button className="bg-[#227a8a] text-white px-2 py-1 rounded-md  w-[70px]"
                 onClick={() => onClickCloseCustomPop(closePopup, close)}
                 >Yes</button>}
               </div>
@@ -305,6 +275,17 @@ const Feedback = ({ page, closePopup }) => {
   };
   
 
+  const ValidationMessageFunction =()=>{
+    return <div className=" flex  gap-6 items-start mx-8 p-4 border-[1px] rounded-md border-[#8080808b]">
+        <div className="rounded-md bg-[red] p-[0.8px]"><IoMdClose className="text-white"/></div>
+        <div className="">
+          <h2 className="font-semibold">Validation Error</h2>
+          <p className="text-[gray]">Some required fields are missing . Please complete them before submitting.</p>
+        </div>
+    </div>
+  }
+
+
   return (
     <div className={`flex flex-col justify-between gap-2 ${page==="Home"?"h-[89vh]":"h-[100vh]"}  `}    >
       <div className=" px-8 flex items-center justify-between border-b-2 border-[#8080807f]">
@@ -314,6 +295,7 @@ const Feedback = ({ page, closePopup }) => {
           {page === "Popup" && <PopupConfirmation />}
         </div>
       </div>
+    { !isFormValid &&  ValidationMessageFunction()}
       <ReturnTabsSection />
       <div className=" px-8 py-4  border-[#8080807a] mb-8 h-[67vh] overflow-y-auto border-2 border-solid rounded-md mx-8 " >
         {displayData()}

@@ -25,7 +25,7 @@ const SkillsTabComponent = ({ tab, page }) => {
         category.id===catId ? {
           ...category,
           skillsList:category.skillsList.map((skill,index)=>
-          index===skillIndex?{...skill,rating,error:rating<=1?true:false}:skill
+          index===skillIndex?{...skill,rating,error: (skill.required && rating<=1)?true:false}:skill
         )
         }:category
       )
@@ -114,18 +114,71 @@ const SkillsTabComponent = ({ tab, page }) => {
         {skillsTabData.map((skillCat) => (
           <li key={skillCat.id} className="flex flex-col gap-4 ">
             <h2 className="font-bold">{skillCat.category}:</h2>
-            <ul className="flex flex-col gap-4">
+            <ul className="flex flex-col gap-4" >
               {skillCat.skillsList.map((skill, skillIndex) => (
-                <li key={skill.name} className="flex flex-col gap-4">
+                <li key={skill.name} className="flex flex-col gap-4" >
                   <div
-                    className={`flex  items-center ${page==="Home"?"w-[50%]":"w-[100%]"} `}>
-                    <p className={` ${
-                        page === "Home" ? "w-[250px]" : "w-[40%]"
-                      }`} >
+                    className={`flex  items-center ${page==="Home"?"w-[50%]":"w-[100%]"}  justify-between`} >
+                    <p 
+                    className={` ${
+                        // page === "Home" ? "w-[250px]" : "w-[40%]"
+                        page === "Home" ? "w-[250px]" : "w-[25%]"
+                      }`}
+                       >
                       {skill.name}
-                      {skill.required && <span className="text-[red]">*</span>}
+                      {(skill.required && tab) && <span className="text-[red]">*</span>}
                     </p>
-                    <div className="flex w-[50%] justify-between">
+                    <div className="flex gap-2 justify-between">
+                        {Array.from({ length: 5 }, (_, index) => {
+                          const isSelected = index + 1 <= skill.rating;
+                          return (
+                            <IoIosStar
+                              onClick={
+                                tab
+                                  ? () =>
+                                      onClickRating(
+                                        skillCat.id,
+                                        skillIndex,
+                                        index + 1
+                                      )
+                                  : null
+                              }
+                              className="cursor-pointer transform transition-transform hover:scale-110"
+                              size={20}
+                              style={{
+                                color: isSelected
+                                  ? getColorByRating(skill.rating)
+                                  : "gray",
+                              }}
+                              key={index}
+                            />
+                          );
+                        })}
+                      </div>
+                      {tab  && (
+                        <div>
+                          {skill.notesBool ? (
+                            <button
+                              className="p-1 text-[#227a8a] border border-[#227a8a] rounded-md w-[120px]"
+                              onClick={() =>
+                                onClickDeleteNote(skillCat.id, skillIndex)
+                              }
+                            >
+                              Delete Note
+                            </button>
+                          ) : (
+                            <button
+                              className="p-1 text-[#227a8a] border border-[#227a8a] rounded-md w-[120px]"
+                              onClick={() =>
+                                onClickAddNote(skillCat.id, skillIndex)
+                              }
+                            >
+                              Add a Note
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    {/* <div className="flex w-[50%] justify-between">
                       <div className="flex gap-2">
                         {Array.from({ length: 5 }, (_, index) => {
                           const isSelected = index + 1 <= skill.rating;
@@ -153,12 +206,11 @@ const SkillsTabComponent = ({ tab, page }) => {
                           );
                         })}
                       </div>
-                      {tab !== null && (
-                        <div>
+                      {tab  && (
+                        <div >
                           {skill.notesBool ? (
                             <button
                               className="p-1 text-[#227a8a] border border-[#227a8a] rounded-md w-[120px]"
-                              // onClick={() => setNoteId(null)}
                               onClick={() =>
                                 onClickDeleteNote(skillCat.id, skillIndex)
                               }
@@ -177,21 +229,23 @@ const SkillsTabComponent = ({ tab, page }) => {
                           )}
                         </div>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                   {(skill.notesBool && tab ) && (
-                    <div className="flex w-full ">
+                    <div className="flex justify-between w-full">
                       <label
                         htmlFor="skill-id"
                         className={` ${
-                          page === "Home" ? "w-[300px]" : "w-[40%]"
+                          // page === "Home" ? "w-[300px]" : "w-[25%] border-2"
+                          // page === "Home" ? "w-[300px]" : "w-[470px]"
+                          page === "Home" ? "w-[460px]" : "w-[470px]"
                         }`}
                       >
                         Note
                       </label>
                       {page === "Home" ? (
                         <div
-                          className=" flex flex-col w-full "
+                          className=" flex flex-col w-full"
                         >
                           <input
                             value={skill.note}
@@ -216,7 +270,7 @@ const SkillsTabComponent = ({ tab, page }) => {
                           </span>
                         </div>
                       ) : (
-                        <div className="flex flex-col justify-end w-1/2 flex-grow-1">
+                        <div className="flex flex-col w-full">
                           <textarea
                             rows={5}
                             readOnly={!tab} 

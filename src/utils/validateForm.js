@@ -70,7 +70,12 @@ const AddCustomQuestionValidation = (question,answer, CustomQuestionErrFunction)
 const SchedulerQuestionsValidation = (SchedulerSectionData,setSchedulerSectionData) => {
   let isValid = true;
   const updatedData = SchedulerSectionData.map((question) => {
-    if (question.mandatory && !question.isAnswered) {
+    // if (question.mandatory && !question.isAnswered) {
+    if (question.mandatory && !question.isAnswered ) {
+      if (question.isLiked==="disliked" && question.whyDislike===""){
+        isValid = false;
+        return { ...question, error: true };
+      }
       isValid = false;
       return { ...question, error: true };
     }
@@ -85,7 +90,8 @@ const ValidateSkills = (skillsTabData,setSkillsTabData) => {
   let isValid = true; // Assume valid unless an error is found
 
   const updatedData = skillsTabData.map(category=>
-  ({...category,
+  ({
+    ...category,
     skillsList:category.skillsList.map(skill=>{
       if (skill.required && skill.rating<=1){
         isValid= false;
@@ -104,7 +110,8 @@ const validateOverallImpression = (overallImpressionTabData, setInterviewTabData
   const { rating, note, recommendation, required } = overallImpressionTabData;
 
   // Determine if there's an error in the data
-  const hasError = required && (rating <= 1 || note.trim() === "" || recommendation.trim() === "");
+  // const hasError = required && (rating <= 1 || note.trim() === "" || recommendation.trim() === "");
+  const hasError = required && (rating <= 1  || recommendation.trim() === "");
 
   // Update the state with the error
   setInterviewTabData((prev) => ({

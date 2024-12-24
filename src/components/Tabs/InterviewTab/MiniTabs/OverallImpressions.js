@@ -24,15 +24,6 @@ const OverallImpressions = ({ tab, page }) => {
   const getColorByRating = (rating) =>
     ratingLst.find((r) => r.stars === rating)?.color || "gray";
 
-  // const handleInputChange = (field, value) => {
-  //   setOverallImpressionTabData((prev) => ({
-  //     ...prev,
-  //     overallImpressionTabData: {
-  //       ...prev.overallImpressionTabData,
-  //       [field]: value,
-  //     },
-  //   }));
-  // };
   const handleInputChange = (field, value) => {
     console.log(`Field: ${field}, Value: ${value}`);
     setOverallImpressionTabData((prev) => ({
@@ -67,7 +58,7 @@ const OverallImpressions = ({ tab, page }) => {
 
       <div className="flex  items-center">
         <p className={` ${page === "Home" ? "w-[250px]" : "w-[40%]"}`}>
-          Overall Rating<span className="text-red-500">*</span>
+          Overall Rating{tab && <span className="text-red-500">*</span>}
         </p>
         <div className="flex w-1/2 gap-8">
           <div className="flex gap-3">
@@ -166,7 +157,7 @@ const OverallImpressions = ({ tab, page }) => {
             page === "Home" ? "w-[250px]" : "w-[40%]"
           } border-red-600`}
         >
-          Recommendation<span className="text-[red]">*</span>
+          Recommendation{ tab && <span className="text-[red]">*</span>}
         </label>
         <ul className="flex w-1/2 gap-8">
           {options.map(({ value, label }) => (
