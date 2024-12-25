@@ -1,3 +1,47 @@
+
+
+// import React, { useEffect, useRef, useState } from "react";
+// import Header from "../../Navbar/Header/Header";
+// import CandidateMiniTab from "./MiniTabs/Candidate";
+// import SkillsTabComponent from "./MiniTabs/Skills";
+// import OverallImpressions from "./MiniTabs/OverallImpressions";
+// import { useCustomContext } from "../../../context/context";
+
+// const Preview = () => {
+//   const  {setPage} = useCustomContext
+
+//   useEffect(()=>{
+//     setPage("Home")
+//   },[])
+
+//   return (
+//     <div>
+//         <Header/>
+//         <CandidateMiniTab/>
+//         <SkillsTabComponent/>
+//         <OverallImpressions/>
+//     </div>
+//   )
+// }
+
+// export default Preview
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useEffect, useRef, useState } from "react";
 import CandidateMiniTab from "./MiniTabs/Candidate";
 import SkillsTabComponent from "./MiniTabs/Skills";
@@ -7,6 +51,7 @@ import { useLocation } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { IoIosStar } from "react-icons/io";
+import { useCustomContext } from "../../../context/context";
 
 const ratingList = [
   { id: 1, name: "Poor", stars: 2, color: "red" },
@@ -22,8 +67,11 @@ const Preview = () => {
   const previewRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const  {setPage} = useCustomContext()
+
   useEffect(()=>{
     document.title="Job Portal - Interview Feedback Preview"
+    setPage("Home")
     
   },[])
 
@@ -71,12 +119,13 @@ const Preview = () => {
           <div className="border-b-2 border-[#80808075] pb-12 h-[82vh]">
             <CandidateMiniTab />
           </div>
-          <div className="grid grid-cols-5 gap-4 my-4 border-b-2 border-[#80808075] pb-12">
-            <div className="col-span-3">
+          {/* <div className="grid grid-cols-5 gap-4 my-4 border-b-2 border-[#80808075] pb-12"> */}
+          <div className="relative my-4 border-b-2 border-[#80808075] pb-12">
+            <div className="">
               <h2 className="font-semibold text-xl">Skills:</h2>
               <SkillsTabComponent tab={state?.tab} />
             </div>
-            <div className="col-span-2 flex flex-col items-center">
+            <div className="absolute right-0 top-[0%] col-span-2 flex flex-col items-center">
               <ul className="stars-container flex gap-8">
                 {ratingList.map((rating) => (
                   <li
@@ -98,7 +147,8 @@ const Preview = () => {
               </ul>
             </div>
           </div>
-          <div className="w-[60%]">
+          {/* <div className="w-[60%]"> */}
+          <div className="">
             <h2 className="font-semibold text-xl mb-4 w-[250px]">Overall Impressions:</h2>
             <OverallImpressions />
           </div>

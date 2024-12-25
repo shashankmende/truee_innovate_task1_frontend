@@ -15,8 +15,8 @@ const options = [
   { value: "Maybe", label: "Maybe" },
 ];
 
-const OverallImpressions = ({ tab, page }) => {
-  const {  overallImpressionTabData,setOverallImpressionTabData } = useCustomContext();
+const OverallImpressions = ({ tab }) => {
+  const {  overallImpressionTabData,setOverallImpressionTabData ,page} = useCustomContext();
   // const {overallImpressionTabData}=interviewTabData
   const { rating, note, recommendation, notesBool } =
     overallImpressionTabData;
@@ -56,12 +56,12 @@ const OverallImpressions = ({ tab, page }) => {
         </ul>
       )}
 
-      <div className="flex  items-center">
-        <p className={` ${page === "Home" ? "w-[250px]" : "w-[40%]"}`}>
+      <div className={`${page==="Home"?"w-[50%] justify-between":"w-[100%]"} flex justify-between items-center`}>
+        {/* <p className={` ${page === "Home" ? "w-[250px]" : "w-[40%]"}`}> */}
+        <p className={` ${page === "Home" ? "w-[250px]" : "w-[25%]"}`}>
           Overall Rating{tab && <span className="text-red-500">*</span>}
         </p>
-        <div className="flex w-1/2 gap-8">
-          <div className="flex gap-3">
+        <div className="flex gap-3">
             {Array.from({ length: 5 }, (_, index) => {
               const isSelected = index + 1 <= rating;
               return (
@@ -79,23 +79,24 @@ const OverallImpressions = ({ tab, page }) => {
               );
             })}
           </div>
-
-          {tab && (
+          
             <button
               onClick={handleNoteToggle}
               className="p-1 text-[#227a8a] border border-[#227a8a] rounded-md w-[120px]"
+              style={{visibility:tab?"visible":"hidden" }}
             >
               {notesBool ? "Delete Note" : "Add Note"}
             </button>
-          )}
-        </div>
+          
+
+       
       </div>
 
       {notesBool && tab && (
-        <div className="flex">
+        <div className="flex justify-between">
           <label
             htmlFor="overall-note"
-            className={` ${page === "Home" ? "w-[250px]" : "w-[40%]"}`}
+            className={` ${page === "Home" ? "w-[360px]" : "w-[450px] "}`}
           >
             Note
           </label>
@@ -120,7 +121,7 @@ const OverallImpressions = ({ tab, page }) => {
               </span>
             </div>
           ) : (
-            <div className="flex flex-col justify-end w-1/2 flex-grow-1">
+            <div className="flex flex-col w-full justify-end  flex-grow-1">
               <textarea
                 rows={5}
                 value={note}
@@ -154,8 +155,8 @@ const OverallImpressions = ({ tab, page }) => {
       <div className="flex">
         <label
           className={` ${
-            page === "Home" ? "w-[250px]" : "w-[40%]"
-          } border-red-600`}
+            page === "Home" ? "w-[340px]" : "w-[265px]"
+          } `}
         >
           Recommendation{ tab && <span className="text-[red]">*</span>}
         </label>

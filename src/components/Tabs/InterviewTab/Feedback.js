@@ -14,7 +14,7 @@ import {
   validateOverallImpression,
   ValidateSkills,
 } from "../../../utils/validateForm";
-import { closeIcon, maximizeScreenIcon, upArrowIcon } from "../../../IconsData";
+import { closeIcon, maximizeScreenIcon, minimizeScreenIcon, upArrowIcon } from "../../../IconsData";
 import Popup from "reactjs-popup";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -42,6 +42,7 @@ const Feedback = ({ page, closePopup }) => {
   const [tab, setTab] = useState(1);
   const [isFormValid,setIsFormValid]=useState(false)
   const navigate = useNavigate();
+  const {popupVisibility,setPopupVisibility,feedbackCloseFlag,setFeedbackCloseFlag}=useCustomContext()
   const {
     SchedulerSectionData,
     setSchedulerSectionData,
@@ -151,7 +152,8 @@ const Feedback = ({ page, closePopup }) => {
       console.log("response from frontend", response);
       if (response.data.success) {
         // alert(response.data.message);
-        toast.success(response.data.message)
+        // toast.success(response.data.message)
+        toast.success("Feedback Submitted!")
       }
       else{
         toast.error(response.data.error.message|| "something went wrong")
@@ -191,9 +193,10 @@ const Feedback = ({ page, closePopup }) => {
   };
 
   const onClickMaximizeScreen =()=>{
-    // setPage("Home");
-    const url = "/interview-feedback-new";
-    window.open(url, "_blank");
+    setPage("Home");
+    // const url = "/interview-feedback-new";
+    // window.open(url, "_blank");
+    setPopupVisibility(true)
   }
 
 
@@ -208,7 +211,8 @@ const Feedback = ({ page, closePopup }) => {
       // setCustomQuestionPopupLoader(false)
       close()
       closePopup()
-      setPage("Home")
+      // setPage(page==="Home"?"Popup":"Home")
+      // setPage("Home")
     },0)
   }
 
@@ -278,7 +282,7 @@ const Feedback = ({ page, closePopup }) => {
   const ValidationMessageFunction =()=>{
     return <div className=" flex  gap-6 items-start mx-8 p-4 border-[1px] rounded-md border-[#8080808b]">
         <div className="rounded-md bg-[red] p-[0.8px]"><IoMdClose className="text-white"/></div>
-        <div className="">
+        <div className="mt-[-5px]">
           <h2 className="font-semibold">Validation Error</h2>
           <p className="text-[gray]">Some required fields are missing . Please complete them before submitting.</p>
         </div>
@@ -291,8 +295,27 @@ const Feedback = ({ page, closePopup }) => {
       <div className=" px-8 flex items-center justify-between border-b-2 border-[#8080807f]">
         <h1 className=" pt-4  text-[#227a8a] text-xl font-semibold">Interview Feedback</h1>
         <div className="flex gap-8">
-          {page === "Popup" && (  <button  className="text-md transition-transform scale-110 duration-300 ease-in-out"  onClick={onClickMaximizeScreen} > {maximizeScreenIcon} </button>)}
-          {page === "Popup" && <PopupConfirmation />}
+          {/* {page === "Popup" && (  <button  className="text-md transition-transform scale-110 duration-300 ease-in-out"  onClick={onClickMaximizeScreen} > {maximizeScreenIcon} </button>)} */}
+          {/* {page === "Popup" && ( !popupVisibility ?  <button  className="text-md transition-transform scale-110 duration-300 ease-in-out"  onClick={onClickMaximizeScreen} > {maximizeScreenIcon} </button>:<button onClick={()=>setPopupVisibility(false)}>{minimizeScreenIcon}</button>)} */}
+          {/* {page === "Popup" ? <button  onClick={onClickMaximizeScreen}>{maximizeScreenIcon}</button> :
+          
+          <div className="flex gap-8">
+          <button onClick={()=>setPage("Popup")}>{minimizeScreenIcon}</button> 
+            <PopupConfirmation/>
+          </div>
+          
+          }
+          
+          {page === "Popup" && <PopupConfirmation />} */}
+          {feedbackCloseFlag &&(
+            <div  className="flex gap-8">
+              {!popupVisibility ?<button  onClick={onClickMaximizeScreen}>{maximizeScreenIcon}</button>:<button onClick={()=>{
+                setPopupVisibility(false)
+                setPage("Popup")
+                }}>{minimizeScreenIcon}</button> }
+              <PopupConfirmation/>
+            </div>
+          )}
         </div>
       </div>
     { !isFormValid &&  ValidationMessageFunction()}

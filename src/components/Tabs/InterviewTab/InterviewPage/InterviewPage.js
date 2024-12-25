@@ -21,15 +21,18 @@ import { useEffect } from 'react';
 const IconButton = ({ icon, label, color = "text-gray-700" }) => (
   <button className={`flex flex-col items-center ${color} hover:opacity-80`}>
     <Icon path={icon} size={0.9} className="mb-1" />
-    <span className="text-xs">{label}</span>
+    <span className="text-xs">{label}</span>  
   </button>
 );
  
 const InterviewPage = () => {
-  const {page,setPage}=useCustomContext()
+  const {popupVisibility,setPopupVisibility,feedbackCloseFlag,setFeedbackCloseFlag,page,setPage}=useCustomContext()
+  console.log(useCustomContext())
   useEffect(()=>{
     setPage("Popup")
-  },[page])
+    setFeedbackCloseFlag(true)
+    // setPopupVisibility(false)
+  },[])
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Header Icons*/}
@@ -44,15 +47,17 @@ const InterviewPage = () => {
         <Popup nested closeOnDocumentClick={false} trigger={<button><IconButton icon={mdiMessageTextOutline} label="Feedback" /></button>}>
           {closePopup =>
           // <div className=" fixed top-0 bottom-0 right-0 w-full h-full flex justify-end bg-[#80808067]">
-          <div className="w-full bg-[#8080805f] fixed top-0 right-0 bottom-0  rounded-md flex justify-end">
-            <div style={{width:"50%"}} 
+          <div className={`w-full bg-[#8080805f] fixed top-0 right-0 bottom-0  rounded-md flex justify-end ${popupVisibility?"text-[1rem]":"text-sm"}`}>
+            {/* <div style={{width:page==="Home" ? "100%":"50%"}}  */}
+            <div style={{width:popupVisibility ? "100%":"50%",
+            // fontSize: popupVisibility ? "1.25rem" : "0.875rem",
+          }} 
             // <div 
-              className={`bg-white ${
-                // page === "Popup" ? "text-sm" : "text-md"
-                "text-sm"
-              } transition-all duration-500 ease-in-out transform`}
+              className={`bg-white 
+                
+              transition-all duration-500 ease-in-out transform`}
             >
-              <Feedback closePopup={closePopup}  page={page}/>
+              <Feedback closePopup={closePopup}  page={ !feedbackCloseFlag ? "Home":"Popup"}/>
             </div>
           </div>}
         </Popup>

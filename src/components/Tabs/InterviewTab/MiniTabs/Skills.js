@@ -10,8 +10,8 @@ const ratingLst = [
   { id: 4, name: "Excellent", stars: 5, color: "green" },
 ];
 
-const SkillsTabComponent = ({ tab, page }) => {
-  const { skillsTabData,setSkillsTabData} = useCustomContext();
+const SkillsTabComponent = ({ tab }) => {
+  const { skillsTabData,setSkillsTabData,page} = useCustomContext();
   const getColorByRating = (rating) => {
     const ratingItem = ratingLst.find((r) => r.stars === rating);
     return ratingItem ? ratingItem.color : "gray";
@@ -118,7 +118,7 @@ const SkillsTabComponent = ({ tab, page }) => {
               {skillCat.skillsList.map((skill, skillIndex) => (
                 <li key={skill.name} className="flex flex-col gap-4" >
                   <div
-                    className={`flex  items-center ${page==="Home"?"w-[50%]":"w-[100%]"}  justify-between`} >
+                    className={`flex  items-center ${page==="Home" || page==="Preview"?"w-[50%]":"w-[100%]"}  justify-between`} >
                     <p 
                     className={` ${
                         // page === "Home" ? "w-[250px]" : "w-[40%]"
@@ -155,8 +155,7 @@ const SkillsTabComponent = ({ tab, page }) => {
                           );
                         })}
                       </div>
-                      {tab  && (
-                        <div>
+                        <div className={tab ?"visibility-visible" : "visibility-hidden"} style={{visibility:tab? "visible":"hidden"}}>
                           {skill.notesBool ? (
                             <button
                               className="p-1 text-[#227a8a] border border-[#227a8a] rounded-md w-[120px]"
@@ -177,59 +176,6 @@ const SkillsTabComponent = ({ tab, page }) => {
                             </button>
                           )}
                         </div>
-                      )}
-                    {/* <div className="flex w-[50%] justify-between">
-                      <div className="flex gap-2">
-                        {Array.from({ length: 5 }, (_, index) => {
-                          const isSelected = index + 1 <= skill.rating;
-                          return (
-                            <IoIosStar
-                              onClick={
-                                tab
-                                  ? () =>
-                                      onClickRating(
-                                        skillCat.id,
-                                        skillIndex,
-                                        index + 1
-                                      )
-                                  : null
-                              }
-                              className="cursor-pointer transform transition-transform hover:scale-110"
-                              size={20}
-                              style={{
-                                color: isSelected
-                                  ? getColorByRating(skill.rating)
-                                  : "gray",
-                              }}
-                              key={index}
-                            />
-                          );
-                        })}
-                      </div>
-                      {tab  && (
-                        <div >
-                          {skill.notesBool ? (
-                            <button
-                              className="p-1 text-[#227a8a] border border-[#227a8a] rounded-md w-[120px]"
-                              onClick={() =>
-                                onClickDeleteNote(skillCat.id, skillIndex)
-                              }
-                            >
-                              Delete Note
-                            </button>
-                          ) : (
-                            <button
-                              className="p-1 text-[#227a8a] border border-[#227a8a] rounded-md w-[120px]"
-                              onClick={() =>
-                                onClickAddNote(skillCat.id, skillIndex)
-                              }
-                            >
-                              Add a Note
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div> */}
                   </div>
                   {(skill.notesBool && tab ) && (
                     <div className="flex justify-between w-full">

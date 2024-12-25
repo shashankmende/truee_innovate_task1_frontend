@@ -11,7 +11,8 @@ const CustomProvider = ({ children }) => {
   const [searchText, setSearchText] = useState("");
   const [isOpen, setIsopen] = useState(false);
   const [page,setPage]=useState("Home")
-
+  const [popupVisibility,setPopupVisibility]=useState(false)
+  const [feedbackCloseFlag,setFeedbackCloseFlag]=useState(false)
   const [error, setError] = useState(null);
   const [skillsTabData,setSkillsTabData]=useState([
       {
@@ -222,6 +223,9 @@ const CustomProvider = ({ children }) => {
   return (
     <CustomContext.Provider
       value={{
+        feedbackCloseFlag,setFeedbackCloseFlag,
+        popupVisibility,
+        setPopupVisibility,
         overallImpressionTabData,
         setOverallImpressionTabData,
         skillsTabData,

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { likeIcon, dislikeIcon, closeIcon } from "../../../../../IconsData";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import Popup from "reactjs-popup";
@@ -14,9 +14,9 @@ const dislikeOptions = [
   { value: "Too basic", label: "Too basic" },
 ];
 
-const SchedulerSectionComponent = ({ tab,page }) => {
+const SchedulerSectionComponent = ({ tab }) => {
 
-  const {setSchedulerSectionData,SchedulerSectionData,}= useCustomContext()
+  const {setSchedulerSectionData,SchedulerSectionData,page}= useCustomContext()
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [dislikeQuestionId, setDislikeQuestionId] = useState("");
   const questionRef = useRef();

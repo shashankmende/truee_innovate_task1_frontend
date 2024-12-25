@@ -7,7 +7,7 @@ import { closeIcon, dislikeIcon, likeIcon } from "../../../../../IconsData";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { useCustomContext } from "../../../../../context/context";
 
-const InterviewerSectionComponent = ({page}) => {
+const InterviewerSectionComponent = () => {
   const [interviewerQuestion, setInterviewerQuestion] = useState({
     question: "",
     answer: "",
@@ -19,7 +19,7 @@ const InterviewerSectionComponent = ({page}) => {
     notes: "",
   });
 
-  const { interviewerSectionData, setInterviewerSectionData } =
+  const { interviewerSectionData, setInterviewerSectionData ,page} =
     useCustomContext();
 
   const [selectedQuestion, setSelectedQuestion] = useState(null);
