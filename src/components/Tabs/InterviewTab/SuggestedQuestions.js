@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { closeIcon, filterIcon } from '../../../IconsData';
+import { closeIcon, downArrow, filterIcon } from '../../../IconsData';
 import Switch from 'react-switch';
+import { FaAngleDown } from "react-icons/fa6";
 
 const sampleQuestionsList = [
   {
@@ -21,22 +22,54 @@ const sampleQuestionsList = [
     question: 'What are the key features of Java?',
     level: 'Easy',
     mandatory: false,
-    answer:
-      'Platform independence; Java uses the Java Virtual Machine (JVM) to allow programs to run on platforms to run on any platform without modifications.',
+    answer: `Platform independence; Java uses the Java Virtual Machine (JVM) to allow programs to run on platforms to run on any platform without modifications.
+    Object-Oriented: Java uses principles like inheritance, encapsulation, polymorphism, and abstraction.
+    Robust: Java has strong memory management, exception handling, and garbage collection mechanisms.
+    Secure: Features like bytecode verification and a secure runtime environment prevent vulnerabilities.
+    Multithreaded: Java supports multithreading, enabling concurrent execution of tasks.
+    High Performance: While Java is an interpreted language, the Just-In-Time(JIT) compiler improves performance.`,
+    isChecked: false,
+  },
+  {
+    id: 3,
+    question: 'What are the key features of Java?',
+    level: 'Easy',
+    mandatory: false,
+    answer: `Platform independence; Java uses the Java Virtual Machine (JVM) to allow programs to run on platforms to run on any platform without modifications.
+    Object-Oriented: Java uses principles like inheritance, encapsulation, polymorphism, and abstraction.
+    Robust: Java has strong memory management, exception handling, and garbage collection mechanisms.
+    Secure: Features like bytecode verification and a secure runtime environment prevent vulnerabilities.
+    Multithreaded: Java supports multithreading, enabling concurrent execution of tasks.
+    High Performance: While Java is an interpreted language, the Just-In-Time(JIT) compiler improves performance.`,
     isChecked: false,
   },
 ];
 
+const tabsList = [
+    {
+        id:1,
+        tab:"Suggested Questions"
+    },
+    {
+        id:2,
+        tab:"My Questions List"
+    }
+]
+
 const SuggestedQuestions = ({ close, closePlusPopup }) => {
   const [questionsList, setQuestionsList] = useState(sampleQuestionsList);
+  const [tab,setTab]=useState(1)
   const [filterSkillsList] = useState([
     'Java',
     'HTML',
     'React.js',
     'CSS',
     'MongoDB',
-    '1-2 Years',
+    // '1-2 Years',
   ]);
+
+//   const [selected]
+  const [selectedSkill,setSelectedSkill]=useState(null)
 
   const onClickClose = () => {
     close();
@@ -53,50 +86,42 @@ const SuggestedQuestions = ({ close, closePlusPopup }) => {
     );
   };
 
+  const onClickTab =(id)=>{
+    setTab(id)
+  }
+
+  const onClickQuestionsListSkill = (index)=>{
+    setSelectedSkill(prev=>prev===index ? null:index)
+  }
+
+  const onChangeQuestionCheckbox =(id)=>{
+    setQuestionsList(prev=>
+      prev.map(question=>question.id===id ? {...question,isChecked:!question.isChecked}:question)
+    )
+  }
+
+  const displayData = ()=>{
+    switch(tab){
+        case 1: return ReturnSuggestedQuestionsData()
+        case 2: return MyQuestionListData()
+    }
+  }
+
+  const ReturnSuggestedQuestionsData =()=>{
   return (
-    <div className="fixed top-0 bg-white right-0 bottom-0 w-full flex items-center justify-center">
-      <div className="w-[90%] h-[90%] bg-white flex flex-col ">
-        {/* Header */}
-        <div className="bg-[#227a8a] p-2 flex items-center justify-between text-white">
-          <h3 className="font-semibold text-lg">Suggested Questions</h3>
-          <span className="text-[1.2rem] cursor-pointer" onClick={onClickClose}>
-            {closeIcon}
-          </span>
-        </div>
-
-        {/* Filter Section */}
-        <div className="flex justify-between items-center p-4">
-          <div className="flex items-center gap-4">
-            <h2 className="font-semibold">Filters applied - </h2>
-            <ul className="flex gap-4">
-              {filterSkillsList.map((filterItem, index) => (
-                <button
-                  className="border-[1px] text-[#227a8a] border-[#227a8a] p-2"
-                  key={index}
-                >
-                  {filterItem}
-                </button>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <span className="text-[1.5rem]">{filterIcon}</span>
-          </div>
-        </div>
-
-        {/* Questions Section */}
-        <ul className="h-[67vh] p-4 flex flex-col gap-3">
+        <ul className="h-[67vh] p-4 flex flex-col gap-3 overflow-auto">
           {questionsList.map((question) => (
             <li
               key={question.id}
               className="w-full border-[1px] border-[gray] rounded-md"
             >
-              <div className="p-b-none flex justify-between border-[gray] border-b-[1px] w-full h-[60px]">
+              <div className="p-b-none flex justify-between border-[gray] border-b-[1px] w-full h-[50px]">
                 <div className="flex items-center p-2 w-full">
-                  <input
-                    checked={question.isChecked}
+                  <input 
+                  checked={question.isChecked}
                     type="checkbox"
-                    className="mr-[20px]"
+                    className="mr-[20px] w-5 h-5 cursor-pointer"
+                    onChange={()=>onChangeQuestionCheckbox(question.id)}
                   />
                   <h2 className="font-medium">
                     {question.id}. {question.question}
@@ -115,7 +140,8 @@ const SuggestedQuestions = ({ close, closePlusPopup }) => {
                       onChange={() => onChangeQuestionStatus(question.id)}
                     //   onColor="#4CAF50"
                     //   offColor="#ccc"
-                    onColor='#4DA1A9'
+                    // onColor='#4DA1A9'
+                    onColor='#227a8a'
                       handleDiameter={20}
                       height={20}
                       width={40}
@@ -138,14 +164,78 @@ const SuggestedQuestions = ({ close, closePlusPopup }) => {
             </li>
           ))}
         </ul>
-        {/* <div className="w-full flex justify-end pb-2 pr-2 shadow-md pt-2 border-t-[1px] border-[gray]">
-          <button className="bg-[#227a8a] px-8 py-2 text-white font-medium rounded-md">
-            Add
-          </button>
-        </div> */}
-      </div>
-    </div>
+      
   );
+  
+}
+
+const MyQuestionListData = ()=>{
+    return(
+        <ul className='flex flex-col  gap-2 p-4'>
+            {filterSkillsList.map((skill,index)=>
+                <li onClick={()=>onClickQuestionsListSkill(index)} key={index} className='cursor-pointer bg-[#227a8a] text-white w-full rounded-md px-4 py-3 flex flex-col justify-between'>
+                    <div className='flex justify-between'>
+                    <p>{skill}</p>
+                    <div className='flex gap-4 items-center'>
+                        <p>No.of Questions(2)</p>
+                        <FaAngleDown/>
+                    </div>
+                    </div>
+                    {selectedSkill===index && <h1>content</h1>}
+                </li>
+            )}
+
+        </ul>
+    )
+}
+
+return (
+    <div className="fixed bg-[gray] top-0 right-0 bottom-0 w-full flex items-center justify-center">
+     <div className="w-[90%] h-[95%] bg-white flex flex-col gap-3">
+        {/* header section */}
+     <div className="bg-[#227a8a] p-2 flex items-center justify-between text-white">
+          <h3 className="font-semibold text-lg">Question Bank</h3>
+          <span className="text-[1.2rem] cursor-pointer" onClick={onClickClose}>
+            {closeIcon}
+          </span>
+        </div>
+{/* filter section */}
+    <ul className='flex justify-between w-full'>
+            <div  className='flex gap-6 px-4'>
+            {tabsList.map(each=><li className={`${tab===each.id? 'border-b-[2px] border-[#227a8a]':""} cursor-pointer`} key={each.id} onClick={()=>onClickTab(each.id)}>{each.tab}</li>)}
+            </div>
+            {tab===2 && <button className='pr-4 text-[1.1rem] text-[#227a8a]'>Add Question</button>}
+
+        </ul>
+        <div className="flex justify-between items-center px-4">
+          <div className="flex items-center gap-4">
+            <h2 className="font-semibold">Filters applied - </h2>
+            <ul className="flex gap-4">
+              {filterSkillsList.map((filterItem, index) => (
+                <button
+                  className="border-[1px] text-[#227a8a] border-[#227a8a] p-2"
+                  key={index}
+                >
+                  {filterItem}
+                </button>
+              ))}
+            </ul>
+          </div>
+          <div className='border-[1px] border-[black]'>
+            <span className="text-[1.5rem] ">{filterIcon}</span>
+          </div>
+        </div>
+        
+        <div>
+
+        {displayData()}
+        </div>
+
+     </div>
+</div>
+)
+
+
 };
 
 export default SuggestedQuestions;
