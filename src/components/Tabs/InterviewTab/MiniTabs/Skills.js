@@ -117,17 +117,8 @@ const SkillsTabComponent = ({ tab }) => {
             <ul className="flex flex-col gap-4" >
               {skillCat.skillsList.map((skill, skillIndex) => (
                 <li key={skill.name} className="flex flex-col gap-4" >
-                  <div
-                    className={`flex  items-center ${page==="Home" || page==="Preview"?"w-[50%]":"w-[100%]"}  justify-between`} >
-                    <p 
-                    className={` ${
-                        // page === "Home" ? "w-[250px]" : "w-[40%]"
-                        page === "Home" ? "w-[250px]" : "w-[25%]"
-                      }`}
-                       >
-                      {skill.name}
-                      {(skill.required && tab) && <span className="text-[red]">*</span>}
-                    </p>
+                  <div className={`flex  items-center ${page==="Home"?"w-[50%]":"w-[100%]"}  justify-between`} >
+                    <p  className={` ${ page === "Home" ? "w-[250px]" : "w-[25%]"  }`} >  {skill.name}  {(skill.required && tab) && <span className="text-[red]">*</span>}</p>
                     <div className="flex gap-2 justify-between">
                         {Array.from({ length: 5 }, (_, index) => {
                           const isSelected = index + 1 <= skill.rating;
@@ -181,18 +172,9 @@ const SkillsTabComponent = ({ tab }) => {
                     <div className="flex justify-between w-full">
                       <label
                         htmlFor="skill-id"
-                        className={` ${
-                          // page === "Home" ? "w-[300px]" : "w-[25%] border-2"
-                          // page === "Home" ? "w-[300px]" : "w-[470px]"
-                          page === "Home" ? "w-[460px]" : "w-[470px]"
-                        }`}
-                      >
-                        Note
-                      </label>
+                        className={` ${ page === "Home" ? "w-[460px]" : "w-[470px]"  } `}  > Note</label>
                       {page === "Home" ? (
-                        <div
-                          className=" flex flex-col w-full"
-                        >
+                        <div className=" flex flex-col w-full">
                           <input
                             value={skill.note}
                             onChange={(e) =>
@@ -240,12 +222,12 @@ const SkillsTabComponent = ({ tab }) => {
                       )}
                     </div>
                   )}
-                  {!tab && 
-                    skill.note && <div className="flex w-full ">
+                  {(!tab && 
+                    skill.note )&& <div className="flex w-full " >
                   <label
                     htmlFor="skill-id"
                     className={` ${
-                      page === "Home" ? "w-[300px]" : "w-[40%]"
+                      page === "Home" ? "w-[350px]" : "w-[40%]"
                     }`}
                   >
                     Note

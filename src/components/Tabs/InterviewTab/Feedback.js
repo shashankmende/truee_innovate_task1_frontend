@@ -275,7 +275,7 @@ const Feedback = ({ page, closePopup }) => {
 
   const ValidationMessageFunction =()=>{
     return <div className=" flex  gap-6 items-start mx-8 p-4 border-[1px] rounded-md border-[#8080808b]">
-        <div className="rounded-md bg-[red] p-[0.8px]"><IoMdClose className="text-white"/></div>
+        <div className="rounded-md bg-[#D93025] p-[0.8px]"><IoMdClose className="text-white"/></div>
         <div className="mt-[-5px]">
           <h2 className="font-semibold">Validation Error</h2>
           <p className="text-[gray]">Some required fields are missing . Please complete them before submitting.</p>

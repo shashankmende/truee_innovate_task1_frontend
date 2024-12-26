@@ -140,11 +140,11 @@ const OverallImpressions = ({ tab }) => {
         </div>
       )}
 
-      {!tab && note && (
+      {(!tab && note) && (
         <div className="flex w-full ">
           <label
             htmlFor="skill-id"
-            className={` ${page === "Home" ? "w-[300px]" : "w-[40%]"}`}
+            className={` ${page === "Home" ? "w-[345px]" : "w-[40%]"}`}
           >
             Note
           </label>

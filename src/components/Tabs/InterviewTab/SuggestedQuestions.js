@@ -128,12 +128,12 @@ const SuggestedQuestions = ({ close, closePlusPopup }) => {
                   </h2>
                 </div>
                 <div className="flex items-center">
-                  <div className="h-full flex items-center p-2 border-collapse border-[1px] border-l-[gray]">
+                  <div className="h-full flex items-center p-2 border-collapse b-none border-[1px] border-l-[gray]">
                     <p className="bg-[#75ea75] px-3 py-1 font-medium b-none rounded-sm">
                       {question.level}
                     </p>
                   </div>
-                  <div className="h-full flex flex-col justify-center items-center p-2 border-[1px] border-collapse border-r-[gray] border-l-[gray]">
+                  <div className="h-full flex flex-col justify-center items-center p-2 border-[1px] border-collapse b-none border-r-[gray] border-l-[gray]">
                     <span>Mandatory</span>
                     <Switch
                       checked={question.mandatory}
