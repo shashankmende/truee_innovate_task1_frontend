@@ -33,6 +33,7 @@ const InterviewPage = () => {
     setFeedbackCloseFlag(true)
     // setPopupVisibility(false)
   },[])
+  
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Header Icons*/}
@@ -46,17 +47,8 @@ const InterviewPage = () => {
           
         <Popup nested closeOnDocumentClick={false} trigger={<button><IconButton icon={mdiMessageTextOutline} label="Feedback" /></button>}>
           {closePopup =>
-          // <div className=" fixed top-0 bottom-0 right-0 w-full h-full flex justify-end bg-[#80808067]">
           <div className={`w-full bg-[#8080805f] fixed top-0 right-0 bottom-0  rounded-md flex justify-end ${popupVisibility?"text-[1rem]":"text-sm"}`}>
-            {/* <div style={{width:page==="Home" ? "100%":"50%"}}  */}
-            <div style={{width:popupVisibility ? "100%":"50%",
-            // fontSize: popupVisibility ? "1.25rem" : "0.875rem",
-          }} 
-            // <div 
-              className={`bg-white 
-                
-              transition-all duration-500 ease-in-out transform`}
-            >
+            <div style={{width:popupVisibility ? "100%":"50%"}}   className={`bg-white   transition-all duration-500 ease-in-out transform`}>
               <Feedback closePopup={closePopup}  page={ !feedbackCloseFlag ? "Home":"Popup"}/>
             </div>
           </div>}

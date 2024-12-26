@@ -6,8 +6,9 @@ import { AddCustomQuestionValidation } from "../../../../../utils/validateForm";
 import { closeIcon, dislikeIcon, likeIcon } from "../../../../../IconsData";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { useCustomContext } from "../../../../../context/context";
+import SuggestedQuestions from "../../SuggestedQuestions";
 
-const InterviewerSectionComponent = () => {
+const InterviewerSectionComponent = ({closePopup}) => {
   const [interviewerQuestion, setInterviewerQuestion] = useState({
     question: "",
     answer: "",
@@ -161,27 +162,7 @@ const InterviewerSectionComponent = () => {
     );
   };
 
-  
-  
-    const NoteTextArea = React.memo(({each})=>{
-      return <div className="flex justify-start mt-4">
-      <label htmlFor="note-input" className="w-[200px]">Note</label>
-      <div className="w-full relative mr-5 rounded-md h-[100px]">
-        <textarea
-       rows={3} 
-        value={each.note}
-          onChange={(e) =>
-            onChangeInterviewQuestionNotes(
-              each.id,
-              e.target.value.slice(0, 250)
-            )
-          } name="scheduler questions input" id="note-input" className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"></textarea>
-        <span className="absolute right-[0.3rem] bottom-[0.2rem]  text-gray-500">
-          {each.note?.length || 0}/250
-        </span>
-      </div>
-    </div>
-    })
+
 
   return (
     <div className="relative h-[53vh]">
@@ -214,9 +195,9 @@ const InterviewerSectionComponent = () => {
       >
         {(closePlusPopup) => (
           <div className="p-3 w-[200px] flex flex-col gap-3 shadow-lg rounded-md">
-            <button onClick={() => closePlusPopup()}>
-              Suggested Questions
-            </button>
+            <Popup trigger={<button>Suggested Questions</button>} closeOnDocumentClick={false}>
+              {close=><SuggestedQuestions close={close}   closePopup={closePopup} closePlusPopup={closePlusPopup}/>}
+            </Popup>
             <Popup
               trigger={
                 <button
@@ -377,9 +358,9 @@ const InterviewerSectionComponent = () => {
               )}
             </div>
             {selectedQuestion === EachQuestion.id && (
-              <div>
+              <div className="">
                 <p className="text-gray-500">{EachQuestion.answer}</p>
-                <div className="flex justify-between mt-4 flex-wrap gap-4">
+                <div className="flex justify-between mt-4 items-start flex-wrap gap-4">
                   {/* Response Type Section */}
                   <div className="flex rounded-md">
                     <p className="w-[200px] font-bold text-gray-700">

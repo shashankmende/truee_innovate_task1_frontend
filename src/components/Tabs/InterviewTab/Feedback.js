@@ -176,6 +176,7 @@ const Feedback = ({ page, closePopup }) => {
       setFeedbackTabError((prev) => ({ ...prev, skills: isValid }));
     }
   };
+  
   const onClickNextButton = () => {
     handleValidationForTab();
 
@@ -185,7 +186,7 @@ const Feedback = ({ page, closePopup }) => {
   const displayData = () => {
     switch (tab) {
       case 1: return <CandidateMiniTab tab={tab} page={page}/>;
-      case 2: return <InterviewsMiniTabComponent tab={tab} page={page} />;
+      case 2: return <InterviewsMiniTabComponent tab={tab} page={page}  closePopup={closePopup}/>;
       case 3: return <SkillsTabComponent tab={tab} page={page} />;
       case 4:  return <OverallImpressions tab={tab} page={page} />;
       default: return null;
@@ -194,8 +195,6 @@ const Feedback = ({ page, closePopup }) => {
 
   const onClickMaximizeScreen =()=>{
     setPage("Home");
-    // const url = "/interview-feedback-new";
-    // window.open(url, "_blank");
     setPopupVisibility(true)
   }
 
@@ -206,16 +205,11 @@ const Feedback = ({ page, closePopup }) => {
 
 
   const onClickCloseCustomPop =async(closePopup,close)=>{
-    // setCustomQuestionPopupLoader(true)
     setTimeout(()=>{
-      // setCustomQuestionPopupLoader(false)
       close()
       closePopup()
-      // setPage(page==="Home"?"Popup":"Home")
-      // setPage("Home")
     },0)
   }
-
 
 
   //sections
@@ -295,18 +289,6 @@ const Feedback = ({ page, closePopup }) => {
       <div className=" px-8 flex items-center justify-between border-b-2 border-[#8080807f]">
         <h1 className=" pt-4  text-[#227a8a] text-xl font-semibold">Interview Feedback</h1>
         <div className="flex gap-8">
-          {/* {page === "Popup" && (  <button  className="text-md transition-transform scale-110 duration-300 ease-in-out"  onClick={onClickMaximizeScreen} > {maximizeScreenIcon} </button>)} */}
-          {/* {page === "Popup" && ( !popupVisibility ?  <button  className="text-md transition-transform scale-110 duration-300 ease-in-out"  onClick={onClickMaximizeScreen} > {maximizeScreenIcon} </button>:<button onClick={()=>setPopupVisibility(false)}>{minimizeScreenIcon}</button>)} */}
-          {/* {page === "Popup" ? <button  onClick={onClickMaximizeScreen}>{maximizeScreenIcon}</button> :
-          
-          <div className="flex gap-8">
-          <button onClick={()=>setPage("Popup")}>{minimizeScreenIcon}</button> 
-            <PopupConfirmation/>
-          </div>
-          
-          }
-          
-          {page === "Popup" && <PopupConfirmation />} */}
           {feedbackCloseFlag &&(
             <div  className="flex gap-8">
               {!popupVisibility ?<button  onClick={onClickMaximizeScreen}>{maximizeScreenIcon}</button>:<button onClick={()=>{
