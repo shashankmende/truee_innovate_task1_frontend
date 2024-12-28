@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { closeIcon, downArrow, filterIcon } from '../../../IconsData';
+import { closeIcon, downArrow, filterIcon } from '../../../../IconsData';
 import Switch from 'react-switch';
 import { FaAngleDown } from "react-icons/fa6";
 
@@ -65,7 +65,7 @@ const SuggestedQuestions = ({ close, closePlusPopup }) => {
     'React.js',
     'CSS',
     'MongoDB',
-    // '1-2 Years',
+    '1-2 Years',
   ]);
 
 //   const [selected]
@@ -202,7 +202,7 @@ return (
 {/* filter section */}
     <ul className='flex justify-between w-full'>
             <div  className='flex gap-6 px-4'>
-            {tabsList.map(each=><li className={`${tab===each.id? 'border-b-[2px] border-[#227a8a]':""} cursor-pointer`} key={each.id} onClick={()=>onClickTab(each.id)}>{each.tab}</li>)}
+            {tabsList.map(each=><li className={`${tab===each.id? 'border-b-[3px] border-[#227a8a]':""} cursor-pointer`} key={each.id} onClick={()=>onClickTab(each.id)}>{each.tab}</li>)}
             </div>
             {tab===2 && <button className='pr-4 text-[1.1rem] text-[#227a8a]'>Add Question</button>}
 
@@ -225,17 +225,10 @@ return (
             <span className="text-[1.5rem] ">{filterIcon}</span>
           </div>
         </div>
-        
         <div>
-
         {displayData()}
         </div>
-
      </div>
 </div>
-)
-
-
-};
-
+)};
 export default SuggestedQuestions;

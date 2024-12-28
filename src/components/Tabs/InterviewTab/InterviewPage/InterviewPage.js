@@ -13,7 +13,7 @@ import {
   mdiPhoneHangup
 } from '@mdi/js';
 import Popup from 'reactjs-popup';
-import Feedback from '../Feedback';
+import Feedback from '../FeedbackPage/Feedback';
 import { useCustomContext } from '../../../../context/context';
 import { useEffect } from 'react';
  
@@ -28,12 +28,13 @@ const IconButton = ({ icon, label, color = "text-gray-700" }) => (
 const InterviewPage = () => {
   const {popupVisibility,setPopupVisibility,feedbackCloseFlag,setFeedbackCloseFlag,page,setPage}=useCustomContext()
   console.log(useCustomContext())
+
+
   useEffect(()=>{
     setPage("Popup")
     setFeedbackCloseFlag(true)
     // setPopupVisibility(false)
   },[])
-  
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Header Icons*/}

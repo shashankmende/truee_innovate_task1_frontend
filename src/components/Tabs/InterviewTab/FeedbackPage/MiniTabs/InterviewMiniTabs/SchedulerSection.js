@@ -1,8 +1,8 @@
 import React, { useState, useRef, useCallback } from "react";
-import { likeIcon, dislikeIcon, closeIcon } from "../../../../../IconsData";
+import { likeIcon, dislikeIcon, closeIcon } from "../../../../../../IconsData";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import Popup from "reactjs-popup";
-import { useCustomContext } from "../../../../../context/context";
+import { useCustomContext } from "../../../../../../context/context";
 
 const dislikeOptions = [
   { value: "Not Skill-related", label: "Not Skill-related" },
@@ -232,13 +232,14 @@ const SchedulerSectionComponent = ({ tab }) => {
       </div>
       <ul className="h-[45vh] overflow-auto pr-4 flex flex-col gap-4 mt-4">
         {SchedulerSectionData.map((each) => (
-          <li className={` p-2 py-4 rounded-md w-full   cursor-pointer border-[1px] ${each.mandatory ? "border-[red]":" border-[green]"}`} ref={questionRef}key={each.id}>
-            <div  className="flex items-center justify-between cursor-pointer transition-transform duration-300s ease-in-out"onClick={()=>onClickQuestionItem(each)}  >
-              <p>{each.question}</p>
+          // <li className={` p-2 py-4 rounded-md w-full   cursor-pointer border-[1px] ${each.mandatory ? "border-[red]":" border-[green]"}`} ref={questionRef}key={each.id}>
+          <li className={`rounded-md w-full   cursor-pointer border-[1px] ${each.mandatory ? "border-[red]":" border-[green]"}`} ref={questionRef}key={each.id}>
+            <div  className="px-2 pt-3 pb-3 flex items-center justify-between cursor-pointer transition-transform duration-300s ease-in-out"onClick={()=>onClickQuestionItem(each)}  >
+              <p >{each.question}</p>
               <span> {selectedQuestion === each.id ? <FaAngleUp /> : <FaAngleDown />}</span>
             </div>
             {selectedQuestion === each.id && (
-              <div>
+              <div className="p-2 pb-2" >
                 <p className="para-value text-gray-500">{each.answer}</p>
                 <div className="w-full flex  justify-between items-start my-4 gap-8">
                   <RadioGroupInput each={each} />
@@ -270,7 +271,6 @@ const SchedulerSectionComponent = ({ tab }) => {
                     </span>
                     <span
                       className={`${
-                        // dislikeQuestionId === each.id ? "text-red-500" : ""
                         each.isLiked==="disliked" ? "text-red-500" : ""
                       } transition-transform hover:scale-110 duration-300 ease-in-out`}
                       style={{ cursor: "pointer" }}
@@ -280,10 +280,8 @@ const SchedulerSectionComponent = ({ tab }) => {
                     </span>
                   </div>
                 </div>
-                {/* {each.notesBool && page==="Home"?<NotesSection each={each}/>: <NoteTextArea  each={each}/>} */}
                 {each.notesBool ? (
   page === "Home" ? (
-    // <NotesComponent each={each} isHome={true} /> // Input element for "Home"
     <NotesSection each={each}/>// Input element for "Home"
   ) : page === "Popup" ? (
     <div className="flex justify-start mt-4">

@@ -4,7 +4,7 @@ import InterviewsMiniTabComponent from "./MiniTabs/Interviews";
 import SkillsTabComponent from "./MiniTabs/Skills";
 import OverallImpressions from "./MiniTabs/OverallImpressions";
 import { useNavigate } from "react-router-dom";
-import { useCustomContext } from "../../../context/context";
+import { useCustomContext } from "../../../../context/context";
 import {ClipLoader} from 'react-spinners'
 import { IoMdClose } from "react-icons/io";
 
@@ -13,8 +13,8 @@ import {
   SchedulerQuestionsValidation,
   validateOverallImpression,
   ValidateSkills,
-} from "../../../utils/validateForm";
-import { closeIcon, maximizeScreenIcon, minimizeScreenIcon, upArrowIcon } from "../../../IconsData";
+} from "../../../../utils/validateForm";
+import { closeIcon, maximizeScreenIcon, minimizeScreenIcon, upArrowIcon } from "../../../../IconsData";
 import Popup from "reactjs-popup";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -63,6 +63,7 @@ const Feedback = ({ page, closePopup }) => {
 
   useLayoutEffect(()=>{
     setIsFormValid(true)
+    // setFeedbackCloseFlag(false)
   },[])
 
   const areAllValidationsMet = () =>
@@ -208,6 +209,7 @@ const Feedback = ({ page, closePopup }) => {
     setTimeout(()=>{
       close()
       closePopup()
+      // setPopupVisibility(false)
     },0)
   }
 

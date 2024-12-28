@@ -216,7 +216,7 @@ const CodeEditor = () => {
             <div
             className={`rounded-[0.3rem] bg-${lightMode ? "#fff":"#1e1e1e"} border-2 border-[${lightMode ?"#227a8a":"gray"}]`}            >
               <div
-                className={` border-b-2 border-${lightMode?"#227a8a":"gray"} editor-btns--container flex items-center justify-between border-collapse h-[2.2rem]`}
+                className={` border-b-2 border-${lightMode?"#227a8a":"gray"} flex items-center justify-between border-collapse h-[2.2rem]`}
                 style={{
                   borderBottom: lightMode
                     ? "2px solid #227A8A"

@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import Popup from "reactjs-popup";
 import { IoCodeSlash } from "react-icons/io5";
 import { RxText } from "react-icons/rx";
-import { AddCustomQuestionValidation } from "../../../../../utils/validateForm";
-import { closeIcon, dislikeIcon, likeIcon } from "../../../../../IconsData";
+import { AddCustomQuestionValidation } from "../../../../../../utils/validateForm";
+import { closeIcon, dislikeIcon, likeIcon } from "../../../../../../IconsData";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
-import { useCustomContext } from "../../../../../context/context";
+import { useCustomContext } from "../../../../../../context/context";
 import SuggestedQuestions from "../../SuggestedQuestions";
 
 const InterviewerSectionComponent = ({closePopup}) => {
@@ -195,7 +195,7 @@ const InterviewerSectionComponent = ({closePopup}) => {
       >
         {(closePlusPopup) => (
           <div className="p-3 w-[200px] flex flex-col gap-3 shadow-lg rounded-md">
-            <Popup trigger={<button>Suggested Questions</button>} closeOnDocumentClick={false}>
+            <Popup trigger={<button>Question Bank</button>} closeOnDocumentClick={false}>
               {close=><SuggestedQuestions close={close}   closePopup={closePopup} closePlusPopup={closePlusPopup}/>}
             </Popup>
             <Popup
@@ -211,7 +211,8 @@ const InterviewerSectionComponent = ({closePopup}) => {
                     display: "block",
                   }}
                 >
-                  Custom Questions
+                  {/* Custom Questions */}
+                  My Questions list
                 </button>
               }
               nested
@@ -340,10 +341,11 @@ const InterviewerSectionComponent = ({closePopup}) => {
         {interviewerSectionData.map((EachQuestion) => (
           <li
             key={EachQuestion.id}
-            className="border border-gray-500 rounded-md p-4 cursor-pointer flex flex-col gap-3"
+            // className="border border-gray-500 rounded-md p-4 cursor-pointer flex flex-col gap-3"
+            className="border border-gray-500 rounded-md cursor-pointer flex flex-col gap-3"
           >
             <div
-              className="flex justify-between"
+              className="flex justify-between px-2 py-4"
               onClick={() => {
                 setSelectedQuestion(
                   selectedQuestion === EachQuestion.id ? null : EachQuestion.id
@@ -358,7 +360,7 @@ const InterviewerSectionComponent = ({closePopup}) => {
               )}
             </div>
             {selectedQuestion === EachQuestion.id && (
-              <div className="">
+              <div className="px-2 pb-2" >
                 <p className="text-gray-500">{EachQuestion.answer}</p>
                 <div className="flex justify-between mt-4 items-start flex-wrap gap-4">
                   {/* Response Type Section */}

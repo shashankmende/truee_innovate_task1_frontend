@@ -38,7 +38,9 @@ import { FiMinimize } from "react-icons/fi";
 import { BiSolidUpArrow } from "react-icons/bi";
 
 import { IoStar } from "react-icons/io5";
+import { IoMdClose } from "react-icons/io";
 
+export const crossIcon = <IoMdClose/>
 export const upArrowIcon =<BiSolidUpArrow/>
 export const minimizeScreenIcon = <FiMinimize/>
 export const maximizeScreenIcon = <TbArrowsMaximize/>

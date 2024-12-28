@@ -1,57 +1,14 @@
 
-
-// import React, { useEffect, useRef, useState } from "react";
-// import Header from "../../Navbar/Header/Header";
-// import CandidateMiniTab from "./MiniTabs/Candidate";
-// import SkillsTabComponent from "./MiniTabs/Skills";
-// import OverallImpressions from "./MiniTabs/OverallImpressions";
-// import { useCustomContext } from "../../../context/context";
-
-// const Preview = () => {
-//   const  {setPage} = useCustomContext
-
-//   useEffect(()=>{
-//     setPage("Home")
-//   },[])
-
-//   return (
-//     <div>
-//         <Header/>
-//         <CandidateMiniTab/>
-//         <SkillsTabComponent/>
-//         <OverallImpressions/>
-//     </div>
-//   )
-// }
-
-// export default Preview
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useRef, useState } from "react";
 import CandidateMiniTab from "./MiniTabs/Candidate";
 import SkillsTabComponent from "./MiniTabs/Skills";
 import OverallImpressions from "./MiniTabs/OverallImpressions";
-import Header from "../../Navbar/Header/Header";
+import Header from "../../../Navbar/Header/Header";
 import { useLocation } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { IoIosStar } from "react-icons/io";
-import { useCustomContext } from "../../../context/context";
+import { useCustomContext } from "../../../../context/context";
 
 const ratingList = [
   { id: 1, name: "Poor", stars: 2, color: "red" },

@@ -7,11 +7,13 @@ import InterviewerSectionComponent from './InterviewMiniTabs/InterviewerSection'
 const interviewMiniTabsList = [
     {
       id: 1,
-      name: "Scheduler Questions",
+      // name: "Scheduler Questions",
+      name: "Preselected Questions",
     },
     {
       id: 2,
-      name: "Interviewer Questions",
+      // name: "Interviewer Questions",
+      name: "Interviewer - added Questions",
     },
   ];
 
