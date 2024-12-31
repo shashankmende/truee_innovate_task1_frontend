@@ -86,34 +86,6 @@ const SchedulerSectionComponent = ({ tab }) => {
   }
 
   //sections
-
-  const NotesSection = React.memo(({ each }) => {
-    return (
-      <div className="flex justify-start mt-4">
-      <label htmlFor="note-input" className="w-[200px]">Note</label>
-      <div className="w-full relative mr-5 rounded-md h-[80px]">
-        <input
-          className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"
-          id="note-input"
-          type="text"
-          value={each.note}
-          onChange={(e) =>
-            onChangeInterviewQuestionNotes(
-              each.id,
-              e.target.value.slice(0, 250)
-            )
-          }
-          placeholder="Add your note here"
-        />
-        <span className="absolute right-[1rem] bottom-[0.2rem]  text-gray-500">
-          {each.note?.length || 0}/250
-        </span>
-      </div>
-    </div>
-    );
-  });
-  
-
   const DisLikeSection = React.memo(({ each, setDislikeQuestionId, closeIcon }) => {
     return (
       <div className="border border-gray-500 w-full p-3 rounded-md">
@@ -202,28 +174,6 @@ const SchedulerSectionComponent = ({ tab }) => {
     );
   });
 
-
-  const NoteTextArea = React.memo(({each})=>{
-    return <div className="flex justify-start mt-4">
-    <label htmlFor="note-input" className="w-[200px]">Note</label>
-    <div className="w-full relative mr-5 rounded-md h-[100px]">
-      <textarea
-     rows={3} 
-      value={each.note}
-        onChange={(e) =>
-          onChangeInterviewQuestionNotes(
-            each.id,
-            e.target.value.slice(0, 250)
-          )
-        } name="scheduler questions input" id="note-input" className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"></textarea>
-      <span className="absolute right-[0.3rem] bottom-[0.2rem]  text-gray-500">
-        {each.note?.length || 0}/250
-      </span>
-    </div>
-  </div>
-  })
-
-
   return (
     <div className="">
       <div className="flex items-start gap-4 mt-4">
@@ -282,7 +232,28 @@ const SchedulerSectionComponent = ({ tab }) => {
                 </div>
                 {each.notesBool ? (
   page === "Home" ? (
-    <NotesSection each={each}/>// Input element for "Home"
+    // <NotesSection each={each}/>// Input element for "Home"
+    <div className="flex justify-start mt-4">
+      <label htmlFor="note-input" className="w-[200px]">Note</label>
+      <div className="w-full relative mr-5 rounded-md h-[80px]">
+        <input
+          className="w-full outline-none b-none border border-gray-500 p-2 rounded-md"
+          id="note-input"
+          type="text"
+          value={each.note}
+          onChange={(e) =>
+            onChangeInterviewQuestionNotes(
+              each.id,
+              e.target.value.slice(0, 250)
+            )
+          }
+          placeholder="Add your note here"
+        />
+        <span className="absolute right-[1rem] bottom-[0.2rem]  text-gray-500">
+          {each.note?.length || 0}/250
+        </span>
+      </div>
+    </div>
   ) : page === "Popup" ? (
     <div className="flex justify-start mt-4">
     <label htmlFor="note-input" className="w-[200px]">
