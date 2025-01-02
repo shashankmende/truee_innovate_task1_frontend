@@ -3,7 +3,10 @@ import { IoHomeOutline } from "react-icons/io5";
 import { CiCircleQuestion } from "react-icons/ci";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
-
+// likeIcon,listViewIcon,kanbanViewIcon,leftArrow,rightArrow cameraIcon, closeIcon,filterIcon,downArrow
+// cppIcon,tsIcon, csharpIcon, javaIcon, jsIcon, phpIcon, pythonIcon, rubyIcon, scalaIcon, swiftIcon, tsIcon 
+// darkModeIcon, lightModeIcon,reloadIcon
+// editIcon, viewIcon ,plusIcon
 import { MdOutlineViewKanban } from "react-icons/md";
 import { IoListOutline } from "react-icons/io5";
 import { IoIosCloseCircleOutline } from "react-icons/io";

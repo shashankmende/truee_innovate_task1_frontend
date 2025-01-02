@@ -2,23 +2,27 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 // import Feedback from "./components/Tabs/InterviewTab/Feedback";
-import PositionViewPage from "./components/Tabs/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
-import Form from "./components/Tabs/MoreTab/PositionPage/Form/Form";
-import Candidate from "./components/Tabs/MoreTab/CandidatePage/Candidate/Candidate";
-import Support from "./components/Tabs/MoreTab/SupportPage/SupportTable/SupportTable";
-import SupportViewPage from "./components/Tabs/MoreTab/SupportPage/SupportViewPage/SupportViewPage";
-import CodeEditor from "./components/Tabs/MoreTab/CodeEditorPage/Editor";
-import HtmlCssJsExecutor from "./components/Tabs/MoreTab/CodeEditorPage/WebEditor";
-import Position from "./components/Tabs/MoreTab/PositionPage/Position/Position";
-import CandidateViewPage from "./components/Tabs/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
-// import Preview from "./components/Tabs/InterviewTab/Preview";
-// import FeedbackHome from "./components/Tabs/InterviewTab/FeedbackHome";
-import InterviewPage from "./components/Tabs/InterviewTab/InterviewPage/InterviewPage";
+// import PositionViewPage from "./components/Tabs/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
+import PositionViewPage from "./Pages/Dashboard-Part/Tabs/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
+// import Form from "./components/Tabs/MoreTab/PositionPage/Form/Form";
+
+import Form from "./Pages/Dashboard-Part/Tabs/MoreTab/PositionPage/Form/Form";
+import Candidate from "./Pages/Dashboard-Part/Tabs/MoreTab/CandidatePage/Candidate/Candidate";
+import Support from "./Pages/Dashboard-Part/Tabs/MoreTab/SupportPage/SupportTable/SupportTable";
+import SupportViewPage from "./Pages/Dashboard-Part/Tabs/MoreTab/SupportPage/SupportViewPage/SupportViewPage";
+import CodeEditor from "./Pages/Dashboard-Part/Tabs/MoreTab/CodeEditorPage/Editor";
+import HtmlCssJsExecutor from "./Pages/Dashboard-Part/Tabs/MoreTab/CodeEditorPage/WebEditor";
+import Position from "./Pages/Dashboard-Part/Tabs/MoreTab/PositionPage/Position/Position";
+import CandidateViewPage from "./Pages/Dashboard-Part/Tabs/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
+// import InterviewPage from "./components/Tabs/InterviewTab/InterviewPage/InterviewPage";
+import InterviewPage from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/InterviewPage";
+// import Feedback from "./components/Tabs/InterviewTab/FeedbackPage/Feedback";
+import Feedback from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/Feedback";
+// import Preview from "./components/Tabs/InterviewTab/FeedbackPage/Preview";
+import Preview from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/Preview";
 // import FeedbackHome from "./components/Tabs/InterviewTab/FeedbackPage/FeedbackHome";
-import Feedback from "./components/Tabs/InterviewTab/FeedbackPage/Feedback";
-import Preview from "./components/Tabs/InterviewTab/FeedbackPage/Preview";
-import FeedbackHome from "./components/Tabs/InterviewTab/FeedbackPage/FeedbackHome";
-import SuggestedQuestions from "./components/Pages/suggestedQuestions";
+import FeedbackHome from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/FeedbackHome";
+import SuggestedQuestions from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/SuggestedQuestions";
 import SuggestedQuestionsComponent from "./components/Pages/suggestedQuestions";
 
 function App() {
@@ -45,9 +49,6 @@ function App() {
       </BrowserRouter>
     </div>
   );
-
-
-  
 }
 
 export default App;

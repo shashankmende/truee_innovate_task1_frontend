@@ -181,7 +181,50 @@ const CustomProvider = ({ children }) => {
     skills: true,
     overallImpression: true,
   });
+
+  const [suggestedQuestions, setSuggestedQuestions] = useState([]);
+  const [suggestedQuestionsFilteredData,setSuggestedQuestionsFilteredData]=useState([])
   
+  const [myQuestionsList,setMyQuestionsList]=useState([])
+
+
+  const fetchMyQuestionsData = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/questions`);
+      
+      setMyQuestionsList(response.data);
+      //Changes done by Shashank, initialized isOpen with response data
+    const newObj = Object.entries(response.data)
+    // console.log('new obj',response.data)
+    // console.log('new obj',newObj)
+    const formattedObj = newObj.map(item => 
+      ({[item[0]]: item[1].map(each => ({...each, isAdded: false}))})
+  );
+  const requiredObj = {}; // Initialize an empty object
+
+  formattedObj.forEach(each => {
+    const [key, value] = each;  // Destructure each entry of the array
+    
+    // Now, dynamically set the key in the object
+    requiredObj[key] = value; // Add the key-value pair to the requiredObj
+  });
+  
+  console.log(requiredObj); // This will now have the correct structure
+  
+  
+      
+
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    } 
+    // finally {
+    //   setLoading(false);
+    // }
+  };
+  useEffect(() => {
+    fetchMyQuestionsData();
+  }, []);
+
   const fetchPositions = async () => {
     try {
       const response = await axios.get(
@@ -217,12 +260,39 @@ const CustomProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    const getQuestions = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/suggested-questions/questions`);
+            if (response.data.success) {
+                const newList = response.data.questions.map(question=>({...question,isAdded:false}))
+                // setSuggestedQuestions(response.data.questions);
+                setSuggestedQuestions([...newList]);
+                // setSuggestedQuestionsFilteredData(response.data.questions)
+                setSuggestedQuestionsFilteredData([...newList])
+            }
+
+        } catch (error) {
+            console.log(`${error.message}`);
+        }
+    };
+    getQuestions();
+}, []);
+
+  useEffect(() => {
     fetchCandidates();
   }, []);
 
   return (
     <CustomContext.Provider
+    
       value={{
+        fetchMyQuestionsData,
+        myQuestionsList,
+        setMyQuestionsList,
+        suggestedQuestions, 
+        setSuggestedQuestions,
+        suggestedQuestionsFilteredData,
+        setSuggestedQuestionsFilteredData,
         feedbackCloseFlag,setFeedbackCloseFlag,
         popupVisibility,
         setPopupVisibility,
