@@ -12,7 +12,7 @@ const instructions = [
   "Join Promptly: Join the call on time and ensure your camera and microphone are working properly.",
 ]
 
-const CandidateMiniTab = ({tab}) => {
+const CandidateMiniTab = ({page,tab}) => {
 
 
 
@@ -41,7 +41,7 @@ const CandidateMiniTab = ({tab}) => {
     </div>
   );
   return (
-    <div className="h-[70vh] flex flex-col gap-4 ">
+    <div className="h-[70vh] flex flex-col gap-4 " >
         <h2 className="text-black font-bold">Candidate Details:</h2>
       {/* <div  style={{border:'1px solid red'}}  className={`border-b-2 border-[#8080808a] grid items-center ${tab ? " grid-cols-1":"grid-cols-[50%_50%]"}`}> */}
       <div    className={`border-b-2 border-[#8080808a] flex ${tab ? "flex-row":"flex-col"} relative`}>

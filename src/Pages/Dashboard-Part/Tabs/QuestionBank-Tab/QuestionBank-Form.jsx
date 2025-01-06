@@ -9,7 +9,6 @@ import Cookies from "js-cookie";
 import MyQuestionList from "./MyQuestionsListPopup.jsx";
 import { FaSearch } from 'react-icons/fa';
 
-
 import { ReactComponent as MdArrowDropDown } from "../../../../icons/MdArrowDropDown.svg";
 import { ReactComponent as IoArrowBack } from "../../../../icons/IoArrowBack.svg";
 import { ReactComponent as FaTrash } from "../../../../icons/FaTrash.svg";
@@ -17,6 +16,7 @@ import { ReactComponent as MdOutlineCancel } from "../../../../icons/MdOutlineCa
 import { ReactComponent as VscSave } from "../../../../icons/VscSave.svg";
 import { ReactComponent as FaRegEdit } from "../../../../icons/FaRegEdit.svg";
 import { ReactComponent as IoIosAddCircle } from "../../../../icons/IoIosAddCircle.svg";
+import '../styles/tabs.scss'
 
 
 
@@ -26,6 +26,8 @@ const optionLabels = Array.from({ length: 26 }, (_, i) =>
 
 const Interviewcq = ({
   onClose,
+  questionBankPopupVisibility,
+  section,
   onOutsideClick,
   onDataAdded,
   isEdit = false,
@@ -405,12 +407,21 @@ const Interviewcq = ({
 
   return (
     <>
-      <div className={"fixed inset-0 bg-black bg-opacity-15 z-50 h-full flex flex-col justify-center "}>
+      <div className={" fixed inset-0 bg-black bg-opacity-15 z-50  h-full flex flex-col justify-center "}>
         {/* <div className="fixed inset-y-0 right-0 z-50 sm:w-full md:w-3/4 lg:w-1/2 xl:w-1/2 2xl:w-1/2 bg-white shadow-lg transition-transform duration-5000 transform"> */}
-        <div className=" flex flex-col justify-center items-center fixed  h-[95%] right-10 z-50 sm:w-full md:w-3/4 lg:w-1/2 xl:w-1/2 2xl:w-1/2 bg-white shadow-lg transition-transform duration-5000 transform">
+        {/* <div className="border-2 border-[red] flex flex-col justify-center items-center fixed  h-[95%] right-10 z-50 sm:w-full md:w-3/4 lg:w-1/2 xl:w-1/2 2xl:w-1/2 bg-white shadow-lg transition-transform duration-5000 transform"> */}
+        {/* <div className={`  ${(section==="Popup") && "right-0  h-full top-0 "} ${ (section==="Popup" && questionBankPopupVisibility) ? "w-1/2 right-0 fixed":"w-full"}  ${section==="interviewerSection"&& "w-1/2  border-2 border-[red] fixed h-[95%] right-10"} flex flex-col justify-center items-center  bg-white shadow-lg transition-transform duration-5000 transform`}> */}
+        {/* <div className={`  ${(section==="Popup") && "right-0  h-full top-0 "} ${ (section==="Popup") && (questionBankPopupVisibility?  "w-1/2 right-0 fixed":"w-full")}  ${section==="interviewerSection"&& "w-1/2  border-2 border-[red] fixed h-[95%] right-10"} flex flex-col justify-center items-center  bg-white shadow-lg transition-transform duration-5000 transform`}> */}
+        <div className={`flex flex-col justify-center items-center bg-white shadow-lg transition-transform duration-5000 transform 
+  ${section === "Popup" ? 
+    `right-0 h-full top-0 
+    ${questionBankPopupVisibility ? "w-1/2 right-0 fixed" : "w-full"}` : 
+    ""}
+  ${section === "interviewerSection" ? "w-1/2  fixed h-[95%] flex flex-col justify-between right-9 " : ""}
+`}
+>
           {/* Header */}
-          <div className="fixed top-0 w-full bg-white border-b z-50">
-            {/* <div className="flex justify-between sm:justify-start items-center p-4 bg-custom-blue text-white"> */}
+          <div className="fixed  top-0 w-full bg-white border-b z-50">
             <div className="flex md:justify-between sm:justify-start items-center text-white p-4 bg-custom-blue w-full  ">
               <button
                 onClick={onClose}
@@ -441,7 +452,8 @@ const Interviewcq = ({
             </div>
           </div>
           {/* Content */}
-          <div className="fixed top-16 bottom-16  overflow-auto text-sm w-full">
+          <div className="fixed   top-16 bottom-16  overflow-auto text-sm w-full">
+          {/* <div className=" border-2 border-[red] top-16 h-full  overflow-auto text-sm w-full"> */}
             <form className="group p-4" onSubmit={handleSubmit}>
               <div>
                 <div className="border-b">

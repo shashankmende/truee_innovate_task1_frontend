@@ -127,54 +127,8 @@ const CustomProvider = ({ children }) => {
     },
   ])
 
-  const [interviewerSectionData,setInterviewerSectionData]=useState([
-    {
-      id: 1,
-      question:
-        "Explain the difference between an interface and an abstract class in Java.",
-      answer:
-        "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
-      note:"",
-      notesBool:false,
-      isLiked:false,
-    },
-    {
-      question: "What is the difference between is and == in Python?",
-      answer:
-        "is checks for identity, i.e., whether two objects refer to the same memory location.,== checks for equality, i.e., whether the values of two objects are the same.",
-      note: "",
-      id: 2,
-      notesBool:false,isLiked:false,
-    },
-    {
-      question:
-        "What is the difference between a shallow copy and a deep copy in Python?",
-      answer:
-        "A shallow copy creates a new object but references the original objects for nested elements. A deep copy creates a new object and recursively copies all objects inside it.",
-      
-      id: 3,
-      note:"",
-      notesBool:false,
-      isLiked:false,
-    },
-    {
-      question: "What is a Python lambda function?",
-      answer:
-        "A lambda function is an anonymous function defined using the lambda keyword. It can have any number of arguments but only one expression.",
-      note: "",
-      id: 4,
-      notesBool:false,isLiked:false,
-    },
-    {
-      question:
-        "What is the difference between @staticmethod and @classmethod?",
-      answer:
-        "@staticmethod defines a method that doesn't operate on the class or instance. @classmethod defines a method that operates on the class and receives the class as the first parameter (cls).",
-      note: "",
-      id: 5,
-      notesBool:false,isLiked:false,
-    },
-  ])
+  const [interviewerSectionData,setInterviewerSectionData]=useState([])
+  
 
   const [feedbackTabErrors, setFeedbackTabError] = useState({
     interviewQuestion: true,
@@ -188,29 +142,46 @@ const CustomProvider = ({ children }) => {
   const [myQuestionsList,setMyQuestionsList]=useState([])
 
 
+  const getInterviewerQuestions = async()=>{
+    try {
+      const url  = `${process.env.REACT_APP_API_URL}/interview-questions/get-questions`
+      const response = await axios.get(url)
+      const formattedLst = response.data.questions.map(question=>({
+        // id:question.questionId,
+        id:question._id,
+        question:question.snapshot.questionText,
+        answer:question.snapshot.correctAnswer,
+        note:"",
+        notesBool:false,
+        isLiked:false,
+      }))
+      setInterviewerSectionData(formattedLst)
+      console.log(response)
+    } catch (error) {
+      console.log('error in getting interviewer questions from frontend',error)
+    }
+  }
+
+  //interviewer questions 
+  useEffect(()=>{
+    
+    getInterviewerQuestions()
+  },[])
+
   const fetchMyQuestionsData = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/questions`);
       
-      setMyQuestionsList(response.data);
-      //Changes done by Shashank, initialized isOpen with response data
-    const newObj = Object.entries(response.data)
-    // console.log('new obj',response.data)
-    // console.log('new obj',newObj)
-    const formattedObj = newObj.map(item => 
-      ({[item[0]]: item[1].map(each => ({...each, isAdded: false}))})
-  );
-  const requiredObj = {}; // Initialize an empty object
+      const newObject = {};
+      for (const key in response.data) {
+        const valuesList = response.data[key].map(each=>({...each,isAdded:false}))
+        // newObject[key] = myObject[key];
+        newObject[key] = valuesList
+      }
+      console.log(newObject);
+      // setMyQuestionsList(response.data);
+      setMyQuestionsList(newObject);
 
-  formattedObj.forEach(each => {
-    const [key, value] = each;  // Destructure each entry of the array
-    
-    // Now, dynamically set the key in the object
-    requiredObj[key] = value; // Add the key-value pair to the requiredObj
-  });
-  
-  console.log(requiredObj); // This will now have the correct structure
-  
   
       
 
@@ -255,7 +226,7 @@ const CustomProvider = ({ children }) => {
       }
     } catch (error) {
       console.log("Error in fetching candidates from frontend", error);
-      alert("Something went wrong.");
+      // alert("Something went wrong.");
     }
   };
 
@@ -286,6 +257,7 @@ const CustomProvider = ({ children }) => {
     <CustomContext.Provider
     
       value={{
+        getInterviewerQuestions,
         fetchMyQuestionsData,
         myQuestionsList,
         setMyQuestionsList,

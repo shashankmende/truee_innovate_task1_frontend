@@ -15,7 +15,8 @@ import {
 import Popup from 'reactjs-popup';
 import Feedback from '../FeedbackPage/Feedback';
 import { useCustomContext } from '../../../../../context/context';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import QuestionBank from '../../QuestionBank-Tab/QuestionBank';
  
 // eslint-disable-next-line react/prop-types
 const IconButton = ({ icon, label, color = "text-gray-700" }) => (
@@ -27,7 +28,8 @@ const IconButton = ({ icon, label, color = "text-gray-700" }) => (
  
 const InterviewPage = () => {
   const {popupVisibility,setPopupVisibility,feedbackCloseFlag,setFeedbackCloseFlag,page,setPage}=useCustomContext()
-  console.log(useCustomContext())
+  const [questionBankPopupVisibility,setQuestionBankPopupVisibility]=useState(false)
+
 
 
   useEffect(()=>{
@@ -49,13 +51,23 @@ const InterviewPage = () => {
         <Popup nested closeOnDocumentClick={false} trigger={<button><IconButton icon={mdiMessageTextOutline} label="Feedback" /></button>}>
           {closePopup =>
           <div className={`w-full bg-[#8080805f] fixed top-0 right-0 bottom-0  rounded-md flex justify-end ${popupVisibility?"text-[1rem]":"text-sm"}`}>
-            <div style={{width:popupVisibility ? "100%":"50%"}}   className={`bg-white   transition-all duration-500 ease-in-out transform`}>
+            <div style={{width:popupVisibility ? "100%":"50%"}}   className={` bg-white   transition-all duration-500 ease-in-out transform`}>
               <Feedback closePopup={closePopup}  page={ !feedbackCloseFlag ? "Home":"Popup"}/>
             </div>
           </div>}
         </Popup>
           
-          <IconButton icon={mdiHelpCircleOutline} label="Questions" />
+          <Popup closeOnDocumentClick={false} trigger={<button><IconButton icon={mdiHelpCircleOutline} label="Questions" /></button>}>
+            {closeQuestionBankPopup=>(
+              <div className='fixed bg-[#8080805f] top-0 left-0 right-0 bottom-0 w-full flex justify-end'>
+                <div className={`${questionBankPopupVisibility ? "w-[100%] text-md":"w-[50%] text-sm"} bg-white  transition-all duration-500 ease-in-out transform`}>
+
+                <QuestionBank  setQuestionBankPopupVisibility={setQuestionBankPopupVisibility} questionBankPopupVisibility={questionBankPopupVisibility} section={"Popup"} closeQuestionBank={closeQuestionBankPopup}/>
+                </div>
+              </div>
+            )}
+          </Popup>
+          {/* <IconButton icon={mdiHelpCircleOutline} label="Questions" /> */}
           <IconButton icon={mdiNoteTextOutline} label="Notes" />
           <IconButton icon={mdiCodeTags} label="Code Editor" />
           <IconButton icon={mdiMessageOutline} label="Chat" />

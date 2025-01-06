@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { useCustomContext } from "../../../../../context/context";
 import {ClipLoader} from 'react-spinners'
 import { IoMdClose,IoIosCloseCircleOutline } from "react-icons/io";
-import { TbArrowsMaximize } from "react-icons/tb";
 import { BiSolidUpArrow } from "react-icons/bi";
+import { TbArrowsMaximize } from "react-icons/tb";
 import { FiMinimize } from "react-icons/fi";
 
 import {
@@ -20,6 +20,7 @@ import {
 import Popup from "reactjs-popup";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { FaCaretUp } from "react-icons/fa";
 
 const tabsList = [
   {
@@ -245,16 +246,17 @@ const Feedback = ({ page, closePopup }) => {
         arrow={false}
         offsetX={-130}
         closeOnEscape={false}
-        closeOnDocumentClick={false} // Ensure it doesn't close on clicking outside
+        // closeOnDocumentClick={false} // Ensure it doesn't close on clicking outside
       >
         {(close) => (
-          <div className="flex flex-col gap-[-1]">
-            <span className="self-end bg-white"><BiSolidUpArrow/></span>
-            <div className="bg-white shadow-md p-2 flex flex-col gap-4 text-center w-[300px] border-[1px] border-[gray] rounded-md">
+          <div className="mt-3 relative backdrop-blur-md  bg-white text-black w-[300px] rounded-sm shadow-lg text-center p-4">
+            <FaCaretUp className="absolute  transform right-0 top-[-17px] text-2xl bg-transparent" />                
+            <div className="flex flex-col gap-3 ">
               <h2 className="font-semibold">Are you sure to close the form?</h2>
               <div className="text-center flex gap-4 justify-center">
                 <button
-                  className="bg-white border-[1px] rounded-md px-2 py-1 border-[#227a8a] w-[70px]"
+
+                  className="border-[1px] border-gray-900 rounded-sm px-2 font-medium"
                   onClick={() => close()} // Cancels the close action
                 >
                   {/* Cancel */}
@@ -265,7 +267,8 @@ const Feedback = ({ page, closePopup }) => {
                   
                     <ClipLoader size={20} color="#ffffff" />
                    
-                </button> :<button className="bg-[#227a8a] text-white px-2 py-1 rounded-md  w-[70px]"
+                </button> :
+                <button className="border-none bg-custom-blue px-2 rounded-sm text-white cursor-pointer font-medium"
                 onClick={() => onClickCloseCustomPop(closePopup, close)}
                 >Yes</button>}
               </div>
@@ -306,7 +309,7 @@ const Feedback = ({ page, closePopup }) => {
       </div>
     { !isFormValid &&  ValidationMessageFunction()}
       <ReturnTabsSection />
-      <div className=" px-8 py-4  border-[#8080807a] mb-8 h-[67vh] overflow-y-auto border-2 border-solid rounded-md mx-8 " >
+      <div  className={`${page==="Home"?"px-8 py-4 ":"p-4"}  border-[#8080807a] mb-8 h-[67vh] overflow-y-auto border-2 border-solid rounded-md mx-8 `} >
         {displayData()}
       </div>
       <div className="next-button--container flex justify-end py-1 pr-8 gap-4 border-t-[1px] border-[gray]">

@@ -24,6 +24,7 @@ import Preview from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/Previ
 import FeedbackHome from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/FeedbackHome";
 import SuggestedQuestions from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/SuggestedQuestions";
 import SuggestedQuestionsComponent from "./components/Pages/suggestedQuestions";
+import Admin from './Pages/Login-Part/Admin.jsx';
 
 function App() {
   return (
@@ -45,6 +46,12 @@ function App() {
           <Route path="/interview-page" element={<InterviewPage/>}/>
           <Route path="/interview-feedback-new" element={<Feedback/>}/>
           <Route path="/suggested-questions" element={<SuggestedQuestionsComponent/>}/>
+          <Route path="/admin" element={<Admin />} />
+          {/* <Route path="/" element={<Login1 />} /> */}
+          {/* <Route path="/callback" element={<Callback />} />
+          <Route path="/profile1" element={<Login2 />} />
+          <Route path="/profile3" element={<Login3 />} />
+          <Route path="/profile4" element={<Login4 />} /> */}
         </Routes>
       </BrowserRouter>
     </div>

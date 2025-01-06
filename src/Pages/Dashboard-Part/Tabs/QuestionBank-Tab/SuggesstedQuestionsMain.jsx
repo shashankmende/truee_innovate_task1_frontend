@@ -16,9 +16,9 @@ import { ReactComponent as LuFilterX } from '../../../../icons/LuFilterX.svg';
 import { ReactComponent as FiFilter } from '../../../../icons/FiFilter.svg';
 import { useCustomContext } from "../../../../context/context.js";
 
-const SuggestedQuestionsComponent = ({section}) => {
+const SuggestedQuestionsComponent = ({questionBankPopupVisibility,section}) => {
     const [tab, setTab] = useState(1);
-    const {suggestedQuestions, setSuggestedQuestions, interviewerSectionData, setInterviewerSectionData,suggestedQuestionsFilteredData,setSuggestedQuestionsFilteredData } = useCustomContext();
+    const {getInterviewerQuestions,suggestedQuestions, setSuggestedQuestions, interviewerSectionData, setInterviewerSectionData,suggestedQuestionsFilteredData,setSuggestedQuestionsFilteredData } = useCustomContext();
     // const [suggestedQuestions, setSuggestedQuestions] = useState([]);
     // const [suggestedQuestionsFilteredData, setSuggestedQuestionsFilteredData] = useState([])
     const [skillInput, setSkillInput] = useState("")
@@ -59,29 +59,49 @@ const SuggestedQuestionsComponent = ({section}) => {
     // Added by Shashank on [02/01/2025]: Feature to handle add question to interviewer section when clicked on add button
     
 
-    const onClickAddButton = (item) => {
+    const onClickAddButton =async (item) => {
       console.log(item);
+
+      const url = `${process.env.REACT_APP_API_URL}/interview-questions/add-question`
+      
+      const questionToAdd = {
+        tenantId:"ten1",
+        ownerId:"own1",
+        questionId:item._id,
+        source:"system",
+        addedBy:"interviewer",
+        snapshot:{
+            questionText:item.questionText,
+            correctAnswer:item.correctAnswer,
+            options:item.options,
+             skillTags:item.skill
+        }
+      }
+
+    const response = await axios.post(url,questionToAdd)
+    if (response.data.success){
+        // getInterviewerQuestions()
+        const addedQuestionUrl = `${process.env.REACT_APP_API_URL}/interview-questions/question/${item._id}`
+      const response2 = await axios.get(addedQuestionUrl)
+      const newQuestion = response2.data.question
+      const formattedQuestion = {
+        id:newQuestion._id,
+        question:newQuestion.snapshot.questionText,
+        answer:newQuestion.snapshot.correctAnswer,
+        note:"",
+        notesBool:false,
+        isLiked:false,
+      }
+      setInterviewerSectionData(prev=>[...prev,formattedQuestion])
+    }
+    console.log('response from add question ',response)
     
       // Update suggestedQuestions with the "isAdded" flag set to tru
       const newList = suggestedQuestionsFilteredData.map(question=> question._id===item._id?{...question,isAdded:true}:question)
       setSuggestedQuestionsFilteredData(newList)
       setSuggestedQuestions(newList)
+
     
-    //   // Create a new question to add to interviewerSectionData
-      const newQuestion = {
-        id: interviewerSectionData.length + 1,
-        question: item.questionText,
-        answer: item.correctAnswer,
-        note: "",
-        notesBool: false,
-        isLiked: false,
-      };
-    
-      // Update interviewerSectionData with the new question
-      setInterviewerSectionData((prev) => [...prev, newQuestion]);
-    
-      // Display success toast
-    //   toast.success("Question added to interviewer question!");
     };
     
 
@@ -287,6 +307,21 @@ const SuggestedQuestionsComponent = ({section}) => {
         }
     };
 
+    const onClickRemoveQuestion =async(id)=>{
+        // alert(`${id}`)
+        try {
+            const url = `${process.env.REACT_APP_API_URL}/interview-questions/question/${id}`
+            const response = await axios.delete(url)
+            // alert(response.data.message)
+            getInterviewerQuestions()
+            const newList = suggestedQuestionsFilteredData.map(question=> question._id===id?{...question,isAdded:false}:question)
+            setSuggestedQuestionsFilteredData(newList)
+            setSuggestedQuestions(newList)
+        } catch (error) {
+            console.log('error in deleting question',error)
+        }
+    }
+
 
     const FilterSection = (closeFilter) => {
         return (
@@ -359,22 +394,26 @@ const SuggestedQuestionsComponent = ({section}) => {
 
     const ReturnSearchFilterSection = () => {
         return (
-            <div  className={` flex  justify-between items-center`}>
-                <div className="w-1/2">
-                    <div className="relative flex items-center rounded-md  w-[300px]  border-[1.5px] border-[gray]">
+            <div  className={` flex gap-4 justify-between items-center`}>
+                {/* <div className={` ${section==="Popup"?"w-[50%]":"w-1/2"}`}> */}
+                <div className={ ` ${section==="Popup" && !questionBankPopupVisibility ?"w-[35%] ":"w-1/2"} `}>
+                    {/* <div className={`${section==="Popup"?"w-full":" w-[300px]"} relative flex items-center rounded-md   border-[1.5px] border-[gray]`}> */}
+                    <div className={` ${(section==="Popup" && !questionBankPopupVisibility )?"w-[240px]":"w-[300px]"}  relative flex items-center rounded-md   border-[1.5px] border-[gray]`}>
                         <span className="text-custom-blue p-2"><FaSearch /></span>
                         <input onChange={(e) => setSkillInput(e.target.value)} value={skillInput} type="search" placeholder="Search by skills" className="w-[85%] p-2 pr-none  h- outline-none " />
                     </div>
                 </div>
-                <div className="w-1/2 flex items-center justify-between">
-
-                    <div className="relative flex items-center rounded-md w-[300px]  border-[1.5px] border-[gray]">
-                        <span className="text-[#227a8a] p-2"><FaSearch /></span>
-                        <input type="search" placeholder="Search by Question Text" className="w-[85%] p-2 pr-none  h- outline-none " />
+                {/* <div className={` ${section==="Popup"?"w-[60%]":"w-1/2"}  flex items-center justify-between`}> */}
+                <div className={`${section==="Popup"&& !questionBankPopupVisibility ? "w-[75%]":"w-[45%]"}  flex items-center justify-between`}>
+                    {/* <div className={`${section==="Popup"?"w-[250px] text-sm":" w-[300px]"} relative flex items-center rounded-md   border-[1.5px] border-[gray]`}> */}
+                    <div className={`${(section==="Popup" && !questionBankPopupVisibility )?"w-[240px] ":" w-[300px]"} relative flex items-center rounded-md   border-[1.5px] border-[gray]`}>
+                        {/* <span className={`${(section==="Popup" && !questionBankPopupVisibility )?"p-1":"p-2"} text-[#227a8a]`}><FaSearch /></span> */}
+                        <span className={`p-2 text-[#227a8a]`}><FaSearch /></span>
+                        {/* <input type="search" placeholder="Search by Question Text" className={` p-2 pr-none border-none  h- outline-none ${(section==="Popup"&& !questionBankPopupVisibility)?"w-full":"w-[85%]"}`} /> */}
+                        <input type="search" placeholder="Search by Question Text" className={` p-2 pr-none border-none  h- outline-none w-[85%] `} />
                     </div>
                     <div className="flex items-center ml-2">
-                        <p className="text-custom-blue">{suggestedQuestionsFilteredData.length}  Questions </p>
-                    
+                        <p className="text-custom-blue">{suggestedQuestionsFilteredData.length}  Questions </p>                    
                     </div>
                     <p className="font-bold">.</p>
                     <div className="flex p-2 items-center">
@@ -384,7 +423,7 @@ const SuggestedQuestionsComponent = ({section}) => {
                     <div className="flex items-center">
                             <Tooltip title="Previous" enterDelay={300} leaveDelay={100} arrow>
                                 <span
-                                    className={`border p-2 mr-2 text-xl sm:text-md md:text-md rounded-md ${currentPage === 0 ? " cursor-not-allowed" : ""}`}
+                                    className={`border ${(section==="Popup" && !questionBankPopupVisibility )?"p-1 mr-1":"p-2 mr-2"}  text-xl sm:text-md md:text-md rounded-md ${currentPage === 0 ? " cursor-not-allowed" : ""}`}
                                     onClick={onClickLeftPaginationIcon}
                                 >
                                     <IoIosArrowBack className="text-custom-blue" />
@@ -394,7 +433,7 @@ const SuggestedQuestionsComponent = ({section}) => {
                                 <span
                                     onClick={onClickRightPagination}
                                     disabled={currentPage === totalPages}
-                                    className={`border p-2 mr-2 text-xl sm:text-md md:text-md rounded-md cursor-pointer ${currentPage === totalPages ? "cursor-not-allowed" : ""
+                                    className={`border ${(section==="Popup" && !questionBankPopupVisibility )?"p-1 mr-1 text-sm":"p-2 mr-2 text-xl sm:text-md md:text-md"}  rounded-md cursor-pointer ${currentPage === totalPages ? "cursor-not-allowed" : ""
                                         }`}
                                 >
                                     <IoIosArrowForward className="text-custom-blue" />
@@ -405,7 +444,7 @@ const SuggestedQuestionsComponent = ({section}) => {
                         <Popup
                             responsive={true}
                             trigger={
-                                <button className="cursor-pointer text-xl sm:text-md md:text-md border rounded-md p-2">
+                                <button className={`${(section==="Popup" && !questionBankPopupVisibility )?"text-sm p-1":"p-2 mr-2"}  cursor-pointer text-xl sm:text-md md:text-md border rounded-md`}>
                                     {isPopupOpen ? (
                                         <LuFilterX className="text-custom-blue" />
                                     ) : (
@@ -451,7 +490,7 @@ const SuggestedQuestionsComponent = ({section}) => {
 
     const ReturnSuggestedQuestionsData = () => {
         return (
-            <div  className={` ${section==="interviewerSection"?"w-[95%]":""} p-4 fixed w-full"`}>
+            <div  className={` ${section==="interviewerSection"&&"w-[95%]"} ${section==="Popup"&&"w-full"}  p-4 fixed w-full"`}>
                 {ReturnSearchFilterSection()}
                 {/* tags dropdown */}
                 <ul   className="absolute bg-white flex flex-col cursor-pointer gap-3 h-max max-h-[200px] overflow-auto shadow-md w-[300px] ">
@@ -484,13 +523,17 @@ const SuggestedQuestionsComponent = ({section}) => {
                 }
 
                 {/* questions */}
-                <ul  className={` ${section==="interviewerSection"?"h-[63vh]":"h-[calc(100vh-350px)]"} flex flex-col gap-4 my-2 overflow-y-scroll  overflow-hidden text-sm"`}>
-                    {paginatedData.map((item, index) => (
-                        <li key={index} className="border-[1px] border-[gray] rounded-md">
-                            <div className="flex  items-center border-b-[1px] border-[gray]">
-                                <h2 className="pl-4 font-medium text-sm w-[85%] ">{(currentPage - 1) * itemsPerPage + 1 + index}. {item.questionText}</h2>
+                {/* <ul  className={` ${section==="interviewerSection"|| section==="Popup"?"h-[63vh]":"h-[calc(100vh-350px)]"} flex flex-col gap-4 my-2 overflow-y-scroll  overflow-hidden text-sm pr-2 `}> */}
+                <ul  className={` ${section==="interviewerSection"|| section==="Popup"?"h-[63vh]":"h-[calc(100vh-350px)]"} flex flex-col gap-4 my-2 overflow-y-scroll  overflow-hidden pr-2 ${section==="Popup"? 'text-sm':"text-base"}`}>
+                 {paginatedData.length> 0 ?
+                 
+                 paginatedData.map((item, index) => (
+                    <li key={index} className="border-[1px] border-[gray] rounded-md">
+                            <div className="flex justify-between  items-center border-b-[1px] border-[gray]">
+                                {/* <h2 className="pl-4 font-medium text-sm w-[85%] ">{(currentPage - 1) * itemsPerPage + 1 + index}. {item.questionText}</h2> */}
+                                <h2 className="pl-4 font-medium  w-[85%] ">{(currentPage - 1) * itemsPerPage + 1 + index}. {item.questionText}</h2>
 
-                                <div className="flex justify-center text-center p-2 border-r border-l border-[gray] w-[10%]">
+                                <div className={`flex justify-center text-center p-2 border-r border-l border-[gray] ${(section==="Popup" && !questionBankPopupVisibility)?"w-[15%]":"w-[10%]"}`}>
                                     <p
                                         className={`w-20 text-center ${getDifficultyStyles(
                                             item.difficultyLevel
@@ -501,12 +544,14 @@ const SuggestedQuestionsComponent = ({section}) => {
                                     </p>
                                 </div>
                                 {/*Changes done by Shashank,  Adding the Add button based on section */}
-                                { section==="interviewerSection"?
-                                <div className="w-[5%] p-1 flex justify-center">
-                                    <button className={` py-1 px-2 text-white rounded-md ${item.isAdded ? "bg-[gray] p-1 text-black disabled cursor-not-allowed":"bg-custom-blue"}`} onClick={()=>onClickAddButton(item)}>  
-                                        {item.isAdded? "Added":"Add"} </button>
+                                { (section==="Popup"||section==="interviewerSection")?
+                                
+                                <div className={`${(section==="Popup" && !questionBankPopupVisibility)?"w-[15%]":"w-[8%] "}  p-1 flex justify-center`}>
+                                    {item.isAdded ? <button onClick={()=>onClickRemoveQuestion(item._id)} className={`  rounded-sm bg-[gray] w-[80%] px-2 py-1  text-md text-white `} > Remove </button> :<button className="bg-custom-blue  w-[80%] text-md  py-1 px-1 text-white rounded-sm" onClick={()=>onClickAddButton(item)}>Add</button>}
 
-                                        </div>: 
+                                        </div>
+                                        
+                                        : 
                                         <div className="w-[5%] flex justify-center flex-grow-1 relative">
                                     
                                     <button className=" border-[1px] cursor-pointer rounded-sm p-1 font-bold border-custom-blue text-custom-blue" onClick={() => toggleDropdown(item._id)}>{<FaPlus />}</button>
@@ -515,12 +560,19 @@ const SuggestedQuestionsComponent = ({section}) => {
                                             question={item}
                                             closeDropdown={closeDropdown} />
                                     )}
-                                </div>}
+                                </div> }
                             </div>
                             <p className="p-3 pl-4 text-[gray]"><span>Answer : </span>{item.correctAnswer}</p>
                             <p className="px-3 pl-4 pb-2 font-medium">Tags : {item.tags.join(', ')}</p>
                         </li>
-                    ))}
+                    ))
+                    :
+                    <div className="h-auto flex flex-col gap-4 justify-center items-center">
+                    <h2 className='text-custom-blue font-semibold'>No question found</h2>
+                    <p className='text-custom-blue'>Try again with different filter options...!</p>
+                    </div>
+                    
+                    }
                 </ul>
             </div>
         )
@@ -539,7 +591,7 @@ const SuggestedQuestionsComponent = ({section}) => {
         }
     };
     return (
-        <div className="flex flex-col gap-4 ">
+        <div className={`flex flex-col gap-4`}>
             {DisplayTabsData()}
         </div>
     );
