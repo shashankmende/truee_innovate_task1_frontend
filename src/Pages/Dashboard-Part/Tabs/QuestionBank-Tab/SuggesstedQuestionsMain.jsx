@@ -16,7 +16,7 @@ import { ReactComponent as LuFilterX } from '../../../../icons/LuFilterX.svg';
 import { ReactComponent as FiFilter } from '../../../../icons/FiFilter.svg';
 import { useCustomContext } from "../../../../context/context.js";
 
-const SuggestedQuestionsComponent = ({questionBankPopupVisibility,section}) => {
+const SuggestedQuestionsComponent = ({interviewQuestionsList,setInterviewQuestionsList,questionBankPopupVisibility,section}) => {
     const [tab, setTab] = useState(1);
     const {getInterviewerQuestions,suggestedQuestions, setSuggestedQuestions, interviewerSectionData, setInterviewerSectionData,suggestedQuestionsFilteredData,setSuggestedQuestionsFilteredData } = useCustomContext();
     // const [suggestedQuestions, setSuggestedQuestions] = useState([]);
@@ -62,6 +62,8 @@ const SuggestedQuestionsComponent = ({questionBankPopupVisibility,section}) => {
     const onClickAddButton =async (item) => {
       console.log(item);
 
+      setInterviewQuestionsList(prev=>[...prev,item])
+
       const url = `${process.env.REACT_APP_API_URL}/interview-questions/add-question`
       
       const questionToAdd = {
@@ -96,7 +98,7 @@ const SuggestedQuestionsComponent = ({questionBankPopupVisibility,section}) => {
     }
     console.log('response from add question ',response)
     
-      // Update suggestedQuestions with the "isAdded" flag set to tru
+      // Update suggestedQuestions with the "isAdded" flag set to true
       const newList = suggestedQuestionsFilteredData.map(question=> question._id===item._id?{...question,isAdded:true}:question)
       setSuggestedQuestionsFilteredData(newList)
       setSuggestedQuestions(newList)
@@ -316,6 +318,9 @@ const SuggestedQuestionsComponent = ({questionBankPopupVisibility,section}) => {
             getInterviewerQuestions()
             const newList = suggestedQuestionsFilteredData.map(question=> question._id===id?{...question,isAdded:false}:question)
             setSuggestedQuestionsFilteredData(newList)
+            setInterviewQuestionsList(prev=>
+                prev.filter(each =>each._id!== id)
+            )
             setSuggestedQuestions(newList)
         } catch (error) {
             console.log('error in deleting question',error)
