@@ -11,7 +11,7 @@ import { ReactComponent as MdArrowDropDown } from "../../../../icons/MdArrowDrop
 
 const MyQuestionsList1 = forwardRef(({ question, fromcreate, closeDropdown, fromform, onSelectList = () => { }, error, onErrorClear, defaultTenantList,callmaindata }, ref) => {
     console.log("question:", question);
-    const [createdLists, setCreatedLists] = useState([{label:"a"},{label:"b"}]);
+    const [createdLists, setCreatedLists] = useState([]);
     const [selectedListIds, setSelectedListIds] = useState([]);
     const [showNewListPopup, setShowNewListPopup] = useState(false);
     console.log("showNewListPopup:", showNewListPopup);

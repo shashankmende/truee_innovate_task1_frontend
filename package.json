@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
     "@chakra-ui/spinner": "^2.1.0",
     "@craco/craco": "^7.1.0",
     "@mdi/js": "^7.4.47",

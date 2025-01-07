@@ -76,7 +76,6 @@ const Preview = () => {
           <div className="border-b-2 border-[#80808075] pb-12 h-[82vh]">
             <CandidateMiniTab />
           </div>
-          {/* <div className="grid grid-cols-5 gap-4 my-4 border-b-2 border-[#80808075] pb-12"> */}
           <div className="relative my-4 border-b-2 border-[#80808075] pb-12">
             <div className="">
               <h2 className="font-semibold text-xl">Skills:</h2>
@@ -104,7 +103,6 @@ const Preview = () => {
               </ul>
             </div>
           </div>
-          {/* <div className="w-[60%]"> */}
           <div className="">
             <h2 className="font-semibold text-xl mb-4 w-[250px]">Overall Impressions:</h2>
             <OverallImpressions />

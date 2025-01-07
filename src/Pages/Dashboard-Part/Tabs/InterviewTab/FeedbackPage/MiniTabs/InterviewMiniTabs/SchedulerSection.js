@@ -45,7 +45,6 @@ const SchedulerSectionComponent = ({ tab }) => {
   const handleDislikeToggle = (id) => {
     setDislikeQuestionId((prev) => (prev === id ? null : id));
     setSchedulerSectionData((prev) =>
-      // prev.map((q) => (q.id === id ? { ...q, isLiked: false } : q))
       prev.map((q) => (q.id === id ? { ...q, isLiked: "disliked" } : q))
     );
   };
@@ -53,7 +52,6 @@ const SchedulerSectionComponent = ({ tab }) => {
   const handleLikeToggle = useCallback((id) => {
     setSchedulerSectionData((prev) =>
       prev.map((q) =>
-        // q.id === id ? { ...q, isLiked: !q.isLiked } : q
         q.id === id ? { ...q, isLiked: "liked" } : q
       )
     );
@@ -91,7 +89,6 @@ const SchedulerSectionComponent = ({ tab }) => {
     return (
       <div className="border border-gray-500 w-full p-3 rounded-md">
         <div className="flex justify-between w-full mb-4">
-          {/* <h1>Tell us more<span className="text-[red]">*</span>:</h1> */}
           <h1>Tell us more :</h1>
           <button onClick={() => setDislikeQuestionId(null)}><IoIosCloseCircleOutline/></button>
         </div>
@@ -115,7 +112,7 @@ const SchedulerSectionComponent = ({ tab }) => {
             </li>
           ))}
         </ul>
-        {/* {(each.isLiked ==='disliked' && each.whyDislike==="") && <p className="text-[red]">Please select reason for dislike</p>} */}
+
       </div>
     );
   });
@@ -130,7 +127,7 @@ const SchedulerSectionComponent = ({ tab }) => {
         position={"top center"}
         offsetY={5}
         arrowStyle={{
-          color: "gray", // Tailwind teal-500 for the arrow
+          color: "gray", 
         }}
       >
         <p className="bg-[gray] text-xs text-white px-2 p-1 rounded-md">
@@ -155,7 +152,7 @@ const SchedulerSectionComponent = ({ tab }) => {
       <input
         checked={each.isAnswered === option}
         value={option}
-        name={`isAnswered-${each.id}`} // Grouped by the question id
+        name={`isAnswered-${each.id}`} 
         type="radio"
         id={`isAnswered-${each.id}-${option}`}
         onChange={(e) => onChangeRadioInput(each.id, e.target.value)}
@@ -183,7 +180,6 @@ const SchedulerSectionComponent = ({ tab }) => {
       </div>
       <ul className="h-[45vh] overflow-auto pr-4 flex flex-col gap-4 mt-4">
         {SchedulerSectionData.map((each) => (
-          // <li className={` p-2 py-4 rounded-md w-full   cursor-pointer border-[1px] ${each.mandatory ? "border-[red]":" border-[green]"}`} ref={questionRef}key={each.id}>
           <li className={`rounded-md w-full   cursor-pointer border-[1px] ${each.mandatory ? "border-[red]":" border-[green]"}`} ref={questionRef}key={each.id}>
             <div  className="px-2 pt-3 pb-3 flex items-center justify-between cursor-pointer transition-transform duration-300s ease-in-out"onClick={()=>onClickQuestionItem(each)}  >
               <p >{each.question}</p>
@@ -233,7 +229,6 @@ const SchedulerSectionComponent = ({ tab }) => {
                 </div>
                 {each.notesBool ? (
   page === "Home" ? (
-    // <NotesSection each={each}/>// Input element for "Home"
     <div className="flex justify-start mt-4">
       <label htmlFor="note-input" className="w-[200px]">Note</label>
       <div className="w-full relative mr-5 rounded-md h-[80px]">
@@ -280,7 +275,7 @@ const SchedulerSectionComponent = ({ tab }) => {
       </span>
     </div>
   </div>
-  ) : null // Handle other cases if needed
+  ) : null 
 ) : null}
 
                 {dislikeQuestionId === each.id && (

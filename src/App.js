@@ -1,11 +1,7 @@
 
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import Feedback from "./components/Tabs/InterviewTab/Feedback";
-// import PositionViewPage from "./components/Tabs/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
+import {  Routes, Route } from "react-router-dom";
 import PositionViewPage from "./Pages/Dashboard-Part/Tabs/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
-// import Form from "./components/Tabs/MoreTab/PositionPage/Form/Form";
-
 import Form from "./Pages/Dashboard-Part/Tabs/MoreTab/PositionPage/Form/Form";
 import Candidate from "./Pages/Dashboard-Part/Tabs/MoreTab/CandidatePage/Candidate/Candidate";
 import Support from "./Pages/Dashboard-Part/Tabs/MoreTab/SupportPage/SupportTable/SupportTable";
@@ -14,22 +10,17 @@ import CodeEditor from "./Pages/Dashboard-Part/Tabs/MoreTab/CodeEditorPage/Edito
 import HtmlCssJsExecutor from "./Pages/Dashboard-Part/Tabs/MoreTab/CodeEditorPage/WebEditor";
 import Position from "./Pages/Dashboard-Part/Tabs/MoreTab/PositionPage/Position/Position";
 import CandidateViewPage from "./Pages/Dashboard-Part/Tabs/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
-// import InterviewPage from "./components/Tabs/InterviewTab/InterviewPage/InterviewPage";
 import InterviewPage from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/InterviewPage";
-// import Feedback from "./components/Tabs/InterviewTab/FeedbackPage/Feedback";
 import Feedback from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/Feedback";
-// import Preview from "./components/Tabs/InterviewTab/FeedbackPage/Preview";
 import Preview from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/Preview";
-// import FeedbackHome from "./components/Tabs/InterviewTab/FeedbackPage/FeedbackHome";
 import FeedbackHome from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/FeedbackHome";
-import SuggestedQuestions from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/SuggestedQuestions";
 import SuggestedQuestionsComponent from "./components/Pages/suggestedQuestions";
 import Admin from './Pages/Login-Part/Admin.jsx';
 
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
+      <>
         <Routes>
           <Route path="/" element={<Position />} />
           <Route path="/form" element={<Form />} />
@@ -53,7 +44,7 @@ function App() {
           <Route path="/profile3" element={<Login3 />} />
           <Route path="/profile4" element={<Login4 />} /> */}
         </Routes>
-      </BrowserRouter>
+      </>
     </div>
   );
 }

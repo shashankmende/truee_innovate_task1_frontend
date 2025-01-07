@@ -9,8 +9,8 @@ const ratingLst = [
   { id: 4, name: "Excellent", stars: 5, color: "green" },
 ];
 
-const SkillsTabComponent = ({ tab }) => {
-  const { skillsTabData,setSkillsTabData,page} = useCustomContext();
+const SkillsTabComponent = ({skillsTabData, tab }) => {
+  const { setSkillsTabData,page} = useCustomContext();
   const getColorByRating = (rating) => {
     const ratingItem = ratingLst.find((r) => r.stars === rating);
     return ratingItem ? ratingItem.color : "gray";
@@ -178,7 +178,6 @@ const SkillsTabComponent = ({ tab }) => {
                             id="skill-id"
                             type="text"
                             placeholder="Enter Note"
-                            // style={{width:"60vh"}}
                             className="w-full  text-gray-500 p-1 rounded-md border border-gray-500"
                           />
                           <span

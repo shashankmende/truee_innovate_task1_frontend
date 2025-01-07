@@ -1,9 +1,7 @@
 
 
-import React from 'react'
-// import DoughnutChart from '../../../../../../components/Tabs/InterviewTab/FeedbackPage/MiniTabs/PieChart';
-// import PieChart from './PieChart';
-// import DoughnutChart from './PieChart';
+import React from 'react';
+import DoughnutChart from './PieChart';
 
 const instructions = [
   "Access the Link: Click the provided link at least 5 minutes before the scheduled time to test your connection.",
@@ -43,7 +41,6 @@ const CandidateMiniTab = ({page,tab}) => {
   return (
     <div className="h-[70vh] flex flex-col gap-4 " >
         <h2 className="text-black font-bold">Candidate Details:</h2>
-      {/* <div  style={{border:'1px solid red'}}  className={`border-b-2 border-[#8080808a] grid items-center ${tab ? " grid-cols-1":"grid-cols-[50%_50%]"}`}> */}
       <div    className={`border-b-2 border-[#8080808a] flex ${tab ? "flex-row":"flex-col"} relative`}>
         <div className={`pb-4 flex  flex-wrap gap-6 ${tab ? "flex-row":"flex-col"}`}>
           <KeyValueRow label="Candidate Name" value="Shashank" />
@@ -54,10 +51,8 @@ const CandidateMiniTab = ({page,tab}) => {
           <KeyValueRow label="Interview Type" value="Virtual" />
         </div>
        {!tab && <div style={{ width: "500px",aspectRatio:"1" }} className='absolute right-0 top-[-150px]'>
-        {/* <DoughnutChart/> */}
+        <DoughnutChart/>
         </div>}
-        {/* {!tab && <DoughnutChart/>} */}
-        {/* {!tab && <DoughnutChart/>} */}
         </div>
         <InstructionsList instructions={InstructionsList}/>
         <SectionWrapper title="Question Details:">

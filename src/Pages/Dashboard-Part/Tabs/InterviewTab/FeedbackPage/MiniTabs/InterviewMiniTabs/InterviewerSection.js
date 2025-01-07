@@ -2,105 +2,22 @@ import React, { useState } from "react";
 import Popup from "reactjs-popup";
 import { IoCodeSlash } from "react-icons/io5";
 import { RxText } from "react-icons/rx";
-import { AddCustomQuestionValidation } from "../../../../../../../utils/validateForm";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
-import { IoIosCloseCircleOutline } from "react-icons/io";
 import { useCustomContext } from "../../../../../../../context/context";
-import SuggestedQuestions from "../../SuggestedQuestions";
 import QuestionBank from "../../../../QuestionBank-Tab/QuestionBank";
 
-{/* <QuestionBank/> */}
+
 const InterviewerSectionComponent = ({closePopup}) => {
-  const [interviewerQuestion, setInterviewerQuestion] = useState({
-    question: "",
-    answer: "",
-    notes: "",
-  });
-  const [interviewQuestionErr, setInterviewQuestionErr] = useState({
-    question: "",
-    answer: "",
-    notes: "",
-  });
+
 
   const { interviewerSectionData, setInterviewerSectionData ,page} =
     useCustomContext();
 
   const [selectedQuestion, setSelectedQuestion] = useState(null);
 
-  const onClickSaveCustomQuestion = (closeNestedPopup,closePlusPopup) => {
-    console.log("Save custom question clicked");
-    const { answer, question } = interviewerQuestion;
-    const isValid = AddCustomQuestionValidation(
-      question,
-      answer,
-      CustomQuestionErrFunction
-    );
 
-    console.log("Validation result:", isValid);
 
-    if (isValid) {
-      setInterviewerSectionData((prev) => [
-        ...prev,
-        {
-          ...interviewerQuestion,
-          id: interviewerSectionData.length + 1,
-        },
-      ]);
-      setInterviewerQuestion({
-        question: "",
-        answer: "",
-        notes: "",
-      });
-      
-    closeNestedPopup();
-    closePlusPopup()
 
-      alert("Question added to local storage");
-      console.log("Validation passed. Proceed to save data.");
-    } else {
-      console.log("Validation failed. Fix the errors.");
-    }
-  };
-
-  const onClickSaveAndNext = () => {
-    console.log("Save custom question clicked");
-    const { answer, question } = interviewerQuestion;
-    const isValid = AddCustomQuestionValidation(
-      question,
-      answer,
-      CustomQuestionErrFunction
-    );
-
-    console.log("Validation result:", isValid);
-
-    if (isValid) {
-      setInterviewerSectionData((prev) => [
-        ...prev,
-        {
-          ...interviewerQuestion,
-          id: interviewerSectionData.length + 1,
-        },
-      ]);
-      setInterviewerQuestion({
-        question: "",
-        answer: "",
-        notes: "",
-      });
-      
-
-      alert("Question added to local storage");
-      console.log("Validation passed. Proceed to save data.");
-    } else {
-      console.log("Validation failed. Fix the errors.");
-    }
-  };
-
-  const CustomQuestionErrFunction = (field, value) => {
-    setInterviewQuestionErr((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
 
   const onChangeRadioInput = (questionId, value) => {
     setInterviewerSectionData((prev) =>
@@ -120,31 +37,9 @@ const InterviewerSectionComponent = ({closePopup}) => {
     );
   };
 
-  const onChangeQuestion = (e) => {
-    const { answer } = interviewerQuestion;
-    AddCustomQuestionValidation(
-      e.target.value,
-      "answer",
-      CustomQuestionErrFunction
-    );
-    setInterviewerQuestion((prev) => ({
-      ...prev,
-      question: e.target.value,
-    }));
-  };
 
-  const onChangeAnswer = (e) => {
-    const { question } = interviewerQuestion;
-    AddCustomQuestionValidation(
-      "question",
-      e.target.value,
-      CustomQuestionErrFunction
-    );
-    setInterviewerQuestion((prev) => ({
-      ...prev,
-      answer: e.target.value,
-    }));
-  };
+
+
 
   const onClickAddNote = (id) => {
     setInterviewerSectionData((prev) =>
@@ -206,7 +101,6 @@ const InterviewerSectionComponent = ({closePopup}) => {
         {interviewerSectionData.map((EachQuestion,index) => (
           <li
             key={EachQuestion.id}
-            // className="border border-gray-500 rounded-md p-4 cursor-pointer flex flex-col gap-3"
             className="border border-gray-500 rounded-md cursor-pointer flex flex-col gap-3"
           >
             <div
@@ -217,7 +111,6 @@ const InterviewerSectionComponent = ({closePopup}) => {
                 );
               }}
             >
-              {/* <p>{`${EachQuestion.id}. ${EachQuestion.question}`}</p> */}
               <p>{index+1}. {EachQuestion.question}</p>
               {selectedQuestion === EachQuestion.id ? (
                 <FaAngleUp />
@@ -276,7 +169,6 @@ const InterviewerSectionComponent = ({closePopup}) => {
 
                   <div className="flex items-center gap-4">
                     <button
-                      // className="cursor-pointer font-bold py-1 px-4 text-[#227a8a] bg-transparent rounded-md shadow-sm border border-[#227a8a]"
                       className={`${page==="Home"?"py-[0.2rem] px-[0.8rem]":"p-1 "} question-add-note-button cursor-pointer font-bold  text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]`}  
                       onClick={() =>
                         EachQuestion.notesBool

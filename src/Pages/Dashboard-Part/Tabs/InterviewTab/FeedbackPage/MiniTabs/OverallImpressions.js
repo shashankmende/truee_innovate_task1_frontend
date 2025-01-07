@@ -17,7 +17,6 @@ const options = [
 
 const OverallImpressions = ({ tab }) => {
   const {  overallImpressionTabData,setOverallImpressionTabData ,page} = useCustomContext();
-  // const {overallImpressionTabData}=interviewTabData
   const { rating, note, recommendation, notesBool } =
     overallImpressionTabData;
 
@@ -57,7 +56,6 @@ const OverallImpressions = ({ tab }) => {
       )}
 
       <div className={`${page==="Home"?"w-[50%] justify-between":"w-[100%]"} flex justify-between items-center`}>
-        {/* <p className={` ${page === "Home" ? "w-[250px]" : "w-[40%]"}`}> */}
         <p className={` ${page === "Home" ? "w-[250px]" : "w-[25%]"}`}>
           Overall Rating{tab && <span className="text-red-500">*</span>}
         </p>
@@ -193,7 +191,6 @@ const OverallImpressions = ({ tab }) => {
           ))}
         </ul>
       </div>
-      {/* {(overallImpressionTabData.error && tab) && <p className="text-[red]">Please fill mandatory fields</p>} */}
     </div>
   );
 };

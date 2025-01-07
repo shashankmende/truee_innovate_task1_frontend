@@ -54,9 +54,48 @@ const Feedback = ({ page, closePopup }) => {
     setFeedbackTabError,
     setOverallImpressionTabData,
     overallImpressionTabData,
-    skillsTabData,
-    setSkillsTabData,
+    // skillsTabData,
+    // setSkillsTabData,
   } = useCustomContext();
+
+  const [skillsTabData, setSkillsTabData] = useState([
+    {
+      id: 1,
+      category: "Mandatory skills",
+      // required:true,
+      skillsList: [
+        { name: "Apex Programming", rating: 0, note: "", notesBool: false, required: true, error: false },
+        { name: "SOQL/SOSL", rating: 0, note: "", notesBool: false, required: true, error: false },
+        { name: "API Integration", rating: 0, note: "", notesBool: false, required: true, error: false },
+      ],
+    },
+    {
+      id: 2,
+      category: "Optional skills",
+      // required:false,
+      skillsList: [
+        { name: "Javascript", rating: 0, note: "", notesBool: false, required: false },
+        { name: "Mobile Development", rating: 0, note: "", notesBool: false, required: false, },
+        { name: "Salesforce CPQ", rating: 0, note: "", notesBool: false, required: false, },
+      ],
+    },
+    {
+      id: 3,
+      category: "Technical skills",
+      // required:true,
+      skillsList: [
+        { name: "Coding", rating: 0, note: "", notesBool: false, required: true, error: false },
+        { name: "Problem-Solving", rating: 0, note: "", notesBool: false, required: true, error: false },
+        { name: "API Integration", rating: 0, note: "", notesBool: false, required: true, error: false },
+      ],
+    },
+    {
+      id: 4,
+      category: "Communication",
+      // required:true,
+      skillsList: [{ name: "Mobile Teamwork", rating: 0, note: "", notesBool: false, required: true, error: false }],
+    },
+  ])
 
 
   const [customQuestionPopupLoader,setCustomQuestionPopupLoader]=useState(false)
@@ -66,7 +105,6 @@ const Feedback = ({ page, closePopup }) => {
 
   useLayoutEffect(()=>{
     setIsFormValid(true)
-    // setFeedbackCloseFlag(false)
   },[])
 
   const areAllValidationsMet = () =>
@@ -75,14 +113,13 @@ const Feedback = ({ page, closePopup }) => {
   const PrepareFormData = () => {
     const questionFeedback = SchedulerSectionData.map((question) => ({
       questionId: question.id,
-      // CandidateAnswer: question.answer,
+
       candidateAnswer:{
         answerType:question.isAnswered,
         submittedAnswer:question.answer
       },
       interviewerFeedback:{
         liked:question.isLiked,
-        // reason:question.whyDislike,
         dislikeReason: question.isLiked==="disliked"  ? question.whyDislike:"",
         note:question.note
       },
@@ -132,20 +169,10 @@ const Feedback = ({ page, closePopup }) => {
     if (!isValid) {
       const alertMessages = [];
       if (!interviewQuestion)
-        // alertMessages.push("Interview Questions have an error.");
         alertMessages.push("Interview Questions ");
-      // toast.error("Interview Questions have an error.")
       if (!skills) alertMessages.push("Skills");
-      // if (!skills) alertMessages.push("Skills have an error.");
-      // if (!skills) toast.error("Skills have an error.");
       if (!updatedOverallImpression)
         alertMessages.push("Overall Impression");
-        // toast.error("Overall Impression has an error.");
-
-      // alert(alertMessages.length > 0 ? alertMessages.join("\n") : "All fields are valid!");
-      // toast.warn(alertMessages.join("\n"));
-      // toast(alertMessages.join("\n"));
-      // toast(`Mandatory fields are missing: ${alertMessages.join(", ")}`);
     } else {
       const data = PrepareFormData();
       console.log('data',data)
@@ -155,8 +182,6 @@ const Feedback = ({ page, closePopup }) => {
       const response = await axios.post(url, data);
       console.log("response from frontend", response);
       if (response.data.success) {
-        // alert(response.data.message);
-        // toast.success(response.data.message)
         toast.success("Feedback Submitted!")
       }
       else{
@@ -164,7 +189,6 @@ const Feedback = ({ page, closePopup }) => {
       }
     } catch (error) {
        toast.error(error.response.statusText || 'something went wrong') 
-      //  console.log(error)
     }
     }
   };
@@ -191,7 +215,7 @@ const Feedback = ({ page, closePopup }) => {
     switch (tab) {
       case 1: return <CandidateMiniTab tab={tab} page={page}/>;
       case 2: return <InterviewsMiniTabComponent tab={tab} page={page}  closePopup={closePopup}/>;
-      case 3: return <SkillsTabComponent tab={tab} page={page} />;
+      case 3: return <SkillsTabComponent skillsTabData={skillsTabData} tab={tab} page={page} />;
       case 4:  return <OverallImpressions tab={tab} page={page} />;
       default: return null;
     }
@@ -212,7 +236,6 @@ const Feedback = ({ page, closePopup }) => {
     setTimeout(()=>{
       close()
       closePopup()
-      // setPopupVisibility(false)
     },0)
   }
 
@@ -246,7 +269,6 @@ const Feedback = ({ page, closePopup }) => {
         arrow={false}
         offsetX={-130}
         closeOnEscape={false}
-        // closeOnDocumentClick={false} // Ensure it doesn't close on clicking outside
       >
         {(close) => (
           <div className="mt-3 relative backdrop-blur-md  bg-white text-black w-[300px] rounded-sm shadow-lg text-center p-4">
@@ -257,9 +279,8 @@ const Feedback = ({ page, closePopup }) => {
                 <button
 
                   className="border-[1px] border-gray-900 rounded-sm px-2 font-medium"
-                  onClick={() => close()} // Cancels the close action
+                  onClick={() => close()} 
                 >
-                  {/* Cancel */}
                   No
                 </button>
                 {customQuestionPopupLoader ? <button className="bg-[#227a8a] text-white px-2 py-1 rounded-md "

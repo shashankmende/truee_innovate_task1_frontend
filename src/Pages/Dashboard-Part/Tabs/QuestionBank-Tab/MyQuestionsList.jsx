@@ -29,7 +29,7 @@ const MyQuestionsList = ({ interviewQuestionsList, setInterviewQuestionsList, se
     fetchMyQuestionsData,
     getInterviewerQuestions
   } = useCustomContext();
-
+  console.log("context from my questions list",useCustomContext())
   const openListPopup = () => {
     if (myQuestionsListRef.current) {
       myQuestionsListRef.current.openPopup();

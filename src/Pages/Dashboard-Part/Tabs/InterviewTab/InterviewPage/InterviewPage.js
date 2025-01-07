@@ -35,7 +35,7 @@ const InterviewPage = () => {
   useEffect(()=>{
     setPage("Popup")
     setFeedbackCloseFlag(true)
-    // setPopupVisibility(false)
+
   },[])
   return (
     <div className="h-screen flex flex-col overflow-hidden">
@@ -67,7 +67,6 @@ const InterviewPage = () => {
               </div>
             )}
           </Popup>
-          {/* <IconButton icon={mdiHelpCircleOutline} label="Questions" /> */}
           <IconButton icon={mdiNoteTextOutline} label="Notes" />
           <IconButton icon={mdiCodeTags} label="Code Editor" />
           <IconButton icon={mdiMessageOutline} label="Chat" />
