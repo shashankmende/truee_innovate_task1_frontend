@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback } from "react";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import Popup from "reactjs-popup";
-import { useCustomContext } from "../../../../../../../context/context";
+import { useCustomContext } from "../../../../../../../Context/Contextfetch";
 import { SlLike } from "react-icons/sl";
 import { SlDislike } from "react-icons/sl";
 import { IoIosCloseCircleOutline } from "react-icons/io";
@@ -15,9 +15,9 @@ const dislikeOptions = [
   { value: "Too basic", label: "Too basic" },
 ];
 
-const SchedulerSectionComponent = ({ tab }) => {
+const SchedulerSectionComponent = ({setSchedulerSectionData,SchedulerSectionData, tab }) => {
 
-  const {setSchedulerSectionData,SchedulerSectionData,page}= useCustomContext()
+  const {page}= useCustomContext()
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [dislikeQuestionId, setDislikeQuestionId] = useState("");
   const questionRef = useRef();

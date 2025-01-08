@@ -4,7 +4,7 @@ import InterviewsMiniTabComponent from "./MiniTabs/Interviews";
 import SkillsTabComponent from "./MiniTabs/Skills";
 import OverallImpressions from "./MiniTabs/OverallImpressions";
 import { useNavigate } from "react-router-dom";
-import { useCustomContext } from "../../../../../context/context";
+import { useCustomContext } from "../../../../../Context/Contextfetch";
 import {ClipLoader} from 'react-spinners'
 import { IoMdClose,IoIosCloseCircleOutline } from "react-icons/io";
 import { BiSolidUpArrow } from "react-icons/bi";
@@ -15,7 +15,7 @@ import {
   SchedulerQuestionsValidation,
   validateOverallImpression,
   ValidateSkills,
-} from "../../../../../utils/validateForm";
+} from "../../../../../utils/feedbackValidation";
 
 import Popup from "reactjs-popup";
 import axios from "axios";
@@ -47,15 +47,9 @@ const Feedback = ({ page, closePopup }) => {
   const navigate = useNavigate();
   const {popupVisibility,setPopupVisibility,feedbackCloseFlag,setFeedbackCloseFlag}=useCustomContext()
   const {
-    SchedulerSectionData,
-    setSchedulerSectionData,
    setPage,
     feedbackTabErrors,
     setFeedbackTabError,
-    setOverallImpressionTabData,
-    overallImpressionTabData,
-    // skillsTabData,
-    // setSkillsTabData,
   } = useCustomContext();
 
   const [skillsTabData, setSkillsTabData] = useState([
@@ -94,6 +88,79 @@ const Feedback = ({ page, closePopup }) => {
       category: "Communication",
       // required:true,
       skillsList: [{ name: "Mobile Teamwork", rating: 0, note: "", notesBool: false, required: true, error: false }],
+    },
+  ])
+
+
+  const [overallImpressionTabData, setOverallImpressionTabData] = useState({
+    rating: 0,
+    note: "",
+    recommendation: "",
+    notesBool: false,
+    required: true,
+    error: false
+  })
+
+  const [SchedulerSectionData, setSchedulerSectionData] = useState([
+    {
+      id: 1,
+      question:
+        "1.Explain the difference between an interface and an abstract class in Java.",
+      answer:
+        "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
+      mandatory: true,
+      rating: 0,
+      note: "",
+      isAnswered: "",
+      notesBool: false,
+      isLiked: "none",
+      whyDislike: "",
+      error: false,
+    },
+    {
+      id: 2,
+      question:
+        "2.Explain the difference between an interface and an abstract class in Java.",
+      answer:
+        "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
+      mandatory: true,
+      rating: 0,
+      note: "",
+      isAnswered: "",
+      notesBool: false,
+      isLiked: "none",
+      whyDislike: "",
+      error: false,
+    },
+    {
+      id: 3,
+      question:
+        "3.Explain the difference between an interface and an abstract class in Java.",
+      answer:
+        "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
+      mandatory: true,
+      rating: 0,
+      note: "",
+      isAnswered: "",
+      notesBool: false,
+      isLiked: "none",
+      error: false,
+      whyDislike: "",
+    },
+    {
+      id: 4,
+      question:
+        "4.Explain the difference between an interface and an abstract class in Java.",
+      answer:
+        "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
+      mandatory: false,
+      rating: 0,
+      note: "",
+      isAnswered: "",
+      notesBool: false,
+      isLiked: "none",
+      error: false,
+      whyDislike: "",
     },
   ])
 
@@ -213,10 +280,10 @@ const Feedback = ({ page, closePopup }) => {
 
   const displayData = () => {
     switch (tab) {
-      case 1: return <CandidateMiniTab tab={tab} page={page}/>;
-      case 2: return <InterviewsMiniTabComponent tab={tab} page={page}  closePopup={closePopup}/>;
-      case 3: return <SkillsTabComponent skillsTabData={skillsTabData} tab={tab} page={page} />;
-      case 4:  return <OverallImpressions tab={tab} page={page} />;
+      case 1: return <CandidateMiniTab skillsTabData={skillsTabData} tab={tab} page={page}/>;
+      case 2: return <InterviewsMiniTabComponent SchedulerSectionData={SchedulerSectionData} setSchedulerSectionData={setSchedulerSectionData} tab={tab} page={page}  closePopup={closePopup}/>;
+      case 3: return <SkillsTabComponent setSkillsTabData={setSkillsTabData}  skillsTabData={skillsTabData} tab={tab} page={page} />;
+      case 4:  return <OverallImpressions overallImpressionTabData={overallImpressionTabData} setOverallImpressionTabData={setOverallImpressionTabData}  tab={tab} page={page} />;
       default: return null;
     }
   };

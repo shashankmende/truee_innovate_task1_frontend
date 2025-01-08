@@ -1,15 +1,12 @@
 import React from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
-import { useCustomContext } from "../../../../../../context/context";
+
 
 // Register the required components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const DoughnutChart = () => {
-  const {skillsTabData} = useCustomContext()
-
-
+const DoughnutChart = ({skillsTabData}) => {
   const calculateCategoryRatings =()=>{
     const categoryRatings = skillsTabData.map(category=>{
       const totalRatings = category.skillsList.reduce((acc,skill)=>acc+skill.rating,0)
@@ -19,8 +16,6 @@ const DoughnutChart = () => {
         avgRating,
       }
     })
-
-
 
     const totalAvgRating = categoryRatings.reduce((acc,cat)=>acc+cat.avgRating,0)
     const percentages = categoryRatings.map((cat)=>({

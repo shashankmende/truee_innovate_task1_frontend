@@ -18,13 +18,13 @@ const interviewMiniTabsList = [
   ];
 
  
-  const InterviewsMiniTabComponent = ({tab,page,closePopup}) => {
+  const InterviewsMiniTabComponent = ({setSchedulerSectionData,SchedulerSectionData,tab,page,closePopup}) => {
     const [interviewMiniTab, setInterviewMiniTab] = useState(1);
 
     const InterviewDisplayData = () => {
         switch (interviewMiniTab) {
           case 1:
-            return <SchedulerSectionComponent tab={tab} page={page}/>;
+            return <SchedulerSectionComponent setSchedulerSectionData={setSchedulerSectionData} SchedulerSectionData={SchedulerSectionData} tab={tab} page={page}/>;
           case 2:
             return <InterviewerSectionComponent closePopup={closePopup} tab={tab} page={page}/>;
         default:

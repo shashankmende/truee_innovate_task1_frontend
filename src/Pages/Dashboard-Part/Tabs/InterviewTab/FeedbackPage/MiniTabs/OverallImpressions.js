@@ -1,6 +1,6 @@
 import React from "react";
 import { IoIosStar } from "react-icons/io";
-import { useCustomContext } from "../../../../../../context/context";
+import { useCustomContext } from "../../../../../../Context/Contextfetch";
 
 const ratingLst = [
   { id: 1, name: "Poor", stars: 2, color: "red" },
@@ -15,8 +15,8 @@ const options = [
   { value: "Maybe", label: "Maybe" },
 ];
 
-const OverallImpressions = ({ tab }) => {
-  const {  overallImpressionTabData,setOverallImpressionTabData ,page} = useCustomContext();
+const OverallImpressions = ({ overallImpressionTabData,setOverallImpressionTabData,tab }) => {
+  const { page} = useCustomContext();
   const { rating, note, recommendation, notesBool } =
     overallImpressionTabData;
 

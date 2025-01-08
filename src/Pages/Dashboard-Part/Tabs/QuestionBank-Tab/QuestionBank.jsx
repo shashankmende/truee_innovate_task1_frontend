@@ -1,3 +1,73 @@
+// import React, { useState} from "react";
+// import "../../../../index.css";
+// import "../styles/tabs.scss";
+// import MyQuestionListMain from "./MyQuestionsList.jsx"
+// import SuggesstedQuestions from "./SuggesstedQuestionsMain.jsx";
+
+// const QuestionBank = () => {
+//   const [activeTab, setActiveTab] = useState("SuggesstedQuestions");
+
+//   const handleSuggestedTabClick = (questionType) => {
+//     setActiveTab("SuggesstedQuestions");
+//   };
+
+//   const handleFavoriteTabClick = (questionType) => {
+//     setActiveTab("MyQuestionsList");
+//   };
+//   return (
+//       <>
+//         <div className="fixed top-16 sm:top-20 md:top-24 left-0 right-0">
+//           <div className="flex justify-between p-4">
+//             <div>
+//               <span className="text-lg font-semibold">Question Bank</span>
+//             </div>
+//           </div>
+//         </div>
+//         <div className="fixed z-10 top-28 sm:top-32 md:top-36 left-0 right-0">
+//           <div className="flex gap-10 p-4">
+//             <div className="relative inline-block">
+//               <span className="flex items-center cursor-pointer ">
+//                 <span
+//                   className={`pb-3 ${activeTab === "SuggesstedQuestions"
+//                     ? "text-black font-semibold border-b-2 border-custom-blue"
+//                     : "text-gray-500"
+//                     }`}
+//                   onClick={() => handleSuggestedTabClick()}
+//                 >
+//                   Suggested Questions
+//                 </span>
+//               </span>
+//             </div>
+//             <div className="relative inline-block">
+//               <span className="flex items-center cursor-pointer">
+//                 <span
+//                   className={`pb-3 ${activeTab === "MyQuestionsList"
+//                     ? "text-black font-semibold border-b-2 border-custom-blue"
+//                     : "text-gray-500"
+//                     }`}
+//                   onClick={() => handleFavoriteTabClick()}
+//                 >
+//                   My Questions List
+//                 </span>
+//               </span>
+//             </div>
+//           </div>
+//         </div>
+//         {activeTab === "SuggesstedQuestions" && (
+//           <>
+//           <SuggesstedQuestions />
+//           </>
+//         )}
+//         {activeTab === "MyQuestionsList" && (
+//           <div>
+//             <MyQuestionListMain />
+//           </div>
+//         )}
+//       </>
+//   );
+// };
+
+// export default QuestionBank;
 
 
 import React, { useState} from "react";
@@ -12,13 +82,11 @@ import Popup from "reactjs-popup";
 import { FaCaretUp } from "react-icons/fa";
 
 
-const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
+// const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
+  //change done by Shashank on -[08/01/2025]
+const QuestionBank = ({ sectionName,updateQuestionsInAddedSectionFromQuestionBank,section,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
   const [activeTab, setActiveTab] = useState("SuggesstedQuestions");
-
-
-  //Changes done by Shashank on [07/01/2025]: Feature - adding new state, to pass it to my questions list component and use it in dropdown as default selected 
   const [interviewQuestionsList,setInterviewQuestionsList]=useState([])
-
 
 
   const handleSuggestedTabClick = (questionType) => {
@@ -29,16 +97,19 @@ const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,set
     setActiveTab("MyQuestionsList");
   };
   return (
-      <div className={`${section==="interviewerSection" ? "h-[95%] shadow-md  w-[95%] bg-white ":""}`}>
-        <div className={`${section==="interviewerSection"?"":" top-16 sm:top-20 md:top-24 left-0 right-0"}`}>
-          <div className={`flex justify-between p-4 bg-custom-blue text-white  ${section==="interviewerSection"?"bg-custom-blue text-white ":""}`}>
+      <div className={`${section==="interviewerSection" || section==="assessment" ? "h-[95%] shadow-md  w-[95%] bg-white ":""}`}>
+        <div className={`${section==="interviewerSection" || section==="assessment" ?"":" top-16 sm:top-20 md:top-24 left-0 right-0"}`}>
+        { (section==="Popup"||section==="interviewerSection" || section==="assessment") &&
+          <div className={`flex justify-between p-4 bg-custom-blue text-white  ${(section==="interviewerSection" || section==="assessment")?"bg-custom-blue text-white ":""}`}>
             <div>
               <span className="text-lg font-semibold">Question Bank</span>
             </div>
             <div className="flex items-center gap-8 ">
             {section==="Popup" && <>
               {
-               questionBankPopupVisibility ? <button className="text-[1.2rem]" onClick={()=>setQuestionBankPopupVisibility(false)}><FiMinimize/></button >:<button className="text-[1.2rem]"  onClick={()=>setQuestionBankPopupVisibility(true)}><TbArrowsMaximize/></button>              
+               questionBankPopupVisibility ? <button className="text-[1.2rem]" on
+               
+               lick={()=>setQuestionBankPopupVisibility(false)}><FiMinimize/></button >:<button className="text-[1.2rem]"  onClick={()=>setQuestionBankPopupVisibility(true)}><TbArrowsMaximize/></button>              
               }              
               </>
               }
@@ -81,8 +152,9 @@ const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,set
           </div>
 
           </div>
+}
         </div>
-        <div  className={` ${section==="interviewerSection"?"w-[95%]":" z-10 top-28 sm:top-32 md:top-36 left-0 right-0"} `}>
+        <div  className={` ${(section==="interviewerSection" || section==="assessment") ?"w-[95%]":" z-10 top-28 sm:top-32 md:top-36 left-0 right-0"} `}>
           <div className="flex gap-10 p-4">
             <div className="relative inline-block">
               <span className="flex items-center cursor-pointer ">
@@ -114,14 +186,16 @@ const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,set
         </div>
         {activeTab === "SuggesstedQuestions" && (
           <>
-          <SuggesstedQuestions interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList}  questionBankPopupVisibility={questionBankPopupVisibility} section={section}/>
+          {/* <SuggesstedQuestions   interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList}  questionBankPopupVisibility={questionBankPopupVisibility} section={section}/> */}
+          <SuggesstedQuestions  sectionName={sectionName} updateQuestionsInAddedSectionFromQuestionBank={updateQuestionsInAddedSectionFromQuestionBank}   interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList}  questionBankPopupVisibility={questionBankPopupVisibility} section={section}/>
           </>
         )}
         {activeTab === "MyQuestionsList" && (
           <div>
-            <MyQuestionListMain  interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList} questionBankPopupVisibility={questionBankPopupVisibility} section={section}/>
+            {/* <MyQuestionListMain  interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList} questionBankPopupVisibility={questionBankPopupVisibility} section={section}/> */}
+            <MyQuestionListMain   sectionName={sectionName} updateQuestionsInAddedSectionFromQuestionBank={updateQuestionsInAddedSectionFromQuestionBank}  interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList} questionBankPopupVisibility={questionBankPopupVisibility} section={section}/>
           </div>
-        )}
+        )}
       </div>
   );
 };

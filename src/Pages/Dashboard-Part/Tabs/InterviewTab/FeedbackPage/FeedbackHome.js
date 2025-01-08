@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import Header from "../../../../../components/Navbar/Header/Header";
+// import Header from "../../../../../Components/Navbar/Header/Header";
 import Feedback from "./Feedback";
-import { useCustomContext } from "../../../../../context/context";
+import { useCustomContext } from "../../../../../Context/Contextfetch";
 
 const FeedbackHome = () => {
   const { page,setPage,feedbackCloseFlag,setFeedbackCloseFlag }=useCustomContext()
@@ -15,7 +15,7 @@ const FeedbackHome = () => {
 
   return (
     <div>
-      <Header />
+      {/* <Header /> */}
       <div className="lg:text-md">
      <Feedback page={page} />
      </div>

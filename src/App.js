@@ -1,50 +1,40 @@
 
 import "./App.css";
-import {  Routes, Route } from "react-router-dom";
-import PositionViewPage from "./Pages/Dashboard-Part/Tabs/MoreTab/PositionPage/PositionViewPage/PositionViewPage";
-import Form from "./Pages/Dashboard-Part/Tabs/MoreTab/PositionPage/Form/Form";
-import Candidate from "./Pages/Dashboard-Part/Tabs/MoreTab/CandidatePage/Candidate/Candidate";
-import Support from "./Pages/Dashboard-Part/Tabs/MoreTab/SupportPage/SupportTable/SupportTable";
-import SupportViewPage from "./Pages/Dashboard-Part/Tabs/MoreTab/SupportPage/SupportViewPage/SupportViewPage";
-import CodeEditor from "./Pages/Dashboard-Part/Tabs/MoreTab/CodeEditorPage/Editor";
-import HtmlCssJsExecutor from "./Pages/Dashboard-Part/Tabs/MoreTab/CodeEditorPage/WebEditor";
-import Position from "./Pages/Dashboard-Part/Tabs/MoreTab/PositionPage/Position/Position";
-import CandidateViewPage from "./Pages/Dashboard-Part/Tabs/MoreTab/CandidatePage/CandidateViewPage/CandidateViewPage";
+import {  Routes, Route, useLocation } from "react-router-dom";
 import InterviewPage from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/InterviewPage";
 import Feedback from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/Feedback";
 import Preview from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/Preview";
 import FeedbackHome from "./Pages/Dashboard-Part/Tabs/InterviewTab/FeedbackPage/FeedbackHome";
-import SuggestedQuestionsComponent from "./components/Pages/suggestedQuestions";
+import SuggestedQuestionsComponent from "./Components/Pages/suggestedQuestions.js";
 import Admin from './Pages/Login-Part/Admin.jsx';
+import Navbar from "./Components/Navbar/Navbar-Sidebar.jsx";
+import QuestionBank from './Pages/Dashboard-Part/Tabs/QuestionBank-Tab/QuestionBank.jsx';
+import Assessment from "./Pages/Dashboard-Part/Tabs/Assessment-Tab/Assessment.jsx";
 
 function App() {
+  const location = useLocation();
+  const shouldRenderNavbar = !['/', '/profile1', '/price', '/profile2', '/profile3', '/profile4', '/assessmenttest', '/assessmenttext', '/assessmentsubmit', '/candidatevc', '/admin', '/nofreelance', '/callback', '/jitsimeetingstart', '/organization'].includes(location.pathname);
+  
   return (
     <div className="App">
-      <>
+      {shouldRenderNavbar && <Navbar />}
+      <div className={!shouldRenderNavbar ? '' : 'mt-16'}>
         <Routes>
-          <Route path="/" element={<Position />} />
-          <Route path="/form" element={<Form />} />
-          <Route path="/position/:id" element={<PositionViewPage />} />
-          <Route path="/candidate" element={<Candidate />} />
-          <Route path="/candidate/:id" element={<CandidateViewPage/>} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/support/:id" element={<SupportViewPage />} />
-          <Route path="/editor" element={<CodeEditor />} />
-          <Route path="/web" element={<HtmlCssJsExecutor/>}/>
-          {/* <Route path="/feedback" element={<Feedback/>}/> */}
           <Route path="/interview-feedback" element={<FeedbackHome/>}/>
           <Route path="/interview-feedback-preview" element={<Preview/>}/>
           <Route path="/interview-page" element={<InterviewPage/>}/>
           <Route path="/interview-feedback-new" element={<Feedback/>}/>
           <Route path="/suggested-questions" element={<SuggestedQuestionsComponent/>}/>
           <Route path="/admin" element={<Admin />} />
+          <Route path="/questionBank" element={<QuestionBank  />} />
+          <Route path="/assessment" element={<Assessment />} />
           {/* <Route path="/" element={<Login1 />} /> */}
           {/* <Route path="/callback" element={<Callback />} />
           <Route path="/profile1" element={<Login2 />} />
           <Route path="/profile3" element={<Login3 />} />
           <Route path="/profile4" element={<Login4 />} /> */}
         </Routes>
-      </>
+      </div>
     </div>
   );
 }

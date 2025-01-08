@@ -3,7 +3,7 @@ import { PermissionsProvider } from './PermissionsContext';
 import ReactDOM from 'react-dom/client';
 import App from './App.js';
 import './index.css';
-import { CustomProvider } from './context/context.js'
+import { CustomProvider } from './Context/Contextfetch.js'
 import { Toaster } from 'react-hot-toast';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { BrowserRouter as Router } from 'react-router-dom';

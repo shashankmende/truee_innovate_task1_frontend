@@ -3,12 +3,13 @@ import React, { useEffect, useRef, useState } from "react";
 import CandidateMiniTab from "./MiniTabs/Candidate";
 import SkillsTabComponent from "./MiniTabs/Skills";
 import OverallImpressions from "./MiniTabs/OverallImpressions";
-import Header from "../../../../../components/Navbar/Header/Header";
+// import Header from "../../../../../Components/Navbar/Header/Header";
 import { useLocation } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { IoIosStar } from "react-icons/io";
-import { useCustomContext } from "../../../../../context/context";
+// import { useCustomContext } from "../../../../../context/context";
+import { useCustomContext } from "../../../../../Context/Contextfetch";
 
 const ratingList = [
   { id: 1, name: "Poor", stars: 2, color: "red" },
@@ -67,7 +68,7 @@ const Preview = () => {
 
   return (
     <div>
-      <Header className="sticky top-0 bg-white z-50 shadow-md" />
+      {/* <Header className="sticky top-0 bg-white z-50 shadow-md" /> */}
       <div ref={previewRef} className="flex flex-col justify-between">
         <h2 className="px-8 h-[40px] flex items-center border-b text-[#227a8a] text-xl font-semibold border-gray-300">
           Interview Feedback - Preview

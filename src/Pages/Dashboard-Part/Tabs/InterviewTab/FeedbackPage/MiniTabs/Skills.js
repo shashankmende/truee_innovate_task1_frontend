@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { IoIosStar } from "react-icons/io";
-import { useCustomContext } from "../../../../../../context/context";
+import { useCustomContext } from "../../../../../../Context/Contextfetch";
 
 const ratingLst = [
   { id: 1, name: "Poor", stars: 2, color: "red" },
@@ -9,8 +9,8 @@ const ratingLst = [
   { id: 4, name: "Excellent", stars: 5, color: "green" },
 ];
 
-const SkillsTabComponent = ({skillsTabData, tab }) => {
-  const { setSkillsTabData,page} = useCustomContext();
+const SkillsTabComponent = ({skillsTabData,setSkillsTabData ,tab }) => {
+  const {page} = useCustomContext();
   const getColorByRating = (rating) => {
     const ratingItem = ratingLst.find((r) => r.stars === rating);
     return ratingItem ? ratingItem.color : "gray";

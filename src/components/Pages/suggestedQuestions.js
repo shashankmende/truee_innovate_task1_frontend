@@ -1,6 +1,6 @@
 
 import React, { useEffect, useMemo, useState } from "react";
-import Header from "../Navbar/Header/Header";
+// import Header from "../Navbar/Header/Header";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { IoIosCloseCircleOutline,IoMdClose } from "react-icons/io";
@@ -489,7 +489,7 @@ const onChangeCheckboxInDifficultyLevel = (e, id, indx) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <Header />
+      {/* <Header /> */}
       <ReturnHeaderSection />
       {DisplayTabsData()}
     </div>

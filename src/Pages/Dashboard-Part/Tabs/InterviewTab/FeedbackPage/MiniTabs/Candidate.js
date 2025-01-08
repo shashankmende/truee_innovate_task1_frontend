@@ -10,7 +10,7 @@ const instructions = [
   "Join Promptly: Join the call on time and ensure your camera and microphone are working properly.",
 ]
 
-const CandidateMiniTab = ({page,tab}) => {
+const CandidateMiniTab = ({skillsTabData,page,tab}) => {
 
 
 
