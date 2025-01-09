@@ -552,6 +552,11 @@ const MyQuestionsList = ({  sectionName ,updateQuestionsInAddedSectionFromQuesti
   const [selectedDifficultyItemsToFilter, setSelectedDifficultyItemsToFilter] = useState([])
   const [filteredMyQuestionsList, setFilteredMyQuestionsList] = useState({});
 
+  //changes made by shashank - [09/01/2025]
+  const [questionScore,setQuestionScore]=useState('')
+  const [questionScoreError,setQuestionScoreError]=useState("")
+
+
   useEffect(() => {
     if (myQuestionsList && Object.keys(myQuestionsList).length > 0) {
       const newMyQuestionsObj = {...myQuestionsList,"interviewQuestions": interviewQuestionsList}
@@ -650,11 +655,20 @@ const MyQuestionsList = ({  sectionName ,updateQuestionsInAddedSectionFromQuesti
 
   };
 
+
   // added by shashank
-  const onClickAddButton = async (listName, question, indx) => {
+  const onClickAddButton = async (listName, question, indx,closeScorePopup) => {
     // console.log(question)
     if (section==="assessment"){
-      updateQuestionsInAddedSectionFromQuestionBank(sectionName,question)
+      if (questionScore !== "") {
+        const updatedItem = { ...question, score: questionScore };
+        updateQuestionsInAddedSectionFromQuestionBank(sectionName, updatedItem);
+        closeScorePopup();
+        setQuestionScore("");
+      } else {
+        setQuestionScoreError("score is required");
+        // alert("Please enter score to add the question")
+      }
     }
     else if (section==="interviewSection"){
     const requiredArray = myQuestionsList[listName];
@@ -691,6 +705,9 @@ const MyQuestionsList = ({  sectionName ,updateQuestionsInAddedSectionFromQuesti
     console.log('response from myquestions list question ', response)
 }
   };
+
+
+  
 
   const onClickRemoveQuestion = async (listName, question, indx) => {
     const requiredArray = myQuestionsList[listName];
@@ -1017,26 +1034,70 @@ const MyQuestionsList = ({  sectionName ,updateQuestionsInAddedSectionFromQuesti
                                 </span>
                                 {/* // Added by Shashank on [02/01/2025]: Feature to handle add question to interviewer section when clicked on add button */}
                                 {/* { (section==="Popup"||section==="interviewerSection")&& */}
-                                { (section==="Popup"||section==="interviewerSection" || section==="assessment")&&
+                                {/* { (section==="Popup"||section==="interviewerSection" || section==="assessment")&& */}
+                                { (section==="Popup" ||section==="interviewerSection")&&
                                 <div>
                                   {question.isAdded ? <button onClick={() => onClickRemoveQuestion(listName, question, index)} className={`  rounded-sm bg-[gray] w-[100%] px-2 py-1  text-md text-white `} > Remove </button> : <button className="bg-custom-blue  w-[100%] text-md  py-1 px-1 text-white rounded-sm" onClick={() => onClickAddButton(listName, question, index)}>Add</button>}
                                 </div>
-            }
-                                {/* <button
-                                className={`${
-                                  question.isAdded
-                                    ? "bg-[gray] cursor-not-allowed px-2 text-sm py-1"
-                                    : "bg-custom-blue px-2 py-1"
-                                } text-white rounded-md`}
-                                onClick={() =>
-                                  !question.isAdded &&
-                                  onClickAddButton(listName, question, index)
-                                }
-                                disabled={question.isAdded}
+                            }
+                      {section==="assessment" && (
+                        <Popup
+                        onClose={() => setQuestionScoreError("")}
+                        offsetX={-50}
+                        trigger={
+                          <div className="w-[full] flex justify-center">
+                            <button
+                              className="bg-custom-blue  w-[full] text-md  py-1 px-1 text-white rounded-sm"
+                              //  onClick={() => onClickAddButton(item)}
+                            >
+                              Add
+                            </button>
+                          </div>
+                        }
+                        >
+{(closeScorePopup) => (
+                        <div className="">
+                          <div className=" bg-white flex flex-col gap-4 p-4 rounded-sm shadow-lg  ">
+                            <div className="flex flex-col gap-2">
+                              <label
+                                htmlFor="assessment-section-score"
+                                className="text-black"
                               >
-                                {question.isAdded ? "Added" : "Add"}
-                              </button> */}
-                                {/* {question.isCustom && ( */}
+                                Score
+                              </label>
+                              <input
+                                value={questionScore}
+                                id="assessment-section-score"
+                                type="number"
+                                placeholder="Score"
+                                className=" px-2 py-1 rounded-sm border-[2px] border-[#80808030]  outline-none"
+                                onChange={(e) => {
+                                  setQuestionScore(e.target.value);
+                                  setQuestionScoreError("");
+                                }}
+                              />
+                              {questionScoreError && (
+                                <p className="text-[red] text-sm">
+                                  score is required*
+                                </p>
+                              )}
+                            </div>
+                            <div className="self-end flex justify-end">
+                              <button
+                                className="bg-custom-blue rounded-sm px-2 py-[0.5] text-white "
+                                onClick={() =>
+                                  onClickAddButton(listName,question,index, closeScorePopup)
+                                }
+                              >
+                                Add
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                        </Popup>
+                      )}
+                                
                                 <div
                                   className={`${question.isCustom ? "visible" : "invisible"
                                     } relative w-8 text-center mt-1`}

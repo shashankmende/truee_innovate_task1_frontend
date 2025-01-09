@@ -80,14 +80,19 @@ import { TbArrowsMaximize } from "react-icons/tb";
 import { FiMinimize } from "react-icons/fi";
 import Popup from "reactjs-popup";
 import { FaCaretUp } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 
 
 // const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
   //change done by Shashank on -[08/01/2025]
-const QuestionBank = ({ sectionName,updateQuestionsInAddedSectionFromQuestionBank,section,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
+const QuestionBank = ({ sectionName,updateQuestionsInAddedSectionFromQuestionBank,section:sectionProp,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
   const [activeTab, setActiveTab] = useState("SuggesstedQuestions");
   const [interviewQuestionsList,setInterviewQuestionsList]=useState([])
 
+  const location = useLocation()
+   const section = location.state?.section || sectionProp
+   console.log('location state from qb',location.state)
+  //  alert(`section: ${section}`)
 
   const handleSuggestedTabClick = (questionType) => {
     setActiveTab("SuggesstedQuestions");
