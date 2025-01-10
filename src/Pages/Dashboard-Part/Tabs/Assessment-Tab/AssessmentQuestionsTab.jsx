@@ -5,12 +5,17 @@ import { ReactComponent as MdMoreVert } from "../../../../icons/MdMoreVert.svg";
 import { ReactComponent as IoIosArrowDown } from "../../../../icons/IoIosArrowDown.svg";
 import { ReactComponent as IoIosArrowUp } from "../../../../icons/IoIosArrowUp.svg";
 import AddQuestion1 from "./AddQuestion1";
+import {
+  MdOutlineKeyboardArrowDown,
+  MdOutlineKeyboardArrowUp,
+} from "react-icons/md";
+
 const AssessmentQuestionsTab = ({
   checkedCount,
   questionsLimit,
   totalScore,
   overallPassScore,
-  sectionName,
+  sectionName: sectionNameProp,
   setSectionName,
   questionsBySection,
   addedSections,
@@ -25,7 +30,7 @@ const AssessmentQuestionsTab = ({
   handleEditSection,
   handleDeleteClick,
   handleQuestionSelection,
-  handleQuestionAdded,
+  // handleQuestionAdded,
   handleBackButtonClick,
   handleSave,
   handleSaveAndNext,
@@ -41,6 +46,8 @@ const AssessmentQuestionsTab = ({
   toggleArrow1,
   handleEditClick,
   actionViewMore,
+  isAlreadyExistingSection,
+  setIsAlreadyExistingSection,
 }) => {
   return (
     <div>
@@ -67,6 +74,7 @@ const AssessmentQuestionsTab = ({
                 Add Section
               </button>
             }
+            onClose={() => setIsAlreadyExistingSection("")}
             offsetX={-50}
           >
             {(closeAddSectionPopup) => (
@@ -75,13 +83,20 @@ const AssessmentQuestionsTab = ({
                   <div className="flex flex-col gap-2">
                     {/* <label htmlFor="assessment-section-name" className="text-black">Name</label> */}
                     <input
-                      value={sectionName}
+                      value={sectionNameProp}
                       id="assessment-section-name"
                       type="text"
                       placeholder="section name"
                       className=" px-2 py-1 rounded-sm border-[2px] border-[#80808030]  outline-none"
-                      onChange={(e) => setSectionName(e.target.value)}
+                      onChange={(e) => {
+                        setSectionName(e.target.value);
+                        setIsAlreadyExistingSection("");
+                      }}
                     />
+                    {/* {!isAlreadyExistingSection && <p className="text-[red] text-sm">section {sectionName} already exists</p>} */}
+                    {isAlreadyExistingSection && (
+                      <p className="text-[red]">{isAlreadyExistingSection}</p>
+                    )}
                   </div>
                   <div className="self-end flex justify-end">
                     <button
@@ -96,8 +111,9 @@ const AssessmentQuestionsTab = ({
             )}
           </Popup>
         </div>
-        {matchingSection.length > 0 &&
-          matchingSection.map((sectionName, index) => (
+        {/* {matchingSection.length > 0 && */}
+        {addedSections.length > 0 &&
+          addedSections.map((sectionName, index) => (
             <div key={index} className="text-md justify-between">
               <div className="flex justify-between bg-gray-100 p-2">
                 <div className="flex">
@@ -108,10 +124,10 @@ const AssessmentQuestionsTab = ({
                         {questionsBySection[sectionName].length}
                       </span>
                     )} */}
-                      <span className="bg-white px-2 py-0 mr-2 rounded-sm">
+                      <span className="bg-white px-2 py-0 mr-2 rounded-sm whitespace-normal">
                         {addedSections[index].Questions.length}
                       </span>
-                      {sectionName}
+                      {sectionName.SectionName}
                     </p>
                   </div>
                   <p className="border-r-gray-600 border"></p>
@@ -138,7 +154,7 @@ const AssessmentQuestionsTab = ({
                       {(closeQuestionBankPopupInAssessment) => (
                         <div className=" fixed  flex justify-center items-center bg-[#80808049]  left-0 top-0 bottom-0 w-full ">
                           <QuestionBank
-                            sectionName={sectionName}
+                            sectionName={sectionName.SectionName}
                             updateQuestionsInAddedSectionFromQuestionBank={
                               updateQuestionsInAddedSectionFromQuestionBank
                             }
@@ -154,7 +170,7 @@ const AssessmentQuestionsTab = ({
                 </div>
                 <div className="flex">
                   <p className="p-2 mr-3">
-                    Pass Score : {passScores[sectionName] || "0"}
+                    Pass Score : {passScores[sectionName.SectionName] || "0"}
                   </p>
                   <p className="border-r-gray-600 border"></p>
                   <div className="relative mt-2 mx-3">
@@ -168,7 +184,10 @@ const AssessmentQuestionsTab = ({
                             <p
                               className="hover:bg-gray-200 p-1 rounded pl-3 cursor-pointer"
                               onClick={() =>
-                                handleEditSection(index, sectionName)
+                                handleEditSection(
+                                  index,
+                                  sectionName.SectionName
+                                )
                               }
                             >
                               Edit
@@ -190,19 +209,23 @@ const AssessmentQuestionsTab = ({
                   </div>
                   <p className="border-r-gray-600 border"></p>
                   <div
-                    className="flex items-center text-3xl ml-3 mr-3 cursor-pointer"
+                    className="flex items-center text-3xl  ml-3 mr-3 cursor-pointer"
                     onClick={() => toggleArrow1(index)}
                   >
                     {toggleStates[index] ? (
-                      <IoIosArrowUp />
+                      <span>
+                        {/* <IoIosArrowUp style={{ color: "red" }}  /> */}
+                        <MdOutlineKeyboardArrowUp />
+                      </span>
                     ) : (
-                      <IoIosArrowDown />
+                      // <IoIosArrowDown style={{ color: "red" }}  />
+                      <MdOutlineKeyboardArrowDown />
                     )}
                   </div>
                 </div>
               </div>
 
-              {isAddQuestionModalOpen && (
+              {/* {isAddQuestionModalOpen && (
                 <AddQuestion1
                   isOpen={isAddQuestionModalOpen}
                   onClose={() => setIsAddQuestionModalOpen(false)}
@@ -213,13 +236,13 @@ const AssessmentQuestionsTab = ({
                   checkedCount={checkedCount}
                   // questionToEdit={selectedQuestion}
                 />
-              )}
+              )} */}
 
               {toggleStates[index] && (
                 <div>
                   {/* <h1>display :{addedSections[index]?.Questions[0].questionText}</h1> */}
                   {addedSections.map((each) => {
-                    if (each.SectionName === sectionName) {
+                    if (each.SectionName === sectionName.SectionName) {
                       return each.Questions.map((question, questionIndex) => (
                         <div
                           key={question._id}
@@ -241,12 +264,13 @@ const AssessmentQuestionsTab = ({
                               <input
                                 type="checkbox"
                                 checked={
-                                  checkedState[sectionName]?.[questionIndex] ||
-                                  false
+                                  checkedState[sectionName.SectionName]?.[
+                                    questionIndex
+                                  ] || false
                                 }
                                 onChange={() =>
                                   handleQuestionSelection(
-                                    sectionName,
+                                    sectionName.SectionName,
                                     questionIndex
                                   )
                                 }
@@ -277,14 +301,18 @@ const AssessmentQuestionsTab = ({
                               <div className="relative mr-2 mt-2">
                                 <button
                                   onClick={() =>
-                                    toggleAction(sectionName, questionIndex)
+                                    toggleAction(
+                                      sectionName.SectionName,
+                                      questionIndex
+                                    )
                                   }
                                   className="focus:outline-none"
                                 >
                                   <MdMoreVert className="text-3xl" />
                                 </button>
                                 {actionViewMore &&
-                                  actionViewMore.sectionName === sectionName &&
+                                  actionViewMore.sectionName ===
+                                    sectionName.SectionName &&
                                   actionViewMore.questionIndex ===
                                     questionIndex && (
                                     <div className="absolute z-10 w-36 rounded-md shadow-lg bg-white ring-1 p-4 ring-black ring-opacity-5 right-0 mt-2">
@@ -294,7 +322,7 @@ const AssessmentQuestionsTab = ({
                                           onClick={() =>
                                             handleEditClick(
                                               question,
-                                              sectionName,
+                                              sectionName.SectionName,
                                               questionIndex
                                             )
                                           }

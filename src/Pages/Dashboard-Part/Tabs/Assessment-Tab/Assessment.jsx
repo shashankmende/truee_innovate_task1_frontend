@@ -392,18 +392,6 @@ const Assessment = () => {
         (field) => field !== null && field !== undefined
       );
 
-      // const matchesStatus =
-      //   selectedFilters.status.length === 0 ||
-      //   selectedFilters.status.includes(user.HigherQualification);
-      // const matchesTech =
-      //   selectedFilters.tech.length === 0 ||
-      //   user.skills.some((skill) => selectedFilters.tech.includes(skill.skill));
-      // const matchesExperience =
-      //   (selectedFilters.experience.min === "" ||
-      //     user.CurrentExperience >= selectedFilters.experience.min) &&
-      //   (selectedFilters.experience.max === "" ||
-      //     user.CurrentExperience <= selectedFilters.experience.max);
-
       const matchesSearchQuery = fieldsToSearch.some((field) =>
         field.toString().toLowerCase().includes(searchQuery.toLowerCase())
       );

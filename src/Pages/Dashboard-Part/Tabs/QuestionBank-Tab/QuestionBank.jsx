@@ -112,9 +112,7 @@ const QuestionBank = ({ sectionName,updateQuestionsInAddedSectionFromQuestionBan
             <div className="flex items-center gap-8 ">
             {section==="Popup" && <>
               {
-               questionBankPopupVisibility ? <button className="text-[1.2rem]" on
-               
-               lick={()=>setQuestionBankPopupVisibility(false)}><FiMinimize/></button >:<button className="text-[1.2rem]"  onClick={()=>setQuestionBankPopupVisibility(true)}><TbArrowsMaximize/></button>              
+               questionBankPopupVisibility ? <button className="text-[1.2rem]" onClick={()=>setQuestionBankPopupVisibility(false)}><FiMinimize/></button >:<button className="text-[1.2rem]"  onClick={()=>setQuestionBankPopupVisibility(true)}><TbArrowsMaximize/></button>              
               }              
               </>
               }

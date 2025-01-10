@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, forwardRef, useCallback, } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  forwardRef,
+  useCallback,
+} from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,37 +17,39 @@ import { fetchFilterData } from "../../../../utils/dataUtils.js";
 import { validateAssessmentData } from "../../../../utils/assessmentValidation.js";
 import Cookies from "js-cookie";
 import Sidebar from "../Assessment-Tab/PassScore.jsx";
-import { usePermissions } from '../../../../PermissionsContext';
-import { useMemo } from 'react';
-import { format } from 'date-fns';
+import { usePermissions } from "../../../../PermissionsContext";
+import { useMemo } from "react";
+import { format } from "date-fns";
 import ConfirmationPopup from "./ConfirmationPopup.jsx";
 // import { handleShareClick as shareAssessment } from '../../../../utils/EmailShare';
 
-import { ReactComponent as MdArrowDropDown } from '../../../../icons/MdArrowDropDown.svg';
-import { ReactComponent as IoIosArrowUp } from '../../../../icons/IoIosArrowUp.svg';
-import { ReactComponent as IoIosArrowDown } from '../../../../icons/IoIosArrowDown.svg';
-import { ReactComponent as SlPencil } from '../../../../icons/SlPencil.svg';
-import { ReactComponent as IoIosAddCircle } from '../../../../icons/IoIosAddCircle.svg';
-import { ReactComponent as HiOutlineExclamationCircle } from '../../../../icons/HiOutlineExclamationCircle.svg';
-import { ReactComponent as MdOutlineCancel } from '../../../../icons/MdOutlineCancel.svg';
-import { ReactComponent as IoArrowBack } from '../../../../icons/IoArrowBack.svg';
-import { ReactComponent as FaTrash } from '../../../../icons/FaTrash.svg';
-import { ReactComponent as CgInfo } from '../../../../icons/CgInfo.svg';
-import { ReactComponent as MdMoreVert } from '../../../../icons/MdMoreVert.svg';
+import { ReactComponent as MdArrowDropDown } from "../../../../icons/MdArrowDropDown.svg";
+import { ReactComponent as IoIosArrowUp } from "../../../../icons/IoIosArrowUp.svg";
+import { ReactComponent as IoIosArrowDown } from "../../../../icons/IoIosArrowDown.svg";
+import { ReactComponent as SlPencil } from "../../../../icons/SlPencil.svg";
+import { ReactComponent as IoIosAddCircle } from "../../../../icons/IoIosAddCircle.svg";
+import { ReactComponent as HiOutlineExclamationCircle } from "../../../../icons/HiOutlineExclamationCircle.svg";
+import { ReactComponent as MdOutlineCancel } from "../../../../icons/MdOutlineCancel.svg";
+import { ReactComponent as IoArrowBack } from "../../../../icons/IoArrowBack.svg";
+import { ReactComponent as FaTrash } from "../../../../icons/FaTrash.svg";
+import { ReactComponent as CgInfo } from "../../../../icons/CgInfo.svg";
+import { ReactComponent as MdMoreVert } from "../../../../icons/MdMoreVert.svg";
 import Popup from "reactjs-popup";
 import QuestionBank from "../QuestionBank-Tab/QuestionBank.jsx";
 import BasicDetailsTab from "./BasicDetailsTab.jsx";
 import AssessmentTestDetailsTab from "./AssessmentTestDetailsTab.jsx";
 import AssessmentQuestionsTab from "./AssessmentQuestionsTab.jsx";
-// import AssessmentQuestionsTab from "./AssessmentQuestionsTab.jsx";
-// import Candidate from "../Candidate-Tab/Candidate.jsx";
 
 const NewAssessment = ({ onClose, onDataAdded }) => {
   const { sharingPermissionscontext } = usePermissions();
-  const positionPermissions = useMemo(() => sharingPermissionscontext.position || {}, [sharingPermissionscontext]);
+  const positionPermissions = useMemo(
+    () => sharingPermissionscontext.position || {},
+    [sharingPermissionscontext]
+  );
 
   const organizationId = Cookies.get("organizationId");
   const [activeTab, setActiveTab] = useState("Basicdetails");
+  // const [activeTab, setActiveTab] = useState("Questions");
   const [position, setPosition] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [showMessage, setShowMessage] = useState(false);
@@ -68,9 +76,11 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   const [value, setValue] = useState("");
   const [showNewPositionContent, setShowNewPositionContent] = useState(false);
   const [showMainContent, setShowMainContent] = useState(true);
-  const [skillsForSelectedPosition, setSkillsForSelectedPosition] = useState([]);
+  const [skillsForSelectedPosition, setSkillsForSelectedPosition] = useState(
+    []
+  );
   const [matchingSection, setMatchingSection] = useState([]);
-  
+
   const [editingIndex, setEditingIndex] = useState(null);
   const [editedSectionName, setEditedSectionName] = useState("");
   const [isEditSectionModalOpen, setIsEditSectionModalOpen] = useState(false);
@@ -80,10 +90,12 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
 
   const [questionToDelete, setQuestionToDelete] = useState(null);
   const [sectionToDeleteFrom, setSectionToDeleteFrom] = useState(null);
-  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
   const [isBulkDelete, setIsBulkDelete] = useState(false);
   const sidebarRefForSection = useRef(null);
   const popupRef = useRef(null);
+  const [isAlreadyExistingSection, setIsAlreadyExistingSection] = useState("");
 
   const [formData, setFormData] = useState({
     AssessmentTitle: "",
@@ -95,6 +107,15 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     ExpiryDate: new Date(),
   });
 
+  //shashank - [10/01/2025]
+  const [tabsSubmitStatus,setTabsSubmitStatus]=useState({
+    responseId:"",
+    Basicdetails:false,
+    Details:false,
+    Questions:false,
+    Candidates:false
+  })
+
   const handleIconClick = (e) => {
     if (e) {
       e.stopPropagation();
@@ -102,28 +123,11 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     setShowMessage(!showMessage);
   };
 
-  // const handleQuestionAdded = (questionData) => {
-  //   setQuestionsBySection((prevQuestions) => ({
-  //     ...prevQuestions,
-  //     [currentSectionName]: [
-  //       ...(prevQuestions[currentSectionName] || []),
-  //       questionData,
-  //     ],
-  //   }));
-  // };
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
-  const [currentSectionName, setCurrentSectionName] = useState('');
+  const [currentSectionName, setCurrentSectionName] = useState("");
 
-  const handleQuestionAdded = (questionData) => {
-    setQuestionsBySection((prevQuestions) => ({
-      ...prevQuestions,
-      [currentSectionName]: [
-        ...(prevQuestions[currentSectionName] || []),
-        questionData,
-      ],
-    }));
-  };
+ 
 
   const resetActiveTab = () => {
     setActiveTab("Basicdetails");
@@ -166,11 +170,11 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     if (name === "NumberOfQuestions") {
       setQuestionsLimit(Number(value));
     }
-
   };
 
   const userName = Cookies.get("userName");
-  const [isQuestionLimitErrorPopupOpen, setIsQuestionLimitErrorPopupOpen] = useState(false);
+  const [isQuestionLimitErrorPopupOpen, setIsQuestionLimitErrorPopupOpen] =
+    useState(false);
 
   const handleSaveAndNext = async (event, currentTab, nextTab) => {
     event.preventDefault();
@@ -189,12 +193,19 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
         }
         break;
       case "Questions":
-        const totalQuestions = Object.values(questionsBySection).reduce((acc, questions) => acc + questions.length, 0);
-        if (totalQuestions !== questionsLimit) {
+        // const totalQuestions = Object.values(questionsBySection).reduce(
+        //   (acc, questions) => acc + questions.length,
+        //   0
+        // );
+        const totalQuestions = addedSections.map(eachSection=> eachSection.Questions.length)
+
+        if (totalQuestions === questionsLimit) {
           newErrors.questions = `Please add exactly ${questionsLimit} questions.`;
           setIsQuestionLimitErrorPopupOpen(true); // Show popup
         } else {
-          const isAnySectionPassScoreSet = Object.values(passScores).some(score => score > 0);
+          const isAnySectionPassScoreSet = Object.values(passScores).some(
+            (score) => score > 0
+          );
           if (!(overallPassScore > 0 || isAnySectionPassScoreSet)) {
             setSidebarOpen(true);
             return;
@@ -212,35 +223,55 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
       setErrors(newErrors);
       return;
     }
+    handleSave(event,currentTab)
     setActiveTab(nextTab);
   };
 
   const gatherDataUpToCurrentTab = (currentTab) => {
     let assessmentData = {};
 
-    if (currentTab === "Basicdetails" || currentTab === "Details" || currentTab === "Questions" || currentTab === "Candidates") {
+    if (
+      currentTab === "Basicdetails" ||
+      currentTab === "Details" ||
+      currentTab === "Questions" ||
+      currentTab === "Candidates"
+    ) {
       assessmentData = {
         ...assessmentData,
-        ...(formData.AssessmentTitle && { AssessmentTitle: formData.AssessmentTitle }),
-        ...(formData.AssessmentType.length > 0 && { AssessmentType: formData.AssessmentType }),
+        ...(formData.AssessmentTitle && {
+          AssessmentTitle: formData.AssessmentTitle,
+        }),
+        ...(formData.AssessmentType.length > 0 && {
+          AssessmentType: formData.AssessmentType,
+        }),
         ...(formData.Position && { Position: formData.Position }),
         ...(formData.Duration && { Duration: formData.Duration }),
-        ...(formData.DifficultyLevel && { DifficultyLevel: formData.DifficultyLevel }),
-        ...(formData.NumberOfQuestions && { NumberOfQuestions: formData.NumberOfQuestions }),
+        ...(formData.DifficultyLevel && {
+          DifficultyLevel: formData.DifficultyLevel,
+        }),
+        ...(formData.NumberOfQuestions && {
+          NumberOfQuestions: formData.NumberOfQuestions,
+        }),
         ...(formData.ExpiryDate && { ExpiryDate: formData.ExpiryDate }),
       };
     }
 
-    if (currentTab === "Details" || currentTab === "Questions" || currentTab === "Candidates") {
+    if (
+      currentTab === "Details" ||
+      currentTab === "Questions" ||
+      currentTab === "Candidates"
+    ) {
       assessmentData = {
         ...assessmentData,
-        ...(includePosition || includePhone ? {
-          CandidateDetails: {
-            ...(includePosition ? { includePosition } : {}),
-            ...(includePhone ? { includePhone } : {}),
-            // ...(includeSkills ? { includeSkills } : {}),
-          }
-        } : {}),
+        ...(includePosition || includePhone
+          ? {
+              CandidateDetails: {
+                ...(includePosition ? { includePosition } : {}),
+                ...(includePhone ? { includePhone } : {}),
+                // ...(includeSkills ? { includeSkills } : {}),
+              },
+            }
+          : {}),
         ...(instructions ? { Instructions: instructions } : {}),
         ...(additionalNotes ? { AdditionalNotes: additionalNotes } : {}),
       };
@@ -249,38 +280,103 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     if (currentTab === "Questions" || currentTab === "Candidates") {
       assessmentData = {
         ...assessmentData,
-        Sections: matchingSection
-          .filter(sectionName => questionsBySection[sectionName]?.length > 0)
-          .map((sectionName) => ({
-            SectionName: sectionName,
-            Questions: questionsBySection[sectionName]?.map((question) => {
-              const baseQuestion = {
-                Question: question.Question,
-                QuestionType: question.QuestionType,
-                DifficultyLevel: question.DifficultyLevel,
-                Score: question.Score,
-                Answer: question.Answer,
-                Hint: question.Hint || null,
-                CharLimits: question.CharLimits,
-              };
+        // Sections: matchingSection
+        //   .filter((sectionName) => questionsBySection[sectionName]?.length > 0)
+        //   .map((sectionName) => ({
+        //     SectionName: sectionName,
+        //     Questions:
+        //       questionsBySection[sectionName]?.map((question) => {
+        //         const baseQuestion = {
+        //           Question: question.Question,
+        //           QuestionType: question.QuestionType,
+        //           DifficultyLevel: question.DifficultyLevel,
+        //           Score: question.Score,
+        //           Answer: question.Answer,
+        //           Hint: question.Hint || null,
+        //           CharLimits: question.CharLimits,
+        //         };
 
-              if (question.QuestionType === 'MCQ' && question.Options && question.Options.length > 0) {
-                baseQuestion.Options = question.Options;
-              }
+        //         if (
+        //           question.QuestionType === "MCQ" &&
+        //           question.Options &&
+        //           question.Options.length > 0
+        //         ) {
+        //           baseQuestion.Options = question.Options;
+        //         }
 
-              if (question.QuestionType === 'Programming Questions' && question.ProgrammingDetails && question.ProgrammingDetails.length > 0) {
-                baseQuestion.ProgrammingDetails = question.ProgrammingDetails;
-              }
+        //         if (
+        //           question.QuestionType === "Programming Questions" &&
+        //           question.ProgrammingDetails &&
+        //           question.ProgrammingDetails.length > 0
+        //         ) {
+        //           baseQuestion.ProgrammingDetails = question.ProgrammingDetails;
+        //         }
 
-              if ((question.QuestionType === 'Short Text(Single line)' || question.QuestionType === 'Long Text(Paragraph)') && question.AutoAssessment?.enabled) {
-                baseQuestion.AutoAssessment = {
-                  enabled: question.AutoAssessment.enabled,
-                  matching: question.AutoAssessment.matching
-                };
-              }
-              return baseQuestion;
-            }) || [],
-          })),
+        //         if (
+        //           (question.QuestionType === "Short Text(Single line)" ||
+        //             question.QuestionType === "Long Text(Paragraph)") &&
+        //           question.AutoAssessment?.enabled
+        //         ) {
+        //           baseQuestion.AutoAssessment = {
+        //             enabled: question.AutoAssessment.enabled,
+        //             matching: question.AutoAssessment.matching,
+        //           };
+        //         }
+        //         return baseQuestion;
+        //       }) || [],
+        //   })),
+
+        Sections: addedSections.filter(eachSection=>eachSection.Questions.length> 0)
+        .map((sectionName) => ({
+          SectionName: sectionName.SectionName,
+          Questions: sectionName.Questions.map(each=>each.qId)
+            // questionsBySection[sectionName]?.map((question) => {
+            // sectionName.Questions.map((question) => {
+            //   const baseQuestion = {
+            //     Question: question.Question,
+            //     QuestionType: question.QuestionType,
+            //     DifficultyLevel: question.DifficultyLevel,
+            //     Score: question.Score,
+            //     Answer: question.Answer,
+            //     Hint: question.Hint || null,
+            //     CharLimits: question.CharLimits,
+            //   };
+
+            //   if (
+            //     question.QuestionType === "MCQ" &&
+            //     question.Options &&
+            //     question.Options.length > 0
+            //   ) {
+            //     baseQuestion.Options = question.Options;
+            //   }
+
+            //   if (
+            //     question.QuestionType === "Programming Questions" &&
+            //     question.ProgrammingDetails &&
+            //     question.ProgrammingDetails.length > 0
+            //   ) {
+            //     baseQuestion.ProgrammingDetails = question.ProgrammingDetails;
+            //   }
+
+            //   if (
+            //     (question.QuestionType === "Short Text(Single line)" ||
+            //       question.QuestionType === "Long Text(Paragraph)") &&
+            //     question.AutoAssessment?.enabled
+            //   ) {
+            //     baseQuestion.AutoAssessment = {
+            //       enabled: question.AutoAssessment.enabled,
+            //       matching: question.AutoAssessment.matching,
+            //     };
+            //   }
+            //   return baseQuestion;
+            // }) || [],
+        })),
+        // Section:addedSections.map(eachSection=>{
+        //   return {
+        //     ...eachSection,
+        //     Questions:eachSection.Questions.map(each=>each.qId)
+        //   }
+        // }),
         totalScore: totalScore,
         passScore: overallPassScore,
       };
@@ -288,12 +384,15 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     if (currentTab === "Candidates") {
       assessmentData = {
         ...assessmentData,
-        ...(selectedCandidates.length > 0 && { candidateIds: selectedCandidates }),
+        ...(selectedCandidates.length > 0 && {
+          candidateIds: selectedCandidates,
+        }),
       };
     }
 
     return assessmentData;
   };
+
 
   const handleSave = async (event, currentTab) => {
     event.preventDefault();
@@ -310,12 +409,18 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
         }
         break;
       case "Questions":
-        const totalQuestions = Object.values(questionsBySection).reduce((acc, questions) => acc + questions.length, 0);
-        if (totalQuestions !== questionsLimit) {
+        // const totalQuestions = Object.values(questionsBySection).reduce(
+        //   (acc, questions) => acc + questions.length,
+        //   0
+        // );
+        const totalQuestions = addedSections.map(eachsection=>eachsection.Questions.length)
+        if (totalQuestions === questionsLimit) {
           newErrors.questions = `Please add exactly ${questionsLimit} questions.`;
           setIsQuestionLimitErrorPopupOpen(true);
         } else {
-          const isAnySectionPassScoreSet = Object.values(passScores).some(score => score > 0);
+          const isAnySectionPassScoreSet = Object.values(passScores).some(
+            (score) => score > 0
+          );
           if (!(overallPassScore > 0 || isAnySectionPassScoreSet)) {
             setSidebarOpen(true);
             return;
@@ -338,7 +443,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     const assessmentData = gatherDataUpToCurrentTab(currentTab);
 
     // Add common fields
-    const currentDateTime = format(new Date(), 'dd MMM, yyyy - hh:mm a');
+    const currentDateTime = format(new Date(), "dd MMM, yyyy - hh:mm a");
     assessmentData.CreatedBy = `${userName} at ${currentDateTime}`;
     assessmentData.LastModifiedById = userId;
     assessmentData.OwnerId = userId;
@@ -348,31 +453,41 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
       assessmentData.orgId = organizationId;
     }
 
-    console.log('Assessment Data to be sent:', assessmentData);
+    console.log("Assessment Data to be sent:", assessmentData);
 
     try {
-      const response = await axios.post(
+      let response;
+    if (!tabsSubmitStatus[currentTab]) {
+      response = await axios.post(
         `${process.env.REACT_APP_API_URL}/assessment`,
         assessmentData
       );
+      // alert("Saved successfully!");
+      setTabsSubmitStatus(prev => ({
+        ...prev,
+        [currentTab]: true,
+         responseId: response.data._id 
+      }));
+    } else {
+      
+      response = await axios.patch(
+        `${process.env.REACT_APP_API_URL}/assessment/${tabsSubmitStatus.responseId}`,
+        assessmentData
+      );
+      // alert(response.data.message)
+    }
 
-      console.log(response.data, "response.data");
-      if (response.data) {
-        // setAssessmentId(response.data._id);
-        onDataAdded(response.data);
-      } else {
-        console.error("Unexpected response status:", response.status);
-      }
+    
       if (currentTab === "Candidates") {
         setIsLoading(true);
         await handleShareClick(response.data._id);
         setIsLoading(false);
       }
-      handleClose();
-      onClose();
-
+      // handleClose();
+      // resetFormData()
+      // onClose();
     } catch (error) {
-      console.error('Error saving data to backend:', error);
+      console.error("Error saving data to backend:", error);
     }
   };
 
@@ -383,38 +498,46 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
       console.log(assessmentId);
 
       if (!assessmentId) {
-        console.error('Failed to save assessment or retrieve assessmentId');
+        console.error("Failed to save assessment or retrieve assessmentId");
         return;
       }
 
       if (selectedCandidates.length === 0) {
-        setErrors({ ...errors, Candidate: "Please select at least one candidate." });
+        setErrors({
+          ...errors,
+          Candidate: "Please select at least one candidate.",
+        });
         return;
       }
 
       // Update candidates with the new assessmentId
       await axios.post(`${process.env.REACT_APP_API_URL}/update-candidates`, {
         candidateIds: selectedCandidates,
-        assessmentId: assessmentId
+        assessmentId: assessmentId,
       });
 
       // Send emails to the selected candidates
-      const candidateEmails = selectedCandidates.map(id => {
-        const candidate = candidateData.find(c => c._id === id);
-        return candidate ? candidate.Email : null;
-      }).filter(email => email !== null);
+      const candidateEmails = selectedCandidates
+        .map((id) => {
+          const candidate = candidateData.find((c) => c._id === id);
+          return candidate ? candidate.Email : null;
+        })
+        .filter((email) => email !== null);
 
       if (candidateEmails.length > 0) {
-        await axios.post(`${process.env.REACT_APP_API_URL}/send-assessment-link`, {
-          candidateEmails,
-          assessmentId: assessmentId,
-        });
-        console.log('Emails sent successfully');
+        await axios.post(
+          `${process.env.REACT_APP_API_URL}/send-assessment-link`,
+          {
+            candidateEmails,
+            assessmentId: assessmentId,
+          }
+        );
+        console.log("Emails sent successfully");
       } else {
-        console.error('No valid candidate emails found');
+        console.error("No valid candidate emails found");
       }
     } catch (error) {
-      console.error('Error during share process:', error);
+      console.error("Error during share process:", error);
     } finally {
       setIsLoading(false);
     }
@@ -765,7 +888,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   // };
 
   const [addedSections, setAddedSections] = useState([]);
-  console.log("added section",addedSections)
+  
 
   const handleSectionAdded = (data) => {
     const { SectionName, Questions } = data;
@@ -779,8 +902,8 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
 
       // Add the section name to the addedSections state
       // setAddedSections((prevSections) => [...prevSections, SectionName]);
-      setAddedSections((prevSections) => [...prevSections,data]);
-      console.log('added sections',addedSections)
+      setAddedSections((prevSections) => [...prevSections, data]);
+      console.log("added sections", addedSections);
 
       // Initialize questions for the new section
       setQuestionsBySection((prevQuestions) => {
@@ -812,24 +935,8 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   };
 
   const handleBackButtonClickCandidate = () => {
-    setActiveTab("Questions")
-  }
-
-  // useEffect(() => {
-  //   const fetchQuestions = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `${process.env.REACT_APP_API_URL}/newquestion`
-  //       );
-  //       setQuestionsBySection(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching questions:", error);
-  //     }
-  //   };
-
-  //   fetchQuestions();
-  // }, []);
-console.log('added sections',addedSections)
+    setActiveTab("Questions");
+  };
 
   const handleEditSection = (index, currentSectionName) => {
     setEditingIndex(index);
@@ -841,7 +948,7 @@ console.log('added sections',addedSections)
   const handleSaveSectionName = () => {
     if (editingIndex !== null && editedSectionName.trim() !== "") {
       const updatedSectionName = editedSectionName.trim();
-
+      // alert(editedSectionName)
       setQuestionsBySection((prevQuestions) => {
         const updatedQuestions = { ...prevQuestions };
         if (updatedQuestions[matchingSection[editingIndex]]) {
@@ -858,48 +965,19 @@ console.log('added sections',addedSections)
         return updatedSections;
       });
 
+      setAddedSections((prev) =>
+        prev.map((section, index) =>
+          index === editingIndex
+            ? { ...section, SectionName: updatedSectionName }
+            : section
+        )
+      );
+
       setIsEditSectionModalOpen(false);
       setEditingIndex(null);
     }
   };
 
-  // const confirmDelete = () => {
-  //   if (questionToDelete && sectionToDeleteFrom) {
-  //     handleDeleteQuestionClick(questionToDelete, sectionToDeleteFrom);
-  //     setIsDeleteConfirmationOpen(false);
-  //     setQuestionToDelete(null);
-  //     setSectionToDeleteFrom(null);
-  //   }
-  // };
-
-  const cancelDelete2 = () => {
-    setIsPopupOpen2(false);
-    setQuestionToDelete(null);
-    setSectionToDeleteFrom(null);
-  };
-
-  // const handleQuestionSelection = (sectionName, questionIndex) => {
-  //   setCheckedState((prevState) => {
-  //     const isChecked = !prevState[sectionName]?.[questionIndex];
-  //     const newCheckedState = {
-  //       ...prevState,
-  //       [sectionName]: {
-  //         ...prevState[sectionName],
-  //         [questionIndex]: isChecked,
-  //       },
-  //     };
-
-  //     const newCheckedCount = Object.values(newCheckedState).reduce(
-  //       (count, section) => {
-  //         return count + Object.values(section).filter(Boolean).length;
-  //       },
-  //       0
-  //     );
-
-  //     setCheckedCount(newCheckedCount);
-  //     return newCheckedState;
-  //   });
-  // };
 
   const handleQuestionSelection = (sectionName, questionIndex) => {
     setCheckedState((prevState) => {
@@ -920,103 +998,15 @@ console.log('added sections',addedSections)
       return count + Object.values(section).filter(Boolean).length;
     }, 0);
   };
-  const confirmDelete2 = () => {
-    setQuestionsBySection((prevState) => {
-      const newQuestionsBySection = { ...prevState };
 
-      Object.keys(checkedState).forEach((sectionName) => {
-        newQuestionsBySection[sectionName] = newQuestionsBySection[
-          sectionName
-        ].filter(
-          (_, questionIndex) => !checkedState[sectionName][questionIndex]
-        );
-      });
 
-      return newQuestionsBySection;
-    });
 
-    setCheckedState({});
-    setCheckedCount(0);
-  };
-
-  const handleDeleteIconClick = (questionIndex, sectionName) => {
-    setQuestionToDelete(questionIndex);
-    setSectionToDeleteFrom(sectionName);
-    setIsBulkDelete(false);
-    setIsDeleteConfirmationOpen(true);
-  };
-
-  // const handleBulkDeleteClick = () => {
-  //   setIsBulkDelete(true);
-  //   setIsDeleteConfirmationOpen(true);
-  // };
-  // const confirmDeleteQuestion = () => {
-  //   if (isBulkDelete) {
-  //     setQuestionsBySection((prevState) => {
-  //       const newQuestionsBySection = { ...prevState };
-
-  //       Object.keys(checkedState).forEach((sectionName) => {
-  //         newQuestionsBySection[sectionName] = newQuestionsBySection[
-  //           sectionName
-  //         ].filter(
-  //           (_, questionIndex) => !checkedState[sectionName][questionIndex]
-  //         );
-  //       });
-
-  //       return newQuestionsBySection;
-  //     });
-
-  //     setCheckedState({});
-  //     setCheckedCount(0);
-  //   } else {
-  //     setQuestionsBySection((prevQuestions) => {
-  //       const updatedQuestions = { ...prevQuestions };
-  //       if (Array.isArray(updatedQuestions[sectionToDeleteFrom])) {
-  //         updatedQuestions[sectionToDeleteFrom] = updatedQuestions[
-  //           sectionToDeleteFrom
-  //         ].filter((_, index) => index !== questionToDelete);
-  //       }
-  //       return updatedQuestions;
-  //     });
-  //   }
-
-  //   setIsDeleteConfirmationOpen(false);
-  //   setQuestionToDelete(null);
-  //   setSectionToDeleteFrom(null);
-  // };
-
-  const cancelDeleteQuestion = () => {
-    setIsDeleteConfirmationOpen(false);
-    setQuestionToDelete(null);
-    setSectionToDeleteFrom(null);
-  };
 
   const [isDeleteSectionConfirmationOpen, setIsDeleteSectionConfirmationOpen] =
     useState(false);
   const [sectionToDelete, setSectionToDelete] = useState(null);
   const [sectionIndexToDelete, setSectionIndexToDelete] = useState(null);
 
-  const confirmDeleteSection = () => {
-    if (sectionToDelete !== null && sectionIndexToDelete !== null) {
-      setMatchingSection((prevSections) =>
-        prevSections.filter((_, i) => i !== sectionIndexToDelete)
-      );
-      setQuestionsBySection((prevQuestions) => {
-        const updatedQuestions = { ...prevQuestions };
-        delete updatedQuestions[sectionToDelete];
-        return updatedQuestions;
-      });
-      setIsDeleteSectionConfirmationOpen(false);
-      setSectionToDelete(null);
-      setSectionIndexToDelete(null);
-    }
-  };
-
-  const cancelDeleteSection = () => {
-    setIsDeleteSectionConfirmationOpen(false);
-    setSectionToDelete(null);
-    setSectionIndexToDelete(null);
-  };
 
   const CustomInput = forwardRef(({ value, onClick }, ref) => (
     <input
@@ -1029,10 +1019,8 @@ console.log('added sections',addedSections)
     />
   ));
 
-
   // mansoor
   const [questionsLimit, setQuestionsLimit] = useState(null);
-
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const sidebarRef = useRef(null);
@@ -1052,9 +1040,9 @@ console.log('added sections',addedSections)
   // Function to calculate total score
   const calculateTotalScore = () => {
     let score = 0;
-    matchingSection.forEach(section => {
+    matchingSection.forEach((section) => {
       if (questionsBySection[section]) {
-        questionsBySection[section].forEach(question => {
+        questionsBySection[section].forEach((question) => {
           score += Number(question.Score) || 0; // Ensure score is treated as a number
         });
       }
@@ -1073,26 +1061,20 @@ console.log('added sections',addedSections)
   // Initialize passScores for each section to 0
   useEffect(() => {
     const initialPassScores = {};
-    matchingSection.forEach(sectionName => {
+    matchingSection.forEach((sectionName) => {
       initialPassScores[sectionName] = 0;
     });
     setPassScores(initialPassScores);
   }, [matchingSection]);
 
-  // const handlePassScoreSave = (scores) => {
-  //   if (scores.overall !== undefined) {
-  //     setOverallPassScore(scores.overall);
-  //   } else {
-  //     setPassScores(scores);
-  //     // Calculate the total pass score from all sections
-  //     const totalPassScore = Object.values(scores).reduce((acc, score) => acc + score, 0);
-  //     setOverallPassScore(totalPassScore);
-  //   }
-  // };
+
 
   const handlePassScoreSave = (scores) => {
     setPassScores(scores);
-    const totalPassScore = Object.values(scores).reduce((acc, score) => acc + Number(score), 0);
+    const totalPassScore = Object.values(scores).reduce(
+      (acc, score) => acc + Number(score),
+      0
+    );
     setOverallPassScore(totalPassScore);
   };
 
@@ -1101,16 +1083,17 @@ console.log('added sections',addedSections)
   useEffect(() => {
     const fetchCandidateData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/candidate`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/candidate`
+        );
         setCandidateData(response.data);
       } catch (error) {
-        console.error('Error fetching candidate data:', error);
+        console.error("Error fetching candidate data:", error);
       }
     };
 
     fetchCandidateData();
   }, []);
-
 
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -1131,35 +1114,40 @@ console.log('added sections',addedSections)
     setCheckedCount(calculateCheckedCount());
   }, [questionsBySection]);
 
-
   const [isLimitReachedPopupOpen, setIsLimitReachedPopupOpen] = useState(false);
-  const toggleSidebarAddQuestion = (sectionName) => {
-    if (checkedCount >= questionsLimit) {
-      setIsLimitReachedPopupOpen(true);
-      return;
-    }
-    // setSelectedQuestion(null);
-    // setCurrentSectionName(sectionName);
-    // setIsAddQuestionModalOpen(true);
-    setCurrentSectionName(sectionName);
-    setIsAddQuestionModalOpen(true);
-  };
+
+  // const toggleSidebarAddQuestion = (sectionName) => {
+  //   if (checkedCount >= questionsLimit) {
+  //     setIsLimitReachedPopupOpen(true);
+  //     return;
+  //   }
+  //   // setSelectedQuestion(null);
+  //   // setCurrentSectionName(sectionName);
+  //   // setIsAddQuestionModalOpen(true);
+  //   setCurrentSectionName(sectionName);
+  //   setIsAddQuestionModalOpen(true);
+  // };
 
   const closeLimitReachedPopup = () => {
     setIsLimitReachedPopupOpen(false);
   };
 
   const handleDeleteSectionClick = (index, sectionName) => {
-    setMatchingSection((prevSections) => prevSections.filter((_, i) => i !== index));
+    setMatchingSection((prevSections) =>
+      prevSections.filter((_, i) => i !== index)
+    );
     setQuestionsBySection((prevQuestions) => {
       const updatedQuestions = { ...prevQuestions };
       delete updatedQuestions[sectionName];
       return updatedQuestions;
     });
-    setAddedSections((prevSections) => prevSections.filter((name) => name !== sectionName));
+    setAddedSections((prevSections) =>
+      prevSections.filter((name) => name !== sectionName)
+    );
   };
 
-  const [isSelectCandidatePopupOpen, setIsSelectCandidatePopupOpen] = useState(false);
+  const [isSelectCandidatePopupOpen, setIsSelectCandidatePopupOpen] =
+    useState(false);
 
   const [includePhone, setIncludePhone] = useState(false);
   const [includePosition, setIncludePosition] = useState(false);
@@ -1215,15 +1203,30 @@ console.log('added sections',addedSections)
     setActiveTab("Basicdetails");
   };
 
-  const handleQuestionUpdated = (updatedQuestion, sectionName, questionIndex) => {
-    console.log("Updating Question:", updatedQuestion, "Section:", sectionName, "Index:", questionIndex);
+  const handleQuestionUpdated = (
+    updatedQuestion,
+    sectionName,
+    questionIndex
+  ) => {
+    console.log(
+      "Updating Question:",
+      updatedQuestion,
+      "Section:",
+      sectionName,
+      "Index:",
+      questionIndex
+    );
     setQuestionsBySection((prevQuestions) => {
       const updatedQuestions = { ...prevQuestions };
       const sectionQuestions = updatedQuestions[sectionName] || [];
       console.log("Before Update:", questionsBySection);
-      console.log("Updated Question at Index:", questionIndex, "Data:", updatedQuestion);
+      console.log(
+        "Updated Question at Index:",
+        questionIndex,
+        "Data:",
+        updatedQuestion
+      );
       console.log("After Update:", updatedQuestions);
-
 
       if (questionIndex !== -1 && sectionQuestions[questionIndex]) {
         // Update the specific question using the index
@@ -1239,7 +1242,7 @@ console.log('added sections',addedSections)
   };
 
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [deleteType, setDeleteType] = useState('');
+  const [deleteType, setDeleteType] = useState("");
 
   // Function to handle delete button click
   const handleDeleteClick = (type, item) => {
@@ -1252,10 +1255,13 @@ console.log('added sections',addedSections)
 
   // Function to confirm deletion
   const confirmDelete = () => {
-    if (deleteType === 'section') {
+    if (deleteType === "section") {
       handleDeleteSectionClick(itemToDelete.index, itemToDelete.sectionName);
-    } else if (deleteType === 'question') {
-      handleDeleteQuestion(itemToDelete.sectionName, itemToDelete.questionIndex);
+    } else if (deleteType === "question") {
+      handleDeleteQuestion(
+        itemToDelete.sectionName,
+        itemToDelete.questionIndex
+      );
     }
     setIsDeleteConfirmationOpen(false);
     setItemToDelete(null);
@@ -1278,7 +1284,8 @@ console.log('added sections',addedSections)
     });
   };
 
-  const [isBulkDeleteConfirmationOpen, setIsBulkDeleteConfirmationOpen] = useState(false);
+  const [isBulkDeleteConfirmationOpen, setIsBulkDeleteConfirmationOpen] =
+    useState(false);
 
   const handleBulkDeleteClick = () => {
     setIsBulkDeleteConfirmationOpen(true);
@@ -1307,7 +1314,9 @@ console.log('added sections',addedSections)
 
   const toggleAction = (sectionName, questionIndex) => {
     setActionViewMore((prev) =>
-      prev && prev.sectionName === sectionName && prev.questionIndex === questionIndex
+      prev &&
+      prev.sectionName === sectionName &&
+      prev.questionIndex === questionIndex
         ? null
         : { sectionName, questionIndex }
     );
@@ -1317,69 +1326,86 @@ console.log('added sections',addedSections)
 
   const toggleActionSection = (sectionIndex) => {
     setActionViewMoreSection((prev) =>
-      prev && prev.sectionIndex === sectionIndex
-        ? null
-        : { sectionIndex }
+      prev && prev.sectionIndex === sectionIndex ? null : { sectionIndex }
     );
   };
 
   const [assessmentTitleLimit] = useState(100);
 
   const handleInputChange = (field, value) => {
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      [field]: value
+      [field]: value,
     }));
-    setErrors(prevErrors => ({
+    setErrors((prevErrors) => ({
       ...prevErrors,
-      [field]: ''
+      [field]: "",
     }));
   };
 
-
   //changes made by shashank on [08/01/2025] addedSections onSectionAdded
-  const [sectionName, setSectionName] = useState('');
-  const [popupMessage, setPopupMessage] = useState(null);
-const handleAddSection =(closeAddSectionPopup)=>{
-const validateErrors = {}
-  if (!sectionName.trim()){
-    validateErrors.sectionName =""
-    alert("Please enter section name")
-  }
-  if (addedSections.includes(sectionName)){
-    alert(`section ${sectionName} already exists`)
+  const [sectionName, setSectionName] = useState("");
+  const handleAddSection = (closeAddSectionPopup) => {
+    const validateErrors = {};
+    if (!sectionName.trim()) {
+      validateErrors.sectionName = "";
 
-    return;
-  }
+      setIsAlreadyExistingSection("section name is required*");
+      return;
+    }
+    if (addedSections.map((each) => each.SectionName).includes(sectionName)) {
+      setIsAlreadyExistingSection(`section ${sectionName} already exists`);
 
-            handleSectionAdded({
-              SectionName: sectionName,
-              // Category: category,
-              Position: position,
-              Skills: selectedSkills,
-              Questions: [],
-          })
-  setSectionName("")
-  closeAddSectionPopup()
-  
-}
+      return;
+    }
 
+    handleSectionAdded({
+      SectionName: sectionName,
+      // Category: category,
+      Position: position,
+      Skills: selectedSkills,
+      Questions: [],
+    });
+    setSectionName("");
+    closeAddSectionPopup();
+  };
 
-//changes made by shashank - [08/01/2025]
-const updateQuestionsInAddedSectionFromQuestionBank =(secName,question)=>{
-  console.log('updateQuestionsInAddedSectionFromQuestionBank',sectionName,question)
-  setAddedSections(prev=>
-    prev.map(each=>each.SectionName===secName ? {...each,Questions:[...each.Questions,question]}:each)
-  )
-}
+  //changes made by shashank - [08/01/2025]
+  const updateQuestionsInAddedSectionFromQuestionBank = async(secName, question) => {
+    console.log(
+      "updateQuestionsInAddedSectionFromQuestionBank",
+      sectionName,
+      question
+    );
+    const reqBody ={
+      assessmentId:tabsSubmitStatus.responseId,
+      questionId:question._id,
+      source: question.isCustom? "custom":"system",
+      snapshot:{
+        questionText:question.questionText,
+        options:question.options,
+        correctAnswer:question.correctAnswer,
+        questionType:question.questionType
+      },
+      order:question.questionNo,
+      customizations:"customization"
 
-
+    }
+    const response =  await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
+    
+    setAddedSections((prev) =>
+      prev.map((each) =>
+        each.SectionName === secName
+          ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id}] }
+          : each
+      )
+    );
+  };
 
   return (
     <React.Fragment>
       <div>
         {showMainContent ? (
-
           <div className="bg-white">
             {isLoading && (
               <div className="fixed inset-0 bg-gray-700 bg-opacity-70 flex items-center justify-center z-50">
@@ -1393,74 +1419,92 @@ const updateQuestionsInAddedSectionFromQuestionBank =(secName,question)=>{
                 <div>
                   <div className="flex justify-center gap-3 mt-3">
                     <div
-                      className={`rounded h-2 w-24 border ${activeTab === "Basicdetails" ? "bg-[#F9CB7B]" : "bg-blue-400"
-                        }`}
+                      className={`rounded h-2 w-24 border ${
+                        activeTab === "Basicdetails"
+                          ? "bg-[#F9CB7B]"
+                          : "bg-blue-400"
+                      }`}
                     ></div>
                     <div
-                      className={`rounded h-2 w-24 border ${activeTab === "Details" ? "bg-[#F9CB7B]" : activeTab === "Questions" ? "bg-blue-400" : activeTab === "Candidates" ? "bg-blue-400" : "bg-gray-400"
-                        }`}
-                    ></div>
-                    <div
-                      className={`rounded h-2 w-24 border ${activeTab === "Questions"
-                        ? "bg-[#F9CB7B]"
-                        : activeTab === "Candidates"
+                      className={`rounded h-2 w-24 border ${
+                        activeTab === "Details"
+                          ? "bg-[#F9CB7B]"
+                          : activeTab === "Questions"
+                          ? "bg-blue-400"
+                          : activeTab === "Candidates"
                           ? "bg-blue-400"
                           : "bg-gray-400"
-                        }`}
+                      }`}
                     ></div>
                     <div
-                      className={`rounded h-2 w-24 border ${activeTab === "Candidates" ? "bg-[#F9CB7B]" : "bg-gray-400"
-                        }`}
+                      className={`rounded h-2 w-24 border ${
+                        activeTab === "Questions"
+                          ? "bg-[#F9CB7B]"
+                          : activeTab === "Candidates"
+                          ? "bg-blue-400"
+                          : "bg-gray-400"
+                      }`}
+                    ></div>
+                    <div
+                      className={`rounded h-2 w-24 border ${
+                        activeTab === "Candidates"
+                          ? "bg-[#F9CB7B]"
+                          : "bg-gray-400"
+                      }`}
                     ></div>
                   </div>
                   <div>
                     {/* basic details tab content */}
                     {activeTab === "Basicdetails" && (
-                      <>                      
+                      <>
                         <BasicDetailsTab
-                        assessmentTitleLimit={assessmentTitleLimit} 
-                        formData={formData}
-                        handleInputChange={handleInputChange}
-                        toggleDropdownAssessment={toggleDropdownAssessment}
-                        selectedAssessmentType={selectedAssessmentType}
-                        handleRemoveAssessmentType={handleRemoveAssessmentType}
-                        setFormData={setFormData}
-                        showDropdownAssessment={showDropdownAssessment}
-                        assessmentTypes={assessmentTypes}
-                        handleAssessmentTypeSelect={handleAssessmentTypeSelect}
-                        setShowDropdownAssessment={setShowDropdownAssessment}
-                        handleChange={handleChange}
-                        handleIconClick={handleIconClick}
-                        showMessage={showMessage}
-                        selectedPosition={selectedPosition}
-                        toggleDropdownPosition={toggleDropdownPosition}
-                        showDropdownPosition={showDropdownPosition}
-                        difficultyLevels={difficultyLevels}
-                        handleDifficultySelect={handleDifficultySelect}
-                        selectedDuration={selectedDuration}
-                        toggleDropdownDuration={toggleDropdownDuration}
-                        showDropdownDuration={showDropdownDuration}
-                        durations={durations}
-                        handleDurationSelect={handleDurationSelect}
-                        showUpgradePopup={showUpgradePopup}
-                        closePopup={closePopup}
-                        handleUpgrade={handleUpgrade}
-                        startDate={startDate}
-                        handleDateChange={handleDateChange}
-                        CustomInput={CustomInput}
-                        onClose={onClose}
-                        handleSave={handleSave}
-                        handleSaveAndNext={handleSaveAndNext}
-                        setSelectedAssessmentType={setSelectedAssessmentType}
-                        setSelectedPosition={setSelectedPosition}
-                        positions={positions}
-                        handlePositionSelect={handlePositionSelect}
-                        handleAddNewPositionClick={handleAddNewPositionClick}
-                        selectedDifficulty={selectedDifficulty}
-                        toggleDropdownDifficulty={toggleDropdownDifficulty}
-                        showDropdownDifficulty={showDropdownDifficulty}
-                         errors={errors}
-                         setErrors={setErrors}
+                          assessmentTitleLimit={assessmentTitleLimit}
+                          formData={formData}
+                          handleInputChange={handleInputChange}
+                          toggleDropdownAssessment={toggleDropdownAssessment}
+                          selectedAssessmentType={selectedAssessmentType}
+                          handleRemoveAssessmentType={
+                            handleRemoveAssessmentType
+                          }
+                          setFormData={setFormData}
+                          showDropdownAssessment={showDropdownAssessment}
+                          assessmentTypes={assessmentTypes}
+                          handleAssessmentTypeSelect={
+                            handleAssessmentTypeSelect
+                          }
+                          setShowDropdownAssessment={setShowDropdownAssessment}
+                          handleChange={handleChange}
+                          handleIconClick={handleIconClick}
+                          showMessage={showMessage}
+                          selectedPosition={selectedPosition}
+                          toggleDropdownPosition={toggleDropdownPosition}
+                          showDropdownPosition={showDropdownPosition}
+                          difficultyLevels={difficultyLevels}
+                          handleDifficultySelect={handleDifficultySelect}
+                          selectedDuration={selectedDuration}
+                          toggleDropdownDuration={toggleDropdownDuration}
+                          showDropdownDuration={showDropdownDuration}
+                          durations={durations}
+                          handleDurationSelect={handleDurationSelect}
+                          showUpgradePopup={showUpgradePopup}
+                          closePopup={closePopup}
+                          handleUpgrade={handleUpgrade}
+                          startDate={startDate}
+                          handleDateChange={handleDateChange}
+                          CustomInput={CustomInput}
+                          onClose={onClose}
+                          handleSave={handleSave}
+                          handleSaveAndNext={handleSaveAndNext}
+                          setSelectedAssessmentType={setSelectedAssessmentType}
+                          setSelectedPosition={setSelectedPosition}
+                          positions={positions}
+                          handlePositionSelect={handlePositionSelect}
+                          handleAddNewPositionClick={handleAddNewPositionClick}
+                          selectedDifficulty={selectedDifficulty}
+                          toggleDropdownDifficulty={toggleDropdownDifficulty}
+                          showDropdownDifficulty={showDropdownDifficulty}
+                          errors={errors}
+                          setErrors={setErrors}
                         />
                       </>
                     )}
@@ -1468,67 +1512,73 @@ const updateQuestionsInAddedSectionFromQuestionBank =(secName,question)=>{
                     {/* details tab content */}
                     {activeTab === "Details" && (
                       <>
-                      <AssessmentTestDetailsTab
-                        includePhone={includePhone}
-                        includePosition={includePosition}
-                        selectedPosition={selectedPosition}
-                        instructions={instructions}
-                        isEditing={isEditing}
-                        instructionError={instructionError}
-                        additionalNotes={additionalNotes}
-                        handleCheckboxChange={handleCheckboxChange}
-                        handleInstructionsChange={handleInstructionsChange}
-                        handleAdditionalNotesChange={handleAdditionalNotesChange}
-                        handleBackToBasicDetails={handleBackToBasicDetails}
-                        handleSave={handleSave}
-                        handleSaveAndNext={handleSaveAndNext}
-                        setIsEditing={setIsEditing}
-                      />
+                        <AssessmentTestDetailsTab
+                          includePhone={includePhone}
+                          includePosition={includePosition}
+                          selectedPosition={selectedPosition}
+                          instructions={instructions}
+                          isEditing={isEditing}
+                          instructionError={instructionError}
+                          additionalNotes={additionalNotes}
+                          handleCheckboxChange={handleCheckboxChange}
+                          handleInstructionsChange={handleInstructionsChange}
+                          handleAdditionalNotesChange={
+                            handleAdditionalNotesChange
+                          }
+                          handleBackToBasicDetails={handleBackToBasicDetails}
+                          handleSave={handleSave}
+                          handleSaveAndNext={handleSaveAndNext}
+                          setIsEditing={setIsEditing}
+                        />
                       </>
                     )}
 
                     {/* question tab content */}
                     {activeTab === "Questions" && (
                       <>
-
-                      <AssessmentQuestionsTab
-                      actionViewMore={actionViewMore}
-                      handleEditClick={handleEditClick}
-                      toggleAction={toggleAction}
-                      passScores={passScores}
-                      toggleActionSection={toggleActionSection}
-                      actionViewMoreSection={actionViewMoreSection}
-                      toggleArrow1={toggleArrow1}
-      checkedCount={checkedCount}
-      questionsLimit={questionsLimit}
-      totalScore={totalScore}
-      overallPassScore={overallPassScore}
-      sectionName={sectionName}
-      setSectionName={setSectionName}
-      questionsBySection={questionsBySection}
-      addedSections={addedSections}
-      isAddQuestionModalOpen={isAddQuestionModalOpen}
-      setIsAddQuestionModalOpen={setIsAddQuestionModalOpen}
-      currentSectionName={currentSectionName}
-      selectedAssessmentType={selectedAssessmentType}
-      checkedState={checkedState}
-      toggleStates={toggleStates}
-      toggleSidebarForSection={toggleSidebarForSection}
-      handleAddSection={handleAddSection}
-      handleEditSection={handleEditSection}
-      handleDeleteClick={handleDeleteClick}
-      handleQuestionSelection={handleQuestionSelection}
-      handleQuestionAdded={handleQuestionAdded}
-      handleBackButtonClick={handleBackButtonClick}
-      handleSave={handleSave}
-      handleSaveAndNext={handleSaveAndNext}
-      handleBulkDeleteClick={handleBulkDeleteClick}
-      updateQuestionsInAddedSectionFromQuestionBank={updateQuestionsInAddedSectionFromQuestionBank}
-      getDifficultyColorClass={getDifficultyColorClass}
-      getSelectedQuestionsCount={getSelectedQuestionsCount}
-      matchingSection={matchingSection}
-    />
-
+                        <AssessmentQuestionsTab
+                          isAlreadyExistingSection={isAlreadyExistingSection}
+                          setIsAlreadyExistingSection={
+                            setIsAlreadyExistingSection
+                          }
+                          actionViewMore={actionViewMore}
+                          handleEditClick={handleEditClick}
+                          toggleAction={toggleAction}
+                          passScores={passScores}
+                          toggleActionSection={toggleActionSection}
+                          actionViewMoreSection={actionViewMoreSection}
+                          toggleArrow1={toggleArrow1}
+                          checkedCount={checkedCount}
+                          questionsLimit={questionsLimit}
+                          totalScore={totalScore}
+                          overallPassScore={overallPassScore}
+                          sectionName={sectionName}
+                          setSectionName={setSectionName}
+                          questionsBySection={questionsBySection}
+                          addedSections={addedSections}
+                          isAddQuestionModalOpen={isAddQuestionModalOpen}
+                          setIsAddQuestionModalOpen={setIsAddQuestionModalOpen}
+                          currentSectionName={currentSectionName}
+                          selectedAssessmentType={selectedAssessmentType}
+                          checkedState={checkedState}
+                          toggleStates={toggleStates}
+                          toggleSidebarForSection={toggleSidebarForSection}
+                          handleAddSection={handleAddSection}
+                          handleEditSection={handleEditSection}
+                          handleDeleteClick={handleDeleteClick}
+                          handleQuestionSelection={handleQuestionSelection}
+                          // handleQuestionAdded={handleQuestionAdded}
+                          handleBackButtonClick={handleBackButtonClick}
+                          handleSave={handleSave}
+                          handleSaveAndNext={handleSaveAndNext}
+                          handleBulkDeleteClick={handleBulkDeleteClick}
+                          updateQuestionsInAddedSectionFromQuestionBank={
+                            updateQuestionsInAddedSectionFromQuestionBank
+                          }
+                          getDifficultyColorClass={getDifficultyColorClass}
+                          getSelectedQuestionsCount={getSelectedQuestionsCount}
+                          matchingSection={matchingSection}
+                        />
                       </>
                     )}
 
@@ -1537,12 +1587,20 @@ const updateQuestionsInAddedSectionFromQuestionBank =(secName,question)=>{
                         {/* <Candidate isAssessmentContext={true} onSelectCandidates={handleSelectCandidates} /> */}
                         <div className="customFooter z-50">
                           <div>
-                            <p className="cursor-pointer border border-custom-blue rounded p-2 ml-8 px-4" onClick={handleBackButtonClickCandidate}>Back</p>
+                            <p
+                              className="cursor-pointer border border-custom-blue rounded p-2 ml-8 px-4"
+                              onClick={handleBackButtonClickCandidate}
+                            >
+                              Back
+                            </p>
                           </div>
                           <div className="mr-8">
-                            <button className="cursor-pointer border rounded p-2 mr-3"
+                            <button
+                              className="cursor-pointer border rounded p-2 mr-3"
                               onClick={(e) => handleSave(e, "Questions")}
-                            >skip</button>
+                            >
+                              skip
+                            </button>
 
                             <button
                               type="submit"
@@ -1565,16 +1623,14 @@ const updateQuestionsInAddedSectionFromQuestionBank =(secName,question)=>{
                   </div>
                 </div>
 
-                {
-                  isDeleteConfirmationOpen && (
-                    <ConfirmationPopup
-                      isOpen={isDeleteConfirmationOpen}
-                      title={`Are you sure you want to delete this ${deleteType}?`}
-                      onConfirm={confirmDelete}
-                      onCancel={cancelDelete}
-                    />
-                  )
-                }
+                {isDeleteConfirmationOpen && (
+                  <ConfirmationPopup
+                    isOpen={isDeleteConfirmationOpen}
+                    title={`Are you sure you want to delete this ${deleteType}?`}
+                    onConfirm={confirmDelete}
+                    onCancel={cancelDelete}
+                  />
+                )}
                 {isBulkDeleteConfirmationOpen && (
                   <ConfirmationPopup
                     isOpen={isBulkDeleteConfirmationOpen}
@@ -1584,47 +1640,43 @@ const updateQuestionsInAddedSectionFromQuestionBank =(secName,question)=>{
                   />
                 )}
 
-                {
-                  isEditSectionModalOpen && (
-                    <ConfirmationPopup
-                      isOpen={isEditSectionModalOpen}
-                      title="Edit Section Name"
-                      message={
-                        <input
-                          type="text"
-                          value={editedSectionName}
-                          onChange={(e) => setEditedSectionName(e.target.value)}
-                          className="border p-2 rounded w-full"
-                        />
-                      }
-                      onConfirm={handleSaveSectionName}
-                      onCancel={() => setIsEditSectionModalOpen(false)}
-                    />
-                  )
-                }
+                {isEditSectionModalOpen && (
+                  <ConfirmationPopup
+                    isOpen={isEditSectionModalOpen}
+                    title="Edit Section Name"
+                    message={
+                      <input
+                        type="text"
+                        value={editedSectionName}
+                        onChange={(e) => setEditedSectionName(e.target.value)}
+                        className="border p-2 rounded w-full"
+                      />
+                    }
+                    onConfirm={handleSaveSectionName}
+                    onCancel={() => setIsEditSectionModalOpen(false)}
+                  />
+                )}
 
-                {
-                  isLimitReachedPopupOpen && (
-                    <ConfirmationPopup
-                      isOpen={isLimitReachedPopupOpen}
-                      title="Question limit reached."
-                      message="Please go back to the previous step to increase the number of questions."
-                      singleButton
-                      onSingleButtonClick={closeLimitReachedPopup}
-                    />
-                  )
-                }
+                {isLimitReachedPopupOpen && (
+                  <ConfirmationPopup
+                    isOpen={isLimitReachedPopupOpen}
+                    title="Question limit reached."
+                    message="Please go back to the previous step to increase the number of questions."
+                    singleButton
+                    onSingleButtonClick={closeLimitReachedPopup}
+                  />
+                )}
 
-                {
-                  isSelectCandidatePopupOpen && (
-                    <ConfirmationPopup
-                      isOpen={isSelectCandidatePopupOpen}
-                      title="Please select at least one candidate to share the assessment."
-                      singleButton
-                      onSingleButtonClick={() => setIsSelectCandidatePopupOpen(false)}
-                    />
-                  )
-                }
+                {isSelectCandidatePopupOpen && (
+                  <ConfirmationPopup
+                    isOpen={isSelectCandidatePopupOpen}
+                    title="Please select at least one candidate to share the assessment."
+                    singleButton
+                    onSingleButtonClick={() =>
+                      setIsSelectCandidatePopupOpen(false)
+                    }
+                  />
+                )}
                 {sidebarOpen && (
                   <div className={"fixed inset-0 bg-black bg-opacity-15 z-50"}>
                     <div className="fixed inset-y-0 right-0 z-50 w-1/2 bg-white shadow-lg transition-transform duration-5000 transform">
@@ -1639,28 +1691,28 @@ const updateQuestionsInAddedSectionFromQuestionBank =(secName,question)=>{
                     </div>
                   </div>
                 )}
-                {
-                  isQuestionLimitErrorPopupOpen && (
-                    <ConfirmationPopup
-                      isOpen={isQuestionLimitErrorPopupOpen}
-                      title={`Please add exactly ${questionsLimit} questions.`}
-                      singleButton
-                      onSingleButtonClick={() => setIsQuestionLimitErrorPopupOpen(false)}
-                      singleButtonText="Close"
-                    />
-                  )
-                }
-                {
-                  isSelectCandidatePopupOpen && (
-                    <ConfirmationPopup
-                      isOpen={isSelectCandidatePopupOpen}
-                      title="Please select at least one candidate to share the assessment."
-                      singleButton
-                      onSingleButtonClick={() => setIsSelectCandidatePopupOpen(false)}
-                      singleButtonText="OK"
-                    />
-                  )
-                }
+                {isQuestionLimitErrorPopupOpen && (
+                  <ConfirmationPopup
+                    isOpen={isQuestionLimitErrorPopupOpen}
+                    title={`Please add exactly ${questionsLimit} questions.`}
+                    singleButton
+                    onSingleButtonClick={() =>
+                      setIsQuestionLimitErrorPopupOpen(false)
+                    }
+                    singleButtonText="Close"
+                  />
+                )}
+                {isSelectCandidatePopupOpen && (
+                  <ConfirmationPopup
+                    isOpen={isSelectCandidatePopupOpen}
+                    title="Please select at least one candidate to share the assessment."
+                    singleButton
+                    onSingleButtonClick={() =>
+                      setIsSelectCandidatePopupOpen(false)
+                    }
+                    singleButtonText="OK"
+                  />
+                )}
                 {isEditQuestionModalOpen && (
                   <Editassesmentquestion
                     sectionName={currentSectionName}
@@ -1681,7 +1733,7 @@ const updateQuestionsInAddedSectionFromQuestionBank =(secName,question)=>{
           </>
         )}
       </div>
-    </React.Fragment >
+    </React.Fragment>
   );
 };
 

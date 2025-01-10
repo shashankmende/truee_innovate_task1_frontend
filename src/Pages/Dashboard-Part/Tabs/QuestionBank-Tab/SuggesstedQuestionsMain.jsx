@@ -90,6 +90,7 @@ const SuggestedQuestionsComponent = ({
   const onClickAddButton = async (item, closeScorePopup) => {
     if (section === "assessment") {
       if (questionScore !== "") {
+        
         const updatedItem = { ...item, score: questionScore };
         updateQuestionsInAddedSectionFromQuestionBank(sectionName, updatedItem);
         closeScorePopup();
