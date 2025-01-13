@@ -516,7 +516,7 @@ const Navbar = () => {
                 {assessmentDropdown && (
                   <div className="absolute mt-2 z-10 w-44 rounded-md shadow-lg bg-white ring-1 p-2 ring-black ring-opacity-5 border">
                     <div className="space-y-1">
-                      <NavLink className="block px-4 py-1 hover:bg-gray-200 hover:text-custom-blue rounded-md" onClick={() => { setAssessmentDropdown(false); }} activeclassname="bg-gray-200 text-gray-800" to="/assessment" >
+                      <NavLink className="block px-4 py-1 hover:bg-gray-200 hover:text-custom-blue rounded-md" onClick={() => { setAssessmentDropdown(false); }} active classname="bg-gray-200 text-gray-800" to="/assessment" >
                         Assessments
                       </NavLink>
                       {/* <NavLink className="block px-4 py-1 hover:bg-gray-200 hover:text-custom-blue rounded-md" activeclassname="bg-gray-200 text-gray-800" to={{pathname:"/questionBank",state:{sectionFromQB:"questionBankTab"}}} onClick={() => { setAssessmentDropdown(false); }} >

@@ -1214,22 +1214,22 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
         return eachSection
       })
       // })
-      // const allQuestions = filteredSections.flatMap((section) =>
-      //   section.Questions.map((q) => ({ ...q, SectionName: section.SectionName }))
-      // );
-      // const reorderedQuestions = allQuestions.map((q, index) => ({
-      //   ...q,
-      //   order: index + 1, 
-      // }));
-      // const updatedSections = filteredSections.map(section=>({
-      //   ...section,
-      //   Questions:reorderedQuestions.filter(question=>question.SectionName===section.SectionName)
-      // }))
-      // console.log("reordered questins",reorderedQuestions)
-      // console.log("all questions",allQuestions)
-      // console.log("filtered sections",filteredSections)
-      setAddedSections(filteredSections)
-      // setAddedSections(updatedSections)
+      const allQuestions = filteredSections.flatMap((section) =>
+        section.Questions.map((q) => ({ ...q, SectionName: section.SectionName }))
+      );
+      const reorderedQuestions = allQuestions.map((q, index) => ({
+        ...q,
+        order: index + 1, 
+      }));
+      const updatedSections = filteredSections.map(section=>({
+        ...section,
+        Questions:reorderedQuestions.filter(question=>question.SectionName===section.SectionName)
+      }))
+      console.log("reordered questins",reorderedQuestions)
+      console.log("all questions",allQuestions)
+      console.log("filtered sections",filteredSections)
+      // setAddedSections(filteredSections)
+      setAddedSections(updatedSections)
     }
     
    
