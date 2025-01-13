@@ -90,7 +90,7 @@ const InterviewerSectionComponent = ({closePopup}) => {
         }}
         closeOnDocumentClick={false}
       >  
-        {closeQuestionBank=><div className="fixed left-0 top-0 bottom -0  h-full w-full flex flex-col items-center justify-center">
+        {closeQuestionBank=><div className="fixed  bg-[#80808060] left-0 top-0 bottom -0  h-full w-full flex flex-col items-center justify-center">
 
         <QuestionBank closeQuestionBank={closeQuestionBank} section={"interviewerSection"} />
         </div>}

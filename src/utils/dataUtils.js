@@ -115,9 +115,9 @@ const fetchFilterData = async (endpoint, sharingPermissions) => {
             params: { tenantId: organizationId }
         });
         if (response.data) {
-            // const data = response.data;
+            const data = response.data;
             //Shashank-[10/01/2025]
-            const data = response.data.positions;
+            // const data = response.data.positions;
             console.log("Fetched data from server:", data);
 
             if (organization === 'true') {

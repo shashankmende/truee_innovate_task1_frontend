@@ -11,6 +11,7 @@ import {
 } from "react-icons/md";
 
 const AssessmentQuestionsTab = ({
+  assessmentId,
   checkedCount,
   questionsLimit,
   totalScore,
@@ -154,6 +155,7 @@ const AssessmentQuestionsTab = ({
                       {(closeQuestionBankPopupInAssessment) => (
                         <div className=" fixed  flex justify-center items-center bg-[#80808049]  left-0 top-0 bottom-0 w-full ">
                           <QuestionBank
+                          assessmentId={assessmentId}
                             sectionName={sectionName.SectionName}
                             updateQuestionsInAddedSectionFromQuestionBank={
                               updateQuestionsInAddedSectionFromQuestionBank
@@ -194,12 +196,14 @@ const AssessmentQuestionsTab = ({
                             </p>
                             <p
                               className="hover:bg-gray-200 p-1 rounded pl-3 cursor-pointer"
-                              onClick={() =>
-                                handleDeleteClick("section", {
-                                  index,
-                                  sectionName,
-                                })
-                              }
+                              //shashank - [11/01/2025]
+                              // onClick={() =>
+                              //   handleDeleteClick("section", {
+                              //     index,
+                              //     sectionName,
+                              //   })
+                              // }
+                              onClick={()=>handleDeleteClick("section",sectionName)}
                             >
                               Delete
                             </p>
@@ -276,7 +280,7 @@ const AssessmentQuestionsTab = ({
                                 }
                               />
                               <div className="sm:-mt-[2px]">
-                                {questionIndex + 1}.
+                                {question.order}.
                               </div>
                               <div className="sm:-mt-[2px] sm:w-[40px] sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap">
                                 {question.questionText}
@@ -317,7 +321,7 @@ const AssessmentQuestionsTab = ({
                                     questionIndex && (
                                     <div className="absolute z-10 w-36 rounded-md shadow-lg bg-white ring-1 p-4 ring-black ring-opacity-5 right-0 mt-2">
                                       <div className="space-y-1">
-                                        <p
+                                        {/* <p
                                           className="hover:bg-gray-200 p-1 rounded pl-3 cursor-pointer"
                                           onClick={() =>
                                             handleEditClick(
@@ -328,15 +332,17 @@ const AssessmentQuestionsTab = ({
                                           }
                                         >
                                           Edit
-                                        </p>
+                                        </p> */}
                                         <p
                                           className="hover:bg-gray-200 p-1 rounded pl-3 cursor-pointer"
-                                          onClick={() =>
-                                            handleDeleteClick("question", {
-                                              sectionName,
-                                              questionIndex,
-                                            })
-                                          }
+                                          //shashank-[11/01/2025]
+                                          // onClick={() =>
+                                          //   handleDeleteClick("question", {
+                                          //     sectionName,
+                                          //     questionIndex,
+                                          //   })
+                                          // }
+                                          onClick={()=>handleDeleteClick("question",question,index)}
                                         >
                                           Delete
                                         </p>

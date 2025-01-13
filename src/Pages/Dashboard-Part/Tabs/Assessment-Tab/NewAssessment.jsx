@@ -197,9 +197,10 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
         //   (acc, questions) => acc + questions.length,
         //   0
         // );
-        const totalQuestions = addedSections.map(eachSection=> eachSection.Questions.length)
-
-        if (totalQuestions === questionsLimit) {
+        // const totalQuestions = addedSections.map(eachSection=> eachSection.Questions.length)
+        const totalQuestions = addedSections.reduce((acc,eachSection)=>acc+ eachSection.Questions.length,0)
+        // alert(`${totalQuestions}`)
+        if (totalQuestions !== questionsLimit) {
           newErrors.questions = `Please add exactly ${questionsLimit} questions.`;
           setIsQuestionLimitErrorPopupOpen(true); // Show popup
         } else {
@@ -226,6 +227,8 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     handleSave(event,currentTab)
     setActiveTab(nextTab);
   };
+
+
 
   const gatherDataUpToCurrentTab = (currentTab) => {
     let assessmentData = {};
@@ -278,105 +281,15 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     }
 
     if (currentTab === "Questions" || currentTab === "Candidates") {
+    
       assessmentData = {
         ...assessmentData,
-        // Sections: matchingSection
-        //   .filter((sectionName) => questionsBySection[sectionName]?.length > 0)
-        //   .map((sectionName) => ({
-        //     SectionName: sectionName,
-        //     Questions:
-        //       questionsBySection[sectionName]?.map((question) => {
-        //         const baseQuestion = {
-        //           Question: question.Question,
-        //           QuestionType: question.QuestionType,
-        //           DifficultyLevel: question.DifficultyLevel,
-        //           Score: question.Score,
-        //           Answer: question.Answer,
-        //           Hint: question.Hint || null,
-        //           CharLimits: question.CharLimits,
-        //         };
-
-        //         if (
-        //           question.QuestionType === "MCQ" &&
-        //           question.Options &&
-        //           question.Options.length > 0
-        //         ) {
-        //           baseQuestion.Options = question.Options;
-        //         }
-
-        //         if (
-        //           question.QuestionType === "Programming Questions" &&
-        //           question.ProgrammingDetails &&
-        //           question.ProgrammingDetails.length > 0
-        //         ) {
-        //           baseQuestion.ProgrammingDetails = question.ProgrammingDetails;
-        //         }
-
-        //         if (
-        //           (question.QuestionType === "Short Text(Single line)" ||
-        //             question.QuestionType === "Long Text(Paragraph)") &&
-        //           question.AutoAssessment?.enabled
-        //         ) {
-        //           baseQuestion.AutoAssessment = {
-        //             enabled: question.AutoAssessment.enabled,
-        //             matching: question.AutoAssessment.matching,
-        //           };
-        //         }
-        //         return baseQuestion;
-        //       }) || [],
-        //   })),
-
         Sections: addedSections.filter(eachSection=>eachSection.Questions.length> 0)
         .map((sectionName) => ({
           SectionName: sectionName.SectionName,
           Questions: sectionName.Questions.map(each=>each.qId)
-            // questionsBySection[sectionName]?.map((question) => {
-            // sectionName.Questions.map((question) => {
-            //   const baseQuestion = {
-            //     Question: question.Question,
-            //     QuestionType: question.QuestionType,
-            //     DifficultyLevel: question.DifficultyLevel,
-            //     Score: question.Score,
-            //     Answer: question.Answer,
-            //     Hint: question.Hint || null,
-            //     CharLimits: question.CharLimits,
-            //   };
-
-            //   if (
-            //     question.QuestionType === "MCQ" &&
-            //     question.Options &&
-            //     question.Options.length > 0
-            //   ) {
-            //     baseQuestion.Options = question.Options;
-            //   }
-
-            //   if (
-            //     question.QuestionType === "Programming Questions" &&
-            //     question.ProgrammingDetails &&
-            //     question.ProgrammingDetails.length > 0
-            //   ) {
-            //     baseQuestion.ProgrammingDetails = question.ProgrammingDetails;
-            //   }
-
-            //   if (
-            //     (question.QuestionType === "Short Text(Single line)" ||
-            //       question.QuestionType === "Long Text(Paragraph)") &&
-            //     question.AutoAssessment?.enabled
-            //   ) {
-            //     baseQuestion.AutoAssessment = {
-            //       enabled: question.AutoAssessment.enabled,
-            //       matching: question.AutoAssessment.matching,
-            //     };
-            //   }
-            //   return baseQuestion;
-            // }) || [],
         })),
-        // Section:addedSections.map(eachSection=>{
-        //   return {
-        //     ...eachSection,
-        //     Questions:eachSection.Questions.map(each=>each.qId)
-        //   }
-        // }),
+
         totalScore: totalScore,
         passScore: overallPassScore,
       };
@@ -413,8 +326,11 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
         //   (acc, questions) => acc + questions.length,
         //   0
         // );
-        const totalQuestions = addedSections.map(eachsection=>eachsection.Questions.length)
-        if (totalQuestions === questionsLimit) {
+        // const totalQuestions = addedSections.map(eachsection=>eachsection.Questions.length)
+        const totalQuestions = addedSections.reduce((acc,eachsection)=>acc+eachsection.Questions.length,0)
+        // alert(`${totalQuestions}`)
+        // alert(`${questionsLimit}`)
+        if (totalQuestions !== questionsLimit) {
           newErrors.questions = `Please add exactly ${questionsLimit} questions.`;
           setIsQuestionLimitErrorPopupOpen(true);
         } else {
@@ -446,18 +362,20 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     const currentDateTime = format(new Date(), "dd MMM, yyyy - hh:mm a");
     assessmentData.CreatedBy = `${userName} at ${currentDateTime}`;
     assessmentData.LastModifiedById = userId;
-    assessmentData.OwnerId = userId;
+    // assessmentData.OwnerId = userId;
+    assessmentData.ownerId = userId;
     assessmentData.CreatedDate = new Date();
 
     if (organizationId) {
-      assessmentData.orgId = organizationId;
+      // assessmentData.orgId = organizationId;
+      assessmentData.tenantId = organizationId;
     }
 
     console.log("Assessment Data to be sent:", assessmentData);
 
     try {
       let response;
-    if (!tabsSubmitStatus[currentTab]) {
+    if (!tabsSubmitStatus["Basicdetails"]) {
       response = await axios.post(
         `${process.env.REACT_APP_API_URL}/assessment`,
         assessmentData
@@ -469,14 +387,22 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
          responseId: response.data._id 
       }));
     } else {
-      
+      // alert("update method")
+      console.log("sections data",assessmentData.Sections)
       response = await axios.patch(
         `${process.env.REACT_APP_API_URL}/assessment/${tabsSubmitStatus.responseId}`,
+        // {...assessmentData,Sections:[{SectionName:"abc",Questions:["eijdiejoie",'jijeijeij']}]}
         assessmentData
       );
       // alert(response.data.message)
+      
     }
 
+    setTabsSubmitStatus(prev => ({
+      ...prev,
+      [currentTab]: true,
+      //  responseId: response.data._id 
+    }));
     
       if (currentTab === "Candidates") {
         setIsLoading(true);
@@ -1040,20 +966,20 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   // Function to calculate total score
   const calculateTotalScore = () => {
     let score = 0;
-    matchingSection.forEach((section) => {
-      if (questionsBySection[section]) {
-        questionsBySection[section].forEach((question) => {
-          score += Number(question.Score) || 0; // Ensure score is treated as a number
-        });
-      }
-    });
+
+    addedSections.forEach(eachSection=>{
+      eachSection.Questions.forEach(eachQuestion=>{
+        score += Number(eachQuestion.score)
+      })
+      
+    })
     setTotalScore(score);
   };
 
   // Effect to recalculate total score whenever questions change
   useEffect(() => {
     calculateTotalScore();
-  }, [questionsBySection]);
+  }, [addedSections]);
 
   const [passScores, setPassScores] = useState({});
   const [overallPassScore, setOverallPassScore] = useState(0);
@@ -1108,11 +1034,17 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     return Object.values(questionsBySection).reduce((total, questions) => {
       return total + (questions ? questions.length : 0);
     }, 0);
+    // return addedSections.reduce((acc,section)=>{
+    //   section.Questions.forEach(question=>{
+    //     return acc+question.length
+    //   })
+    // })
   };
 
   useEffect(() => {
     setCheckedCount(calculateCheckedCount());
-  }, [questionsBySection]);
+  // }, [questionsBySection]);
+  }, [addedSections]);
 
   const [isLimitReachedPopupOpen, setIsLimitReachedPopupOpen] = useState(false);
 
@@ -1245,24 +1177,62 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   const [deleteType, setDeleteType] = useState("");
 
   // Function to handle delete button click
-  const handleDeleteClick = (type, item) => {
+  //shashank-[11/01/2025]
+  // const handleDeleteClick = (type, item) => {
+  const handleDeleteClick = (type,item,index) => {
     setDeleteType(type);
-    setItemToDelete(item);
+    setItemToDelete({...item,index});
     setIsDeleteConfirmationOpen(true);
     setActionViewMore(null);
     setActionViewMoreSection(null);
   };
 
   // Function to confirm deletion
-  const confirmDelete = () => {
+  const confirmDelete = async() => {
     if (deleteType === "section") {
-      handleDeleteSectionClick(itemToDelete.index, itemToDelete.sectionName);
+      // handleDeleteSectionClick(itemToDelete.index, itemToDelete.sectionName);
+      setAddedSections(prev=>
+
+        prev.filter(each=>each.SectionName!==itemToDelete.SectionName)
+      )
     } else if (deleteType === "question") {
-      handleDeleteQuestion(
-        itemToDelete.sectionName,
-        itemToDelete.questionIndex
-      );
+      // handleDeleteQuestion(
+      //   itemToDelete.sectionName,
+      //   itemToDelete.questionIndex
+      // );
+      await axios.delete(`${process.env.REACT_APP_API_URL}/assessment-question/${itemToDelete.qId}`)
+      // const filteredSections = addedSections.map((eachSection,index)=>{
+      //   return {
+      //     ...eachSection,
+      //     Questions:eachSection.Questions.filter(question=>question._id!== itemToDelete._id)
+      //   }
+      // })
+      const filteredSections = addedSections.map((eachSection,index)=>{
+        if (index===itemToDelete.index){
+          return {...eachSection,Questions:eachSection.Questions.filter(question=>question._id!==itemToDelete._id)}
+        }
+        return eachSection
+      })
+      // })
+      // const allQuestions = filteredSections.flatMap((section) =>
+      //   section.Questions.map((q) => ({ ...q, SectionName: section.SectionName }))
+      // );
+      // const reorderedQuestions = allQuestions.map((q, index) => ({
+      //   ...q,
+      //   order: index + 1, 
+      // }));
+      // const updatedSections = filteredSections.map(section=>({
+      //   ...section,
+      //   Questions:reorderedQuestions.filter(question=>question.SectionName===section.SectionName)
+      // }))
+      // console.log("reordered questins",reorderedQuestions)
+      // console.log("all questions",allQuestions)
+      // console.log("filtered sections",filteredSections)
+      setAddedSections(filteredSections)
+      // setAddedSections(updatedSections)
     }
+    
+   
     setIsDeleteConfirmationOpen(false);
     setItemToDelete(null);
   };
@@ -1371,12 +1341,30 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   };
 
   //changes made by shashank - [08/01/2025]
-  const updateQuestionsInAddedSectionFromQuestionBank = async(secName, question) => {
-    console.log(
-      "updateQuestionsInAddedSectionFromQuestionBank",
-      sectionName,
-      question
+  const updateQuestionsInAddedSectionFromQuestionBank = async(secName, question,questionFrom) => {
+
+
+   const questionExistResponse = await axios.get(`${process.env.REACT_APP_API_URL}/assessment-question/${tabsSubmitStatus.responseId}`)
+// let response;
+   if (questionFrom==="addquestion"){
+  
+    console.log("addquestionsection",question)
+    const reqBody = {
+      ...question,
+      assessmentId:tabsSubmitStatus.responseId,
+      order:questionExistResponse.data.order,
+      customizations:"customization"
+    }
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
+    setAddedSections((prev) =>
+      prev.map((each) =>
+        each.SectionName === secName
+          ? { ...each, Questions: [...each.Questions, {order:questionExistResponse.data.order,questionText:question.snapshot.questionText,questionType:question.snapshot.questionType,score:question.snapshot.score,qId:response.data.question._id,order:questionExistResponse.data.order}] }
+          : each
+      )
     );
+   }
+   else{
     const reqBody ={
       assessmentId:tabsSubmitStatus.responseId,
       questionId:question._id,
@@ -1385,21 +1373,34 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
         questionText:question.questionText,
         options:question.options,
         correctAnswer:question.correctAnswer,
-        questionType:question.questionType
+        questionType:question.questionType,
+        score:Number(question.score)
       },
-      order:question.questionNo,
+      order:questionExistResponse.data.order,
       customizations:"customization"
 
     }
+    //shashank - [13/01/2025]
+    //before pushing the question to assessement question ,check if it already exists,if exists increment the order number from latest
+    //question, if not found=>start from one and increment in each request further.
     const response =  await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
-    
     setAddedSections((prev) =>
       prev.map((each) =>
         each.SectionName === secName
-          ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id}] }
+          ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id,order:questionExistResponse.data.order}] }
           : each
       )
     );
+  }
+  // response =  await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
+  //   setAddedSections((prev) =>
+  //     prev.map((each) =>
+  //       each.SectionName === secName
+  //         ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id,order:questionExistResponse.data.order}] }
+  //         : each
+  //     )
+  //   );
+    
   };
 
   return (
@@ -1537,6 +1538,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
                     {activeTab === "Questions" && (
                       <>
                         <AssessmentQuestionsTab
+                        assessmentId={tabsSubmitStatus.responseId}
                           isAlreadyExistingSection={isAlreadyExistingSection}
                           setIsAlreadyExistingSection={
                             setIsAlreadyExistingSection

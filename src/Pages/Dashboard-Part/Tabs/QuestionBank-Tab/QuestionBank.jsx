@@ -85,7 +85,7 @@ import { useLocation } from "react-router-dom";
 
 // const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
   //change done by Shashank on -[08/01/2025]
-const QuestionBank = ({ sectionName,updateQuestionsInAddedSectionFromQuestionBank,section:sectionProp,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
+const QuestionBank = ({ assessmentId, sectionName,updateQuestionsInAddedSectionFromQuestionBank,section:sectionProp,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
   const [activeTab, setActiveTab] = useState("SuggesstedQuestions");
   const [interviewQuestionsList,setInterviewQuestionsList]=useState([])
 
@@ -196,7 +196,7 @@ const QuestionBank = ({ sectionName,updateQuestionsInAddedSectionFromQuestionBan
         {activeTab === "MyQuestionsList" && (
           <div>
             {/* <MyQuestionListMain  interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList} questionBankPopupVisibility={questionBankPopupVisibility} section={section}/> */}
-            <MyQuestionListMain   sectionName={sectionName} updateQuestionsInAddedSectionFromQuestionBank={updateQuestionsInAddedSectionFromQuestionBank}  interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList} questionBankPopupVisibility={questionBankPopupVisibility} section={section}/>
+            <MyQuestionListMain  assessmentId={assessmentId}  sectionName={sectionName} updateQuestionsInAddedSectionFromQuestionBank={updateQuestionsInAddedSectionFromQuestionBank}  interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList} questionBankPopupVisibility={questionBankPopupVisibility} section={section}/>
           </div>
         )}
       </div>

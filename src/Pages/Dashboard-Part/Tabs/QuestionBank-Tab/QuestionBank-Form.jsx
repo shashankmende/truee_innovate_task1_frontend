@@ -27,12 +27,15 @@ const optionLabels = Array.from({ length: 26 }, (_, i) =>
 );
 
 const Interviewcq = ({
+  sectionName,
+  assessmentId,
   onClose,
   questionBankPopupVisibility,
   section,
   onOutsideClick,
   onDataAdded,
   isEdit = false,
+  updateQuestionsInAddedSectionFromQuestionBank,
   question = {},
 }) => {
 
@@ -44,6 +47,8 @@ const Interviewcq = ({
     "Short Text(Single line)",
     "Long Text(Paragraph)",
     "Programming",
+    "Number",
+    "Boolean"
   ];
 
   const [questionNumber, setQuestionNumber] = useState(1);
@@ -212,6 +217,33 @@ const Interviewcq = ({
           `${process.env.REACT_APP_API_URL}/newquestion`,
           questionData
         );
+        console.log("tenant queston response",questionResponse)
+        //shashank-[13/01/2025]
+        //saving the question to the assessment child (questions) schema when added from assessement
+
+        if (section==="assessment"){
+          // const questionExistResponse = await axios.get(`${process.env.REACT_APP_API_URL}/assessment-question/${assessmentId}`)
+          const reqBody ={
+            // assessmentId:assessmentId,
+            questionId:questionResponse.data._id,
+            source:"custom",
+            snapshot:{
+              questionText:formData.questionText,
+              options:formData.options,
+              correctAnswer:formData.correctAnswer,
+              questionType:formData.questionType,
+              score:Number(formData.score),
+            },
+            // order:questionExistResponse.data.order
+
+          }
+          updateQuestionsInAddedSectionFromQuestionBank(sectionName,reqBody,"addquestion")
+        }
+
+
+
+
+
       console.log(isEdit ? "Question updated:" : "Question created:", questionResponse.data);
       if (questionResponse.data) {
         onDataAdded(questionResponse.data);
@@ -862,7 +894,8 @@ const Interviewcq = ({
                 </div>
 
                 {/* Score */}
-                <div className="flex gap-5 mb-4">
+                {/* //shashank - [13/01/2025] */}
+                { section==='assessment' && <div className="flex gap-5 mb-4">
                   <div>
                     <label
                       htmlFor="Score"
@@ -892,7 +925,7 @@ const Interviewcq = ({
                       </p>
                     )}
                   </div>
-                </div>
+                </div>}
                 {/* Automation Options */}
                 {(selectedQuestionType === 'Short Text(Single line)' || selectedQuestionType === 'Long Text(Paragraph)') && (
                   <div>

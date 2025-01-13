@@ -317,9 +317,9 @@ const Assessment = () => {
   }, [sidebarOpen, handleOutsideClick]);
 
   const handleAssessmentClick = (assessment) => {
-    if (objectPermissions.View) {
+    // if (objectPermissions.View) {
       setShowAssessmentDetails(assessment);
-    }
+    // }
     setActionViewMore(false);
   };
 
