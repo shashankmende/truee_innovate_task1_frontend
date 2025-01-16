@@ -3,8 +3,14 @@ import { ReactComponent as MdArrowDropDown } from "../../../../icons/MdArrowDrop
 import { ReactComponent as CgInfo } from "../../../../icons/CgInfo.svg";
 import { ReactComponent as MdOutlineCancel } from "../../../../icons/MdOutlineCancel.svg";
 import { ReactComponent as IoIosAddCircle } from "../../../../icons/IoIosAddCircle.svg";
+import Switch from "react-switch";
 import DatePicker from "react-datepicker";
 const BasicDetailsTab = ({
+  linkExpiryDays,
+  toggleLinkExpiryDropdown,
+  setLinkExpiryDays,
+  showLinkExpiryDay,
+  setShowLinkExpiryDays,
   assessmentTitleLimit,
   formData,
   handleInputChange,
@@ -50,8 +56,6 @@ const BasicDetailsTab = ({
   errors,
   setError,
 }) => {
-  // const [errors, setErrors] = useState("");
-
   return (
     <div>
       <form className="group mx-10">
@@ -465,10 +469,90 @@ const BasicDetailsTab = ({
                 </div>
               </div>
               {errors.ExpiryDate && (
-          <p className="text-red-500 text-sm -mt-4">
-            {errors.ExpiryDate}
-          </p>
-        )}
+                <p className="text-red-500 text-sm -mt-4">
+                  {errors.ExpiryDate}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/*assessment  && link expiry section*/}
+        <div className="grid grid-cols-2 gap-4 items-start">
+          {/* Link Expiry Days */}
+          <div>
+            <div className="flex items-center">
+              <label className="block text-sm font-medium leading-6 text-gray-800 w-[22%] -mt-5">
+                Link Expiry(Days):<span className="text-red-500">*</span>
+              </label>
+              <div className="relative flex-grow">
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="duration"
+                    className={`border-b focus:outline-none mb-5 w-full ${
+                      errors.Duration
+                        ? "border-red-500"
+                        : "border-gray-300 focus:border-black"
+                    }`}
+                    value={linkExpiryDays}
+                    onClick={toggleLinkExpiryDropdown}
+                    readOnly
+                  />
+                  <MdArrowDropDown
+                    className="absolute top-0 text-gray-500 text-lg mt-1 cursor-pointer right-0"
+                    onClick={toggleLinkExpiryDropdown}
+                  />
+                </div>
+                {showLinkExpiryDay && (
+                  <div className="absolute z-50 -mt-3 mb-5 w-full rounded-md bg-white shadow-lg h-36 overflow-y-auto">
+                    {Array.from({ length: 15 }, (_, index) => index + 1).map(
+                      (days) => (
+                        <div
+                          key={days}
+                          className="py-2 px-2 cursor-pointer hover:bg-gray-100 text-sm"
+                          onClick={() => {
+                            setLinkExpiryDays(days);
+                            toggleLinkExpiryDropdown();
+                          }}
+                        >
+                          {days}
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Assessment Status */}
+          <div>
+            <div className="flex items-center gap-3">
+              <label className="block text-sm font-medium leading-6 text-gray-800 w-[22%] -mt-5">
+                Assessment Status
+              </label>
+              
+              <Switch
+                checked={formData.status}
+                onChange={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: !prev.status,
+                  }));
+                }}
+                // onColor="#c2f0f0"
+                onColor="#98e6e6"
+                offColor="#ccc"
+                boxShadow="0px 0px 5px rgba(0, 0, 0, 0.2)"
+                height={20}
+                width={45}
+                onHandleColor="#227a8a"
+                offHandleColor="#9CA3AF"
+                handleDiameter={20}
+                checkedIcon={false}
+                uncheckedIcon={false}
+              />
             </div>
           </div>
         </div>

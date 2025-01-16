@@ -159,6 +159,24 @@ const Interviewcq = ({
     setShowMcqFields(false);
   };
   const listRef = useRef();
+
+
+
+const removeUnwantedFields =(obj)=>{
+  const data = {}
+  for (let key in obj){
+    if (obj[key]){
+      alert(`${key}`)
+      data[key]=obj[key]
+    }
+  }
+  return data
+}
+
+
+
+
+
   const handleSubmit = async (e, isSaveAndNext) => {
     e.preventDefault();
     const updatedFormData = { ...formData, tenentListId: selectedListId };
@@ -183,24 +201,51 @@ const Interviewcq = ({
     };
 
     // Add conditional data based on question type
+    // if (['Short Text(Single line)', 'Long Text(Paragraph)'].includes(selectedQuestionType)) {
+    //   questionData.charLimits = charLimits;
+    //   if (autoAssessment) {
+    //     questionData.isAutoAssessment = autoAssessment;
+    //     questionData.autoAssessment = {
+    //       criteria: answerMatching,
+    //       expectedAnswer: answerMatching,
+    //       testCases: [],
+    //     };
+    //   }
+    // }
+    // if (selectedQuestionType === 'MCQ' && mcqOptions.some(option => option.option)) {
+    //   questionData.options = mcqOptions.map(option => option.option);
+    // }
+    // if (selectedQuestionType === 'Programming Questions' && entries.length > 0) {
+    //   questionData.programmingDetails = entries;
+    // }
     if (['Short Text(Single line)', 'Long Text(Paragraph)'].includes(selectedQuestionType)) {
+      // Adding character limits for text-based question types
       questionData.charLimits = charLimits;
+      
       if (autoAssessment) {
-        questionData.isAutoAssessment = autoAssessment;
+        // Adding autoAssessment only if the flag is true
+        questionData.isAutoAssessment = true;
         questionData.autoAssessment = {
-          criteria: answerMatching,
-          expectedAnswer: answerMatching,
-          testCases: [],
+          criteria: answerMatching,  // Define the criteria for auto-assessment
+          expectedAnswer: answerMatching,  // Define the expected answer
+          testCases: []  // Empty test cases initially
         };
       }
     }
+    
     if (selectedQuestionType === 'MCQ' && mcqOptions.some(option => option.option)) {
+      // For MCQs, add options if valid options are provided
       questionData.options = mcqOptions.map(option => option.option);
     }
+    
     if (selectedQuestionType === 'Programming Questions' && entries.length > 0) {
+      // Add programming details only if entries exist
       questionData.programmingDetails = entries;
     }
 
+    const reqBody  = removeUnwantedFields(questionData)
+    
+    console.log("request body",reqBody)
     if (orgId) {
       questionData.tenentId = orgId;
     }
@@ -211,7 +256,8 @@ const Interviewcq = ({
       const questionResponse = isEdit
         ? await axios.put(
           `${process.env.REACT_APP_API_URL}/newquestion/${question._id}`,
-          questionData
+          // questionData
+          reqBody
         )
         : await axios.post(
           `${process.env.REACT_APP_API_URL}/newquestion`,
@@ -266,6 +312,7 @@ const Interviewcq = ({
     }
   };
 
+  console.log("Log section : ",section)
   const [showSkillsPopup, setShowSkillsPopup] = useState(false);
   const [searchTermSkills, setSearchTermSkills] = useState("");
   const skillsPopupRef = useRef(null);
@@ -441,17 +488,13 @@ const Interviewcq = ({
 
   return (
     <>
-      <div className={" fixed inset-0 bg-black bg-opacity-15 z-50  h-full flex flex-col justify-center "}>
-        {/* <div className="fixed inset-y-0 right-0 z-50 sm:w-full md:w-3/4 lg:w-1/2 xl:w-1/2 2xl:w-1/2 bg-white shadow-lg transition-transform duration-5000 transform"> */}
-        {/* <div className="border-2 border-[red] flex flex-col justify-center items-center fixed  h-[95%] right-10 z-50 sm:w-full md:w-3/4 lg:w-1/2 xl:w-1/2 2xl:w-1/2 bg-white shadow-lg transition-transform duration-5000 transform"> */}
-        {/* <div className={`  ${(section==="Popup") && "right-0  h-full top-0 "} ${ (section==="Popup" && questionBankPopupVisibility) ? "w-1/2 right-0 fixed":"w-full"}  ${section==="interviewerSection"&& "w-1/2  border-2 border-[red] fixed h-[95%] right-10"} flex flex-col justify-center items-center  bg-white shadow-lg transition-transform duration-5000 transform`}> */}
-        {/* <div className={`  ${(section==="Popup") && "right-0  h-full top-0 "} ${ (section==="Popup") && (questionBankPopupVisibility?  "w-1/2 right-0 fixed":"w-full")}  ${section==="interviewerSection"&& "w-1/2  border-2 border-[red] fixed h-[95%] right-10"} flex flex-col justify-center items-center  bg-white shadow-lg transition-transform duration-5000 transform`}> */}
+      <div className={" fixed inset-0 bg-black bg-opacity-15 z-50  h-full flex flex-col justify-center"}>
         <div className={`flex flex-col justify-center items-center bg-white shadow-lg transition-transform duration-5000 transform 
   ${section === "Popup" ? 
     `right-0 h-full top-0
     ${questionBankPopupVisibility ? "w-1/2 right-0 fixed" : "w-full"}` : 
     ""}
-  ${section === "interviewerSection" || section==="assessment" ? "w-1/2  fixed h-[95%] flex flex-col justify-between right-9 " : ""}
+  ${section === "interviewerSection" || section==="assessment" ? "w-1/2  fixed h-[95%] flex flex-col justify-between right-9 " : section==='questionBank' && 'fixed right-0 top-0 bottom-0 w-1/2'}
 `}
 >
           {/* Header */}

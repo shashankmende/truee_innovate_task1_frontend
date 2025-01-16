@@ -446,7 +446,7 @@ import toast from "react-hot-toast";
 import Popup from "reactjs-popup";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
-import { usePermissions } from "../../../../PermissionsContext";
+import { usePermissions } from "../../../../Context/PermissionsContext.js";
 // const MyQuestionsList = ({ interviewQuestionsList, setInterviewQuestionsList, section, questionBankPopupVisibility }) => {
 // changes made by shashank
 

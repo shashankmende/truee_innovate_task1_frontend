@@ -10,7 +10,7 @@ import Editassesmentquestion from "./EditAssessmentquestion.jsx";
 // import { useLocation } from "react-router-dom";
 import AddQuestion1 from './AddQuestion1.jsx';
 import { fetchFilterData } from "../../../../utils/dataUtils.js";
-import { usePermissions } from '../../../../PermissionsContext';
+import { usePermissions } from '../../../../Context/PermissionsContext.js';
 import { useMemo } from 'react';
 
 // import Cookies from 'js-cookie';

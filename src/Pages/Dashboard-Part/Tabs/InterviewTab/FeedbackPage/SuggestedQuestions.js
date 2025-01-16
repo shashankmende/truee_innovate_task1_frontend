@@ -140,7 +140,7 @@ const SuggestedQuestions = ({ close, closePlusPopup }) => {
                     checked={question.mandatory}
                     onChange={() => onChangeQuestionStatus(question.id)}
                     //   onColor="#4CAF50"
-                    //   offColor="#ccc"
+                      // offColor="#ccc"
                     // onColor='#4DA1A9'
                     onColor='#227a8a'
                     handleDiameter={20}

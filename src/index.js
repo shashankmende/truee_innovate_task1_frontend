@@ -1,5 +1,5 @@
 import React from 'react';
-import { PermissionsProvider } from './PermissionsContext';
+import { PermissionsProvider, } from './Context/PermissionsContext.js';
 import ReactDOM from 'react-dom/client';
 import App from './App.js';
 import './index.css';

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { fetchFilterData } from "../utils/dataUtils";
-import { usePermissions } from '../PermissionsContext';
+import { usePermissions } from './PermissionsContext';
 import { useMemo } from 'react';
 const CustomContext = createContext();
 

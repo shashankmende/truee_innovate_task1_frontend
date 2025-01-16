@@ -1,16 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 // import AddCandidateForm from "../Candidate-Tab/CreateCandidate";
+import { addDays, startOfDay } from "date-fns";
+
 import "react-datepicker/dist/react-datepicker.css";
 import "react-phone-input-2/lib/style.css";
 import { fetchFilterData } from '../../../../utils/dataUtils.js';
-import { usePermissions } from '../../../../PermissionsContext';
+import { usePermissions } from '../../../../Context/PermissionsContext.js';
 import { useMemo } from 'react';
 
 import { ReactComponent as MdArrowDropDown } from '../../../../icons/MdArrowDropDown.svg';
 import { ReactComponent as IoIosAddCircle } from '../../../../icons/IoIosAddCircle.svg';
 import { ReactComponent as MdOutlineCancel } from '../../../../icons/MdOutlineCancel.svg';
 import { ReactComponent as IoIosCopy } from '../../../../icons/IoIosCopy.svg';
+import Cookies from 'js-cookie'
+import toast from "react-hot-toast";
 
 const ShareAssessment = ({
   isOpen,
@@ -200,7 +204,46 @@ const ShareAssessment = ({
   // const shareLink = `http://localhost:3000/assessmenttest?assessmentId=${assessmentId}`;
 
 
-  const handleShareClick = async () => {
+  // const handleShareClick = async () => {
+    // if (selectedCandidates.length === 0) {
+    //   setErrors({ ...errors, Candidate: "Please select at least one candidate." });
+    //   return;
+    // }
+    // setIsLoading(true);
+  //   try {
+      // const selectedCandidateIds = selectedCandidates.map(candidate => candidate._id);
+  //     await axios.post(`${process.env.REACT_APP_API_URL}/update-candidates`, {
+  //       candidateIds: selectedCandidateIds,
+  //       assessmentId
+  //     });
+  //     const response = await axios.post(`${process.env.REACT_APP_API_URL}/send-assessment-link`, {
+  //       candidateEmails: selectedCandidateIds.map(id => {
+  //         const candidate = candidateData.find(c => c._id === id);
+  //         return candidate ? candidate.Email : null;
+  //       }).filter(email => email !== null),
+  //       assessmentId,
+  //       // notes: formData.notes,
+  //       // sections: selectedIcons2,
+  //       // questions: InterviewQuestion
+  //     });
+
+  //     if (response.status === 200) {
+  //       setIsSuccess(true);
+  //       setTimeout(() => {
+  //         setIsSuccess(false);
+  //         onCloseshare();
+  //       }, 2000);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error updating candidate IDs or sending emails:', error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+
+  //shashank-[10/01/2025]
+  const handleShareClick = async()=>{
     if (selectedCandidates.length === 0) {
       setErrors({ ...errors, Candidate: "Please select at least one candidate." });
       return;
@@ -208,34 +251,35 @@ const ShareAssessment = ({
     setIsLoading(true);
     try {
       const selectedCandidateIds = selectedCandidates.map(candidate => candidate._id);
-      await axios.post(`${process.env.REACT_APP_API_URL}/update-candidates`, {
-        candidateIds: selectedCandidateIds,
-        assessmentId
-      });
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/send-assessment-link`, {
-        candidateEmails: selectedCandidateIds.map(id => {
-          const candidate = candidateData.find(c => c._id === id);
-          return candidate ? candidate.Email : null;
-        }).filter(email => email !== null),
-        assessmentId,
-        // notes: formData.notes,
-        // sections: selectedIcons2,
-        // questions: InterviewQuestion
-      });
+      selectedCandidateIds.forEach(async candidateId=>{
+        const reqBody = {
+          assessmentId,
+          tenantId:Cookies.get("organizationId"),
+          interviewId:"interviewId",
+          candidateId,
+          startDateTime:new Date(),
+          endDateTime:new Date(new Date().setDate(new Date().getDate()+3)),
+          isActive:true,
+          assessmentLink:"http://truleeinnovativw/assesmment:233ijri3/candidateid:jijefjf/test"
+        }
+        console.log("req body",reqBody)
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
+        if (response.data.success){
+          setIsLoading(false)
 
-      if (response.status === 200) {
-        setIsSuccess(true);
-        setTimeout(() => {
-          setIsSuccess(false);
           onCloseshare();
-        }, 2000);
-      }
+
+        }
+        // alert(`${response.data.message}`)
+      })
+      toast.success(`Assessment Scheduled`)
     } catch (error) {
-      console.error('Error updating candidate IDs or sending emails:', error);
-    } finally {
-      setIsLoading(false);
+      console.error("error in sharing assessment from frontend in Share Assessment page",error)
     }
-  };
+    finally{
+      setIsLoading(false)
+    }
+  }
 
 
   return (

@@ -4,7 +4,7 @@ import EditAssesmentForm from "./EditAssessment";
 import axios from "axios";
 import React from "react";
 import { fetchFilterData } from "../../../../utils/dataUtils.js";
-import { usePermissions } from "../../../../PermissionsContext";
+import { usePermissions } from "../../../../Context/PermissionsContext.js";
 import { useMemo } from "react";
 import Editassesmentquestion from "./EditAssessmentquestion.jsx";
 import AddSection1 from "./AddSection1.jsx";

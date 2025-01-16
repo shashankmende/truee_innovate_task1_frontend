@@ -173,7 +173,7 @@ const fetchFilterData = async (endpoint, sharingPermissions) => {
 
         return filteredData;
     } catch (error) {
-        console.error(`Error fetching data from ${endpoint}:`, error);
+        console.error(`Error ca data from ${endpoint}:`, error);
         return [];
     }
 };

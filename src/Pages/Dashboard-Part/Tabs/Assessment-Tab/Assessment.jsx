@@ -11,7 +11,7 @@ import {
 import ShareAssessment from "./ShareAssessment.jsx";
 import AssessmentProfileDetails from "./Assessmentprofiledetails.jsx";
 import { fetchMasterData } from '../../../../utils/fetchMasterData.js';
-import { usePermissions } from '../../../../PermissionsContext';
+import { usePermissions } from '../../../../Context/PermissionsContext.js';
 import { useMemo } from 'react';
 
 import { ReactComponent as IoIosArrowBack } from '../../../../icons/IoIosArrowBack.svg';

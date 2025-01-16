@@ -1,3 +1,6 @@
+
+
+
 import React, {
   useState,
   useRef,
@@ -17,11 +20,12 @@ import { fetchFilterData } from "../../../../utils/dataUtils.js";
 import { validateAssessmentData } from "../../../../utils/assessmentValidation.js";
 import Cookies from "js-cookie";
 import Sidebar from "../Assessment-Tab/PassScore.jsx";
-import { usePermissions } from "../../../../PermissionsContext";
+import { usePermissions } from "../../../../Context/PermissionsContext.js";
 import { useMemo } from "react";
 import { format } from "date-fns";
 import ConfirmationPopup from "./ConfirmationPopup.jsx";
 // import { handleShareClick as shareAssessment } from '../../../../utils/EmailShare';
+
 
 import { ReactComponent as MdArrowDropDown } from "../../../../icons/MdArrowDropDown.svg";
 import { ReactComponent as IoIosArrowUp } from "../../../../icons/IoIosArrowUp.svg";
@@ -39,6 +43,8 @@ import QuestionBank from "../QuestionBank-Tab/QuestionBank.jsx";
 import BasicDetailsTab from "./BasicDetailsTab.jsx";
 import AssessmentTestDetailsTab from "./AssessmentTestDetailsTab.jsx";
 import AssessmentQuestionsTab from "./AssessmentQuestionsTab.jsx";
+import Candidate from '../Candidate-Tab/Candidate.jsx'
+import toast from "react-hot-toast";
 
 const NewAssessment = ({ onClose, onDataAdded }) => {
   const { sharingPermissionscontext } = usePermissions();
@@ -49,7 +55,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
 
   const organizationId = Cookies.get("organizationId");
   const [activeTab, setActiveTab] = useState("Basicdetails");
-  // const [activeTab, setActiveTab] = useState("Questions");
+  // const [activeTab, setActiveTab] = useState("Candidates");
   const [position, setPosition] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [showMessage, setShowMessage] = useState(false);
@@ -62,6 +68,10 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   const [showUpgradePopup, setShowUpgradePopup] = useState(false);
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
   const [showDropdownDifficulty, setShowDropdownDifficulty] = useState(false);
+  //shashank-[16/01/2025]
+  const [showLinkExpiryDay,setShowLinkExpiryDays]=useState(false)
+  const [linkExpiryDays,setLinkExpiryDays]=useState(3)
+  //
   const [sidebarOpenForSection, setSidebarOpenForSection] = useState(false);
   const [sidebarOpenAddQuestion, setSidebarOpenAddQuestion] = useState(false);
   const sidebarRefAddQuestion = useRef(null);
@@ -105,6 +115,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     DifficultyLevel: "",
     NumberOfQuestions: "",
     ExpiryDate: new Date(),
+    status:true,
   });
 
   //shashank - [10/01/2025]
@@ -417,17 +428,67 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     }
   };
 
-  const handleShareClick = async (assessmentId) => {
-    try {
-      setIsLoading(true);
-      console.log(selectedCandidates);
-      console.log(assessmentId);
 
+  // const handleShareClick = async (assessmentId) => {
+  //   try {
+  //     setIsLoading(true);
+  //     console.log(selectedCandidates);
+  //     console.log(assessmentId);
+
+      // if (!assessmentId) {
+      //   console.error("Failed to save assessment or retrieve assessmentId");
+      //   return;
+      // }
+
+      // if (selectedCandidates.length === 0) {
+      //   setErrors({
+      //     ...errors,
+      //     Candidate: "Please select at least one candidate.",
+      //   });
+      //   return;
+      // }
+
+  //     // Update candidates with the new assessmentId
+  //     await axios.post(`${process.env.REACT_APP_API_URL}/update-candidates`, {
+  //       candidateIds: selectedCandidates,
+  //       assessmentId: assessmentId,
+  //     });
+
+  //     // Send emails to the selected candidates
+  //     const candidateEmails = selectedCandidates
+  //       .map((id) => {
+  //         const candidate = candidateData.find((c) => c._id === id);
+  //         return candidate ? candidate.Email : null;
+  //       })
+  //       .filter((email) => email !== null);
+
+  //     if (candidateEmails.length > 0) {
+  //       await axios.post(
+  //         `${process.env.REACT_APP_API_URL}/send-assessment-link`,
+  //         {
+  //           candidateEmails,
+  //           assessmentId: assessmentId,
+  //         }
+  //       );
+  //       console.log("Emails sent successfully");
+  //     } else {
+  //       console.error("No valid candidate emails found");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during share process:", error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+
+  const handleShareClick = async(assessmentId)=>{
+    try {
+      setIsLoading(true)
       if (!assessmentId) {
         console.error("Failed to save assessment or retrieve assessmentId");
         return;
       }
-
       if (selectedCandidates.length === 0) {
         setErrors({
           ...errors,
@@ -435,40 +496,33 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
         });
         return;
       }
+      selectedCandidates.forEach(async candidateId=>{
+        const reqBody = {
+          assessmentId,
+                    tenantId:Cookies.get("organizationId"),
+                    interviewId:"interviewId",
+                    candidateId,
+                    startDateTime:new Date(),
+                    endDateTime:new Date(new Date().setDate(new Date().getDate()+3)),
+                    isActive:true,
+                    assessmentLink:"http://truleeinnovativw/assesmment:233ijri3/candidateid:jijefjf/test"
+        }
+        
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
+        if (response.data.success){
+          setIsLoading(false)
+          setSelectedCandidates([])
+          onClose()
+        }
+      })
+      toast.success(`Assessment Scheduled`)
 
-      // Update candidates with the new assessmentId
-      await axios.post(`${process.env.REACT_APP_API_URL}/update-candidates`, {
-        candidateIds: selectedCandidates,
-        assessmentId: assessmentId,
-      });
 
-      // Send emails to the selected candidates
-      const candidateEmails = selectedCandidates
-        .map((id) => {
-          const candidate = candidateData.find((c) => c._id === id);
-          return candidate ? candidate.Email : null;
-        })
-        .filter((email) => email !== null);
-
-      if (candidateEmails.length > 0) {
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/send-assessment-link`,
-          {
-            candidateEmails,
-            assessmentId: assessmentId,
-          }
-        );
-        console.log("Emails sent successfully");
-      } else {
-        console.error("No valid candidate emails found");
-      }
     } catch (error) {
-      console.error("Error during share process:", error);
-    } finally {
-      setIsLoading(false);
+      
     }
-  };
-
+  }
+  
   const assessmentTypes = [
     "MCQ",
     "Programming Questions",
@@ -476,6 +530,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     "Long Text(Paragraph)",
     "Number",
     "Boolean",
+    "Mixed"
   ];
 
   const toggleDropdownAssessment = () => {
@@ -522,6 +577,10 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     setShowDropdownDuration(!showDropdownDuration);
   };
 
+  const toggleLinkExpiryDropdown =()=>{
+    setShowLinkExpiryDays(!showLinkExpiryDay)
+  }
+
   const handleDurationSelect = (duration) => {
     if (duration === "60 minutes" || duration === "90 minutes") {
       setShowUpgradePopup(true);
@@ -539,6 +598,10 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
       }));
     }
   };
+
+  const handleLinkExpiryChange =(date)=>{
+    setLinkExpiryDays(date)
+  }
 
   const handleDateChange = (date) => {
     setStartDate(date);
@@ -1179,63 +1242,93 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   // Function to handle delete button click
   //shashank-[11/01/2025]
   // const handleDeleteClick = (type, item) => {
-  const handleDeleteClick = (type,item,index) => {
+  const handleDeleteClick = (type,item,secName) => {
+    console.log("item to delete",{...item,secName})
     setDeleteType(type);
-    setItemToDelete({...item,index});
+    setItemToDelete({...item,secName});
     setIsDeleteConfirmationOpen(true);
     setActionViewMore(null);
     setActionViewMoreSection(null);
   };
 
-  // Function to confirm deletion
-  const confirmDelete = async() => {
-    if (deleteType === "section") {
-      // handleDeleteSectionClick(itemToDelete.index, itemToDelete.sectionName);
-      setAddedSections(prev=>
 
-        prev.filter(each=>each.SectionName!==itemToDelete.SectionName)
-      )
-    } else if (deleteType === "question") {
-      // handleDeleteQuestion(
-      //   itemToDelete.sectionName,
-      //   itemToDelete.questionIndex
-      // );
-      await axios.delete(`${process.env.REACT_APP_API_URL}/assessment-question/${itemToDelete.qId}`)
-      // const filteredSections = addedSections.map((eachSection,index)=>{
-      //   return {
-      //     ...eachSection,
-      //     Questions:eachSection.Questions.filter(question=>question._id!== itemToDelete._id)
-      //   }
-      // })
-      const filteredSections = addedSections.map((eachSection,index)=>{
-        if (index===itemToDelete.index){
-          return {...eachSection,Questions:eachSection.Questions.filter(question=>question._id!==itemToDelete._id)}
-        }
-        return eachSection
-      })
-      // })
-      const allQuestions = filteredSections.flatMap((section) =>
-        section.Questions.map((q) => ({ ...q, SectionName: section.SectionName }))
-      );
-      const reorderedQuestions = allQuestions.map((q, index) => ({
-        ...q,
-        order: index + 1, 
+  const updateQuestionOrdersInBackend = async (questions) => {
+    try {
+      const payload = questions.map((q) => ({
+        questionId: q._id,
+        order: q.order,
       }));
-      const updatedSections = filteredSections.map(section=>({
-        ...section,
-        Questions:reorderedQuestions.filter(question=>question.SectionName===section.SectionName)
-      }))
-      console.log("reordered questins",reorderedQuestions)
-      console.log("all questions",allQuestions)
-      console.log("filtered sections",filteredSections)
-      // setAddedSections(filteredSections)
-      setAddedSections(updatedSections)
+  
+      await axios.patch(
+        `${process.env.REACT_APP_API_URL}/assessment-questions`,
+        payload
+      );
+  
+      console.log("Orders updated successfully for questions:", payload);
+    } catch (error) {
+      console.error("Error updating question orders:", error);
+      alert("Failed to update question orders in the backend. Please try again.");
     }
-    
-   
-    setIsDeleteConfirmationOpen(false);
-    setItemToDelete(null);
   };
+  
+
+  // Function to confirm deletion
+  const confirmDelete = async () => {
+    try {
+      if (deleteType === "section") {
+        // Handle section deletion
+        setAddedSections((prev) =>
+          prev.filter((each) =>
+            each.Questions.every((q) => q.qId !== itemToDelete.qId)
+          )
+        );
+      } else if (deleteType === "question") {
+        // Delete the question from the backend
+        await axios.delete(
+          `${process.env.REACT_APP_API_URL}/assessment-question/${itemToDelete.qId}`
+        );
+  
+        // Update frontend state and reorder
+        const updatedSections = addedSections.map((section) => {
+          // Remove the specific question from the section based on qId
+          
+          // const filteredQuestions = section.Questions.filter(
+          //   (q) => q.qId !== itemToDelete.qId
+          // );
+          if (section.SectionName===itemToDelete.secName){
+            return section.Questions.filter(q=>q.qId!==itemToDelete.qId)
+          }
+          return section
+  
+          // console.log("Filtered questions after deleting:", filteredQuestions);
+  
+          // // Recalculate orders within this section
+          // const reorderedQuestions = filteredQuestions.map((q, index) => ({
+          //   ...q,
+          //   order: index + 1,
+          // }));
+  
+          // // Send updated orders to the backend
+          // updateQuestionOrdersInBackend(reorderedQuestions);
+  
+          // return { ...section, Questions: reorderedQuestions };
+        });
+        console.log("updated seciton after deleting",updatedSections)
+  
+        setAddedSections(updatedSections);
+      }
+  
+      // Close confirmation modal
+      setIsDeleteConfirmationOpen(false);
+      setItemToDelete(null);
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      // Optionally, show a user-friendly error message
+      alert("An error occurred while deleting the item. Please try again.");
+    }
+  };
+  
+  
   // Function to cancel deletion
   const cancelDelete = () => {
     setIsDeleteConfirmationOpen(false);
@@ -1340,69 +1433,153 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     closeAddSectionPopup();
   };
 
+
   //changes made by shashank - [08/01/2025]
-  const updateQuestionsInAddedSectionFromQuestionBank = async(secName, question,questionFrom) => {
+
+//   const updateQuestionsInAddedSectionFromQuestionBank = async(secName, question,questionFrom) => {
 
 
-   const questionExistResponse = await axios.get(`${process.env.REACT_APP_API_URL}/assessment-question/${tabsSubmitStatus.responseId}`)
-// let response;
-   if (questionFrom==="addquestion"){
+//    const questionExistResponse = await axios.get(`${process.env.REACT_APP_API_URL}/assessment-question/${tabsSubmitStatus.responseId}`)
+// // let response;
+//    if (questionFrom==="addquestion"){
   
-    console.log("addquestionsection",question)
-    const reqBody = {
-      ...question,
-      assessmentId:tabsSubmitStatus.responseId,
-      order:questionExistResponse.data.order,
-      customizations:"customization"
-    }
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
-    setAddedSections((prev) =>
-      prev.map((each) =>
-        each.SectionName === secName
-          ? { ...each, Questions: [...each.Questions, {order:questionExistResponse.data.order,questionText:question.snapshot.questionText,questionType:question.snapshot.questionType,score:question.snapshot.score,qId:response.data.question._id,order:questionExistResponse.data.order}] }
-          : each
-      )
-    );
-   }
-   else{
-    const reqBody ={
-      assessmentId:tabsSubmitStatus.responseId,
-      questionId:question._id,
-      source: question.isCustom? "custom":"system",
-      snapshot:{
-        questionText:question.questionText,
-        options:question.options,
-        correctAnswer:question.correctAnswer,
-        questionType:question.questionType,
-        score:Number(question.score)
-      },
-      order:questionExistResponse.data.order,
-      customizations:"customization"
+//     console.log("addquestionsection",question)
+//     const reqBody = {
+//       ...question,
+//       assessmentId:tabsSubmitStatus.responseId,
+//       order:questionExistResponse.data.order,
+//       customizations:"customization"
+//     }
+//     const response = await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
+//     setAddedSections((prev) =>
+//       prev.map((each) =>
+//         each.SectionName === secName
+//           ? { ...each, Questions: [...each.Questions, {order:questionExistResponse.data.order || 0,questionText:question.snapshot.questionText,questionType:question.snapshot.questionType,score:question.snapshot.score,qId:response.data.question._id,order:questionExistResponse.data.order}] }
+//           : each
+//       )
+//     );
+//    }
+//    else{
+//     const reqBody ={
+//       assessmentId:tabsSubmitStatus.responseId,
+//       questionId:question._id,
+//       source: question.isCustom? "custom":"system",
+//       snapshot:{
+//         questionText:question.questionText,
+//         options:question.options,
+//         correctAnswer:question.correctAnswer,
+//         questionType:question.questionType,
+//         score:Number(question.score)
+//       },
+//       order:questionExistResponse.data.order,
+//       customizations:"customization"
 
-    }
-    //shashank - [13/01/2025]
-    //before pushing the question to assessement question ,check if it already exists,if exists increment the order number from latest
-    //question, if not found=>start from one and increment in each request further.
-    const response =  await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
-    setAddedSections((prev) =>
-      prev.map((each) =>
-        each.SectionName === secName
-          ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id,order:questionExistResponse.data.order}] }
-          : each
-      )
-    );
-  }
-  // response =  await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
-  //   setAddedSections((prev) =>
-  //     prev.map((each) =>
-  //       each.SectionName === secName
-  //         ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id,order:questionExistResponse.data.order}] }
-  //         : each
-  //     )
-  //   );
+//     }
+//     //shashank - [13/01/2025]
+//     //before pushing the question to assessement question ,check if it already exists,if exists increment the order number from latest
+//     //question, if not found=>start from one and increment in each request further.
+//     const response =  await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
+//     setAddedSections((prev) =>
+//       prev.map((each) =>
+//         each.SectionName === secName
+//           ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id,order:questionExistResponse.data.order}] }
+//           : each
+//       )
+//     );
+//   }
+//   // response =  await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
+//   //   setAddedSections((prev) =>
+//   //     prev.map((each) =>
+//   //       each.SectionName === secName
+//   //         ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id,order:questionExistResponse.data.order}] }
+//   //         : each
+//   //     )
+//   //   );
     
+//   };
+
+const recalculateOrder = (sections) => {
+  let currentOrder = 1; 
+  return sections.map((section) => ({
+    ...section,
+    Questions: section.Questions?.map((question) => ({
+      ...question,
+      order: currentOrder++, 
+    })),
+  }));
+};
+
+const updateQuestionsInAddedSectionFromQuestionBank = async (secName, question) => {
+  console.log("Updating question in section:", secName, question);
+
+  // Step 1: Add the new question with a temporary order of 0
+  const updatedSections = addedSections.map((section) =>
+    section.SectionName === secName
+      ? {
+          ...section,
+          Questions: [...section.Questions, { ...question, order: 0 }],
+        }
+      : section
+  );
+
+  // Step 2: Recalculate the order for all sections
+  const updatedSectionsWithOrder = recalculateOrder(updatedSections);
+  console.log("updated sections with order",updatedSectionsWithOrder)
+
+  // Step 3: Find the exact updated question with the new order
+  const updatedQuestion = updatedSectionsWithOrder
+    .find((section) => section.SectionName === secName) // Locate the correct section
+    .Questions.find((q) => q._id === question._id); // Locate the question in that section
+
+  console.log("Updated question after recalculating order:", updatedQuestion);
+
+  // Step 4: Prepare the request body for the backend
+  const reqBody = {
+    assessmentId: tabsSubmitStatus.responseId,
+    questionId: updatedQuestion._id,
+    source: updatedQuestion.isCustom ? "custom" : "system",
+    snapshot: {
+      questionText: updatedQuestion.questionText,
+      options: updatedQuestion.options,
+      correctAnswer: updatedQuestion.correctAnswer,
+      questionType: updatedQuestion.questionType,
+      score: Number(updatedQuestion.score),
+    },
+    order: updatedQuestion.order,
+    customizations: "customization",
   };
 
+  try {
+    // Step 5: Send the updated question to the backend
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/assessment-questions`,
+      reqBody
+    );
+
+    // Step 6: Update the section with the response from the backend
+    const finalSectionsUpdate = updatedSectionsWithOrder.map((section) =>
+      section.SectionName === secName
+        ? {
+            ...section,
+            Questions: section.Questions.map((each) =>
+              each._id === updatedQuestion._id
+                ? { ...updatedQuestion, qId: response.data.question._id }
+                : each
+            ),
+          }
+        : section
+    );
+
+    // Step 7: Update the state with the final sections
+    setAddedSections(finalSectionsUpdate);
+    console.log("Successfully updated sections:", finalSectionsUpdate);
+  } catch (error) {
+    console.error("Error pushing updated question to backend:", error);
+  }
+};
+
+
+console.log('added sections',addedSections)
   return (
     <React.Fragment>
       <div>
@@ -1459,6 +1636,11 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
                     {activeTab === "Basicdetails" && (
                       <>
                         <BasicDetailsTab
+                        toggleLinkExpiryDropdown={toggleLinkExpiryDropdown}
+                        linkExpiryDays={linkExpiryDays}
+                        setLinkExpiryDays={setLinkExpiryDays}
+                        showLinkExpiryDay={showLinkExpiryDay}
+                        setShowLinkExpiryDays={setShowLinkExpiryDays}
                           assessmentTitleLimit={assessmentTitleLimit}
                           formData={formData}
                           handleInputChange={handleInputChange}
@@ -1586,7 +1768,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
 
                     {activeTab === "Candidates" && (
                       <>
-                        {/* <Candidate isAssessmentContext={true} onSelectCandidates={handleSelectCandidates} /> */}
+                        <Candidate isAssessmentContext={true} onSelectCandidates={handleSelectCandidates} />
                         <div className="customFooter z-50">
                           <div>
                             <p
@@ -1599,7 +1781,8 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
                           <div className="mr-8">
                             <button
                               className="cursor-pointer border rounded p-2 mr-3"
-                              onClick={(e) => handleSave(e, "Questions")}
+                              // onClick={(e) => handleSave(e, "Questions")}
+                              onClick={() => onClose()}
                             >
                               skip
                             </button>
@@ -1611,6 +1794,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
                                 if (selectedCandidates.length === 0) {
                                   setIsSelectCandidatePopupOpen(true);
                                 } else {
+                                  
                                   handleSave(e, "Candidates");
                                 }
                               }}

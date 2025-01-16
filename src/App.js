@@ -10,7 +10,7 @@ import Admin from './Pages/Login-Part/Admin.jsx';
 import Navbar from "./Components/Navbar/Navbar-Sidebar.jsx";
 import QuestionBank from './Pages/Dashboard-Part/Tabs/QuestionBank-Tab/QuestionBank.jsx';
 import Assessment from "./Pages/Dashboard-Part/Tabs/Assessment-Tab/Assessment.jsx";
-
+import Candidate from "./Pages/Dashboard-Part/Tabs/Candidate-Tab/Candidate.jsx";
 function App() {
   const location = useLocation();
   const shouldRenderNavbar = !['/', '/profile1', '/price', '/profile2', '/profile3', '/profile4', '/assessmenttest', '/assessmenttext', '/assessmentsubmit', '/candidatevc', '/admin', '/nofreelance', '/callback', '/jitsimeetingstart', '/organization'].includes(location.pathname);
@@ -28,6 +28,7 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/questionBank" element={<QuestionBank  />} />
           <Route path="/assessment" element={<Assessment />} />
+          <Route path="/candidate" element={<Candidate />} />
           {/* <Route path="/" element={<Login1 />} /> */}
           {/* <Route path="/callback" element={<Callback />} />
           <Route path="/profile1" element={<Login2 />} />

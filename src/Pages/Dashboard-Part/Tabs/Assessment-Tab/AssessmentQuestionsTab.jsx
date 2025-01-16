@@ -113,7 +113,7 @@ const AssessmentQuestionsTab = ({
           </Popup>
         </div>
         {/* {matchingSection.length > 0 && */}
-        {addedSections.length > 0 &&
+        {addedSections?.length > 0 &&
           addedSections.map((sectionName, index) => (
             <div key={index} className="text-md justify-between">
               <div className="flex justify-between bg-gray-100 p-2">
@@ -126,7 +126,7 @@ const AssessmentQuestionsTab = ({
                       </span>
                     )} */}
                       <span className="bg-white px-2 py-0 mr-2 rounded-sm whitespace-normal">
-                        {addedSections[index].Questions.length}
+                        {addedSections[index].Questions?.length}
                       </span>
                       {sectionName.SectionName}
                     </p>
@@ -280,7 +280,7 @@ const AssessmentQuestionsTab = ({
                                 }
                               />
                               <div className="sm:-mt-[2px]">
-                                {question.order}.
+                                {question.order}. 
                               </div>
                               <div className="sm:-mt-[2px] sm:w-[40px] sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap">
                                 {question.questionText}
@@ -342,7 +342,7 @@ const AssessmentQuestionsTab = ({
                                           //     questionIndex,
                                           //   })
                                           // }
-                                          onClick={()=>handleDeleteClick("question",question,index)}
+                                          onClick={()=>handleDeleteClick("question",question,sectionName.SectionName)}
                                         >
                                           Delete
                                         </p>
