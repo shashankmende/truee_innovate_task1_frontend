@@ -1,4 +1,4 @@
-export const validateQuestionBankData = (formData, mcqOptions) => {
+export const validateQuestionBankData = (formData, mcqOptions,section) => {
     const errors = {};
     const requiredFields = {
         questionText: "Question is required",
@@ -6,7 +6,8 @@ export const validateQuestionBankData = (formData, mcqOptions) => {
         questionType: "Question Type is required",
         skill: "Skill is required",
         difficultyLevel: "Difficulty Level is required",
-        score: "Score is required",
+        // score: "Score is required",
+        ...(section==="assessmet" && {score:"score is required"}),
         correctAnswer: "Answer is required",
     };
 

@@ -46,7 +46,7 @@ import AssessmentQuestionsTab from "./AssessmentQuestionsTab.jsx";
 import Candidate from '../Candidate-Tab/Candidate.jsx'
 import toast from "react-hot-toast";
 
-const NewAssessment = ({ onClose, onDataAdded }) => {
+const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,setShowLinkExpiryDays,showLinkExpiryDay}) => {
   const { sharingPermissionscontext } = usePermissions();
   const positionPermissions = useMemo(
     () => sharingPermissionscontext.position || {},
@@ -68,10 +68,10 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   const [showUpgradePopup, setShowUpgradePopup] = useState(false);
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
   const [showDropdownDifficulty, setShowDropdownDifficulty] = useState(false);
-  //shashank-[16/01/2025]
-  const [showLinkExpiryDay,setShowLinkExpiryDays]=useState(false)
-  const [linkExpiryDays,setLinkExpiryDays]=useState(3)
-  //
+  // //shashank-[16/01/2025]
+  // const [showLinkExpiryDay,setShowLinkExpiryDays]=useState(false)
+  // const [linkExpiryDays,setLinkExpiryDays]=useState(3)
+  // //
   const [sidebarOpenForSection, setSidebarOpenForSection] = useState(false);
   const [sidebarOpenAddQuestion, setSidebarOpenAddQuestion] = useState(false);
   const sidebarRefAddQuestion = useRef(null);
@@ -115,7 +115,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
     DifficultyLevel: "",
     NumberOfQuestions: "",
     ExpiryDate: new Date(),
-    status:true,
+    status:"Active",
   });
 
   //shashank - [10/01/2025]
@@ -267,6 +267,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
           NumberOfQuestions: formData.NumberOfQuestions,
         }),
         ...(formData.ExpiryDate && { ExpiryDate: formData.ExpiryDate }),
+        ...( {status:formData.status})
       };
     }
 
@@ -429,58 +430,7 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
   };
 
 
-  // const handleShareClick = async (assessmentId) => {
-  //   try {
-  //     setIsLoading(true);
-  //     console.log(selectedCandidates);
-  //     console.log(assessmentId);
-
-      // if (!assessmentId) {
-      //   console.error("Failed to save assessment or retrieve assessmentId");
-      //   return;
-      // }
-
-      // if (selectedCandidates.length === 0) {
-      //   setErrors({
-      //     ...errors,
-      //     Candidate: "Please select at least one candidate.",
-      //   });
-      //   return;
-      // }
-
-  //     // Update candidates with the new assessmentId
-  //     await axios.post(`${process.env.REACT_APP_API_URL}/update-candidates`, {
-  //       candidateIds: selectedCandidates,
-  //       assessmentId: assessmentId,
-  //     });
-
-  //     // Send emails to the selected candidates
-  //     const candidateEmails = selectedCandidates
-  //       .map((id) => {
-  //         const candidate = candidateData.find((c) => c._id === id);
-  //         return candidate ? candidate.Email : null;
-  //       })
-  //       .filter((email) => email !== null);
-
-  //     if (candidateEmails.length > 0) {
-  //       await axios.post(
-  //         `${process.env.REACT_APP_API_URL}/send-assessment-link`,
-  //         {
-  //           candidateEmails,
-  //           assessmentId: assessmentId,
-  //         }
-  //       );
-  //       console.log("Emails sent successfully");
-  //     } else {
-  //       console.error("No valid candidate emails found");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error during share process:", error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
+ 
 
   const handleShareClick = async(assessmentId)=>{
     try {
@@ -496,25 +446,32 @@ const NewAssessment = ({ onClose, onDataAdded }) => {
         });
         return;
       }
-      selectedCandidates.forEach(async candidateId=>{
-        const reqBody = {
-          assessmentId,
-                    tenantId:Cookies.get("organizationId"),
-                    interviewId:"interviewId",
-                    candidateId,
-                    startDateTime:new Date(),
-                    endDateTime:new Date(new Date().setDate(new Date().getDate()+3)),
-                    isActive:true,
-                    assessmentLink:"http://truleeinnovativw/assesmment:233ijri3/candidateid:jijefjf/test"
-        }
-        
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
-        if (response.data.success){
-          setIsLoading(false)
-          setSelectedCandidates([])
-          onClose()
-        }
-      })
+     const reqBody = {
+             assessmentId,
+             organizationId:Cookies.get("organizationId"),
+             expiryAt:new Date(new Date().setDate(new Date().getDate()+linkExpiryDays)),
+             status:"scheduled",
+             proctoringEnabled:true,
+             createdBy: Cookies.get("userId"),
+           }
+      const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
+      if (scheduleAssessmentResponse.data.success){
+        const CandidateAssessmentsList = selectedCandidates.map(candidateId=>({
+          scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,
+          candidateId,
+          status:"pending",
+          expiryAt:new Date(new Date().setDate(new Date().getDate()+linkExpiryDays)),
+          isActive:true,
+          assessmentLink:"http://truleeinnovative.com/asssessment/eedgewwf22342343"
+  
+        }))
+        console.log("candidate assessment list",CandidateAssessmentsList)
+          const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment`,CandidateAssessmentsList)
+        setIsLoading(false)
+        setSelectedCandidates([])
+        onClose()
+      }
+      
       toast.success(`Assessment Scheduled`)
 
 

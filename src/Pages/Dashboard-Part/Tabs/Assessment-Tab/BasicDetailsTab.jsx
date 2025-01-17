@@ -185,7 +185,7 @@ const BasicDetailsTab = ({
         </div>
 
         {/* No. of Questions */}
-        <div className="grid grid-cols-2 gap-5 mb-5 mt-3">
+        <div className="grid items-end  grid-cols-2 gap-5 mb-5 mt-3">
           <div className="flex flex-col col-span-1">
             <div className="flex items-center gap-12">
               <label
@@ -216,6 +216,36 @@ const BasicDetailsTab = ({
                   </p>
                 )}
               </div>
+            </div>
+          </div>
+          {/* Assessment Status */}
+          <div >
+            <div className="flex items-center gap-3">
+              <label className="block text-sm font-medium leading-6 text-gray-800 w-[22%] ">
+                Assessment Status
+              </label>
+              
+              <Switch
+                checked={formData.status}
+                onChange={(value) => {
+                  
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: value ? "Active":"Inactive",
+                  }));
+                }}
+                // onColor="#c2f0f0"
+                onColor="#98e6e6"
+                offColor="#ccc"
+                boxShadow="0px 0px 5px rgba(0, 0, 0, 0.2)"
+                height={20}
+                width={45}
+                onHandleColor="#227a8a"
+                offHandleColor="#9CA3AF"
+                handleDiameter={20}
+                checkedIcon={false}
+                uncheckedIcon={false}
+              />
             </div>
           </div>
         </div>
@@ -364,7 +394,7 @@ const BasicDetailsTab = ({
         </div>
 
         {/* Duration */}
-        <div className="flex gap-5 mb-9">
+        <div className="flex gap-5">
           <div className="flex flex-col w-1/2">
             <div className="flex items-center gap-[72px]">
               <label
@@ -450,7 +480,7 @@ const BasicDetailsTab = ({
                 className="block text-sm font-medium leading-6 text-gray-800 w-24 -mt-5"
               >
                 Expiry Date
-                <span className="text-red-500">*</span>
+                {/* <span className="text-red-500">*</span> */}
               </label>
 
               <div className="relative flex-grow">
@@ -482,7 +512,7 @@ const BasicDetailsTab = ({
           {/* Link Expiry Days */}
           <div>
             <div className="flex items-center">
-              <label className="block text-sm font-medium leading-6 text-gray-800 w-[22%] -mt-5">
+              <label className="block text-sm font-medium leading-6 text-gray-800 w-[23%] -mt-5">
                 Link Expiry(Days):<span className="text-red-500">*</span>
               </label>
               <div className="relative flex-grow">
@@ -526,35 +556,7 @@ const BasicDetailsTab = ({
             </div>
           </div>
 
-          {/* Assessment Status */}
-          <div>
-            <div className="flex items-center gap-3">
-              <label className="block text-sm font-medium leading-6 text-gray-800 w-[22%] -mt-5">
-                Assessment Status
-              </label>
-              
-              <Switch
-                checked={formData.status}
-                onChange={() => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    status: !prev.status,
-                  }));
-                }}
-                // onColor="#c2f0f0"
-                onColor="#98e6e6"
-                offColor="#ccc"
-                boxShadow="0px 0px 5px rgba(0, 0, 0, 0.2)"
-                height={20}
-                width={45}
-                onHandleColor="#227a8a"
-                offHandleColor="#9CA3AF"
-                handleDiameter={20}
-                checkedIcon={false}
-                uncheckedIcon={false}
-              />
-            </div>
-          </div>
+          
         </div>
 
         <div className="SaveAndScheduleButtons">

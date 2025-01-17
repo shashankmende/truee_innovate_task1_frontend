@@ -62,6 +62,8 @@ const Interviewcq = ({
     options: [],
     tenentListId: [],
     hints: "",
+    minexperience: "",
+    maxexperience: "",
   });
   const [charLimits, setCharLimits] = useState({ min: 1, max: 100 });
   const [hintCharLimit, setHintCharLimit] = useState(250);
@@ -90,10 +92,14 @@ const Interviewcq = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
     let errorMessage = "";
     setFormData({ ...formData, [name]: value });
+    
     setErrors({ ...errors, [name]: errorMessage });
+    
   };
+
   const userId = Cookies.get("userId");
   const orgId = Cookies.get("organizationId");
 
@@ -162,17 +168,6 @@ const Interviewcq = ({
 
 
 
-const removeUnwantedFields =(obj)=>{
-  const data = {}
-  for (let key in obj){
-    if (obj[key]){
-      alert(`${key}`)
-      data[key]=obj[key]
-    }
-  }
-  return data
-}
-
 
 
 
@@ -180,7 +175,7 @@ const removeUnwantedFields =(obj)=>{
   const handleSubmit = async (e, isSaveAndNext) => {
     e.preventDefault();
     const updatedFormData = { ...formData, tenentListId: selectedListId };
-    const newErrors = validateQuestionBankData(updatedFormData, mcqOptions);
+    const newErrors = validateQuestionBankData(updatedFormData, mcqOptions,section);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -188,6 +183,8 @@ const removeUnwantedFields =(obj)=>{
     // Construct question data object
     const questionData = {
       ...formData,
+      minexperience: parseInt(selectedMinExperience),
+      maxexperience: parseInt(selectedMaxExperience),
       isCustom: true,
       tenentListId: selectedListId,
       difficultyLevel: selectedDifficultyLevel,
@@ -243,9 +240,6 @@ const removeUnwantedFields =(obj)=>{
       questionData.programmingDetails = entries;
     }
 
-    const reqBody  = removeUnwantedFields(questionData)
-    
-    console.log("request body",reqBody)
     if (orgId) {
       questionData.tenentId = orgId;
     }
@@ -257,7 +251,7 @@ const removeUnwantedFields =(obj)=>{
         ? await axios.put(
           `${process.env.REACT_APP_API_URL}/newquestion/${question._id}`,
           // questionData
-          reqBody
+          questionData
         )
         : await axios.post(
           `${process.env.REACT_APP_API_URL}/newquestion`,
@@ -312,7 +306,7 @@ const removeUnwantedFields =(obj)=>{
     }
   };
 
-  console.log("Log section : ",section)
+  
   const [showSkillsPopup, setShowSkillsPopup] = useState(false);
   const [searchTermSkills, setSearchTermSkills] = useState("");
   const skillsPopupRef = useRef(null);
@@ -486,15 +480,53 @@ const removeUnwantedFields =(obj)=>{
   };
 
 
+  // experience
+
+  const [selectedMinExperience, setSelectedMinExperience] = useState("");
+  const [showDropdownMinExperience, setShowDropdownMinExperience] = useState(false);
+  const minExperienceOptions = Array.from({ length: 11 }, (_, i) => ({
+    value: `${i}`,
+    label: `${i}`,
+  }));
+  
+  const toggleDropdownMinExperience = () => {
+    setShowDropdownMinExperience((prev) => !prev);
+  };
+  
+  const handleMinExperienceSelect = (value) => {
+    setSelectedMinExperience(value);
+    setShowDropdownMinExperience(false);
+    setFormData((prev) => ({ ...prev, minexperience: value }));
+    setErrors((prevErrors) => ({ ...prevErrors, minexperience: "" }));
+    setSelectedMaxExperience(""); // Reset max experience
+  };
+  
+  const [selectedMaxExperience, setSelectedMaxExperience] = useState("");
+  const [showDropdownMaxExperience, setShowDropdownMaxExperience] = useState(false);
+  const maxExperienceOptions = Array.from({ length: 12 }, (_, i) => ({
+    value: `${i + 1}`,
+    label: `${i + 1}${i === 10 ? "+" : ""}`,
+  })).filter((option) => parseInt(option.value) > parseInt(selectedMinExperience));
+  
+  const toggleDropdownMaxExperience = () => {
+    setShowDropdownMaxExperience((prev) => !prev);
+  };
+  
+  const handleMaxExperienceSelect = (value) => {
+    setSelectedMaxExperience(value);
+    setShowDropdownMaxExperience(false);
+    setFormData((prev) => ({ ...prev, maxexperience: value }));
+    setErrors((prevErrors) => ({ ...prevErrors, maxexperience: "" }));
+  };
+  
+
+
   return (
     <>
       <div className={" fixed inset-0 bg-black bg-opacity-15 z-50  h-full flex flex-col justify-center"}>
         <div className={`flex flex-col justify-center items-center bg-white shadow-lg transition-transform duration-5000 transform 
-  ${section === "Popup" ? 
-    `right-0 h-full top-0
-    ${questionBankPopupVisibility ? "w-1/2 right-0 fixed" : "w-full"}` : 
-    ""}
-  ${section === "interviewerSection" || section==="assessment" ? "w-1/2  fixed h-[95%] flex flex-col justify-between right-9 " : section==='questionBank' && 'fixed right-0 top-0 bottom-0 w-1/2'}
+  ${section === "Popup" &&  `right-0 h-full top-0 ${questionBankPopupVisibility ? "w-1/2 right-0 fixed" : "w-full"}`}
+  ${section === "interviewerSection" || section==="assessment" ? "w-1/2  fixed h-[95%] flex flex-col justify-between right-9 " : 'fixed right-0 top-0 bottom-0 w-1/2'}
 `}
 >
           {/* Header */}
@@ -886,6 +918,110 @@ const removeUnwantedFields =(obj)=>{
                 </div>
                 <div className="font-semibold text-xl mb-8 mt-4">
                   Evaluation Criteria:
+                </div>
+                   {/* experience */}
+                   <div className="flex gap-5">
+                  <div>
+                    <label
+                      htmlFor="experience"
+                      className="block mb-2  font-medium text-gray-900 w-36"
+                    >
+                      Experience <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <div className="flex-grow">
+                    <div className="flex items-center w-full gap-5">
+                      <div className="flex gap-7 mb-5">
+                        <div className="w-5">
+                          <label
+                            htmlFor="minexperience"
+                            className="block  font-medium leading-6 text-gray-900"
+                          >
+                            Min
+                          </label>
+                        </div>
+                        <div className="relative flex-grow">
+                          <div className="relative">
+                            <input
+                              type="text"
+                              id="minexperience"
+                              className={`border-b focus:outline-none mb-5 w-full ${errors.minexperience
+                                ? "border-red-500"
+                                : "border-gray-300 focus:border-black"
+                                }`}
+                              value={selectedMinExperience}
+                              onClick={toggleDropdownMinExperience}
+                              readOnly
+                            />
+                            {errors.minexperience && (
+                              <p className="text-red-500 text-sm -mt-4">
+                                {errors.minexperience}
+                              </p>
+                            )}
+                          </div>
+                          {showDropdownMinExperience && (
+                            <div className="absolute z-50 -mt-3 mb-5 w-full rounded-md bg-white shadow-lg">
+                              {minExperienceOptions.map((option) => (
+                                <div
+                                  key={option.value}
+                                  className="py-2 px-4 cursor-pointer hover:bg-gray-100"
+                                  onClick={() =>
+                                    handleMinExperienceSelect(option.value)
+                                  }
+                                >
+                                  {option.label}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-5 mb-5">
+                        <div className="w-5">
+                          <label
+                            htmlFor="maxexperience"
+                            className="block text-sm font-medium leading-6 text-gray-900"
+                          >
+                            Max
+                          </label>
+                        </div>
+                        <div className="relative flex-grow">
+                          <div className="relative">
+                            <input
+                              type="text"
+                              id="maxexperience"
+                              className={`border-b focus:outline-none mb-5 w-full ${errors.maxexperience
+                                ? "border-red-500"
+                                : "border-gray-300 focus:border-black"
+                                }`}
+                              value={selectedMaxExperience}
+                              onClick={toggleDropdownMaxExperience}
+                              readOnly
+                            />
+                            {errors.maxexperience && (
+                              <p className="text-red-500 text-sm -mt-4">
+                                {errors.maxexperience}
+                              </p>
+                            )}
+                          </div>
+                          {showDropdownMaxExperience && (
+                            <div className="absolute z-50 -mt-3 mb-5 w-full rounded-md bg-white shadow-lg">
+                              {maxExperienceOptions.map((option) => (
+                                <div
+                                  key={option.value}
+                                  className={`py-2 px-4 cursor-pointer hover:bg-gray-100 ${parseInt(option.value) <= parseInt(selectedMinExperience) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                  onClick={() => handleMaxExperienceSelect(option.value)}
+                                  disabled={parseInt(option.value) <= parseInt(selectedMinExperience)} // Disable invalid options
+                                >
+                                  {option.label}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 {/* Difficulty Level */}
                 <div className="flex gap-5 mb-4">

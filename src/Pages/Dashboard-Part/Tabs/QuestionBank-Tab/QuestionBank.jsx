@@ -104,9 +104,9 @@ const QuestionBank = ({ assessmentId, sectionName,updateQuestionsInAddedSectionF
     setActiveTab("MyQuestionsList");
   };
   return (
-      <div className={`${section==="interviewerSection" || section==="assessment" ? "h-[95%] shadow-md  w-[95%] bg-white ":""}`}>
+      <div className={`${section==="interviewerSection" || section==="assessment" && "h-[95%] shadow-md  w-[95%] bg-white "}`}>
         <div className={`${section==="interviewerSection" || section==="assessment" ?"":" top-16 sm:top-20 md:top-24 left-0 right-0"}`}>
-        { (section==="Popup"||section==="interviewerSection" || section==="assessment") &&
+        { (section==="Popup"|| section==="interviewerSection" || section==="assessment") &&
           <div className={`flex justify-between p-4 bg-custom-blue text-white  ${(section==="interviewerSection" || section==="assessment")?"bg-custom-blue text-white ":""}`}>
             <div>
               <span className="text-lg font-semibold">Question Bank</span>

@@ -6,7 +6,7 @@ export const validateAssessmentData = (assessmentData) => {
         Duration: "Duration is required",
         DifficultyLevel: "Difficulty Level is required",
         NumberOfQuestions: "Number Of Questions is required",
-        ExpiryDate: "Expiry Date is required",
+        // ExpiryDate: "Expiry Date is required",
     };
 
     Object.entries(requiredFields).forEach(([field, message]) => {

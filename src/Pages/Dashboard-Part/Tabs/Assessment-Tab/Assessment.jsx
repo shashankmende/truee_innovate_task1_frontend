@@ -34,6 +34,7 @@ const OffcanvasMenu = ({ isOpen, onFilterChange, closeOffcanvas }) => {
   const [isTechMainChecked, setTechMainChecked] = useState(false);
   const [selectedStatusOptions, setSelectedStatusOptions] = useState([]);
   const [selectedTechOptions, setSelectedTechOptions] = useState([]);
+ 
   const isAnyOptionSelected = selectedStatusOptions.length > 0 || selectedTechOptions.length > 0;
   const handleUnselectAll = () => {
     setSelectedStatusOptions([]);
@@ -287,6 +288,14 @@ const Assessment = () => {
   const [selectedAssessment, setSelectedAssessment] = useState(null);
   const [showAssessmentDetails, setShowAssessmentDetails] = useState(false);
   const [recipientEmail] = useState("");
+   //shashank -[16/01/2025]
+  const [showLinkExpiryDay,setShowLinkExpiryDays]=useState(false)
+    const [linkExpiryDays,setLinkExpiryDays]=useState(3)
+    
+    // useEffect(()=>{
+    //   Cookies.set("linkExpiryDays",linkExpiryDays)
+    // },[linkExpiryDays])
+  //
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -354,6 +363,7 @@ const Assessment = () => {
       );
     // Reverse the data to show the most recent first
       const reversedData = filteredAssessments.reverse();
+      console.log("assessment list",reversedData)
       setAssessmentData(reversedData);
       setCurrentPage(0);
     } catch (error) {
@@ -982,6 +992,7 @@ const Assessment = () => {
       )}
       {isShareOpen && (
         <ShareAssessment
+          linkExpiryDays= {linkExpiryDays}
           isOpen={isShareOpen}
           onCloseshare={handleCloseShare}
           assessmentId={isShareOpen._id}
@@ -989,6 +1000,8 @@ const Assessment = () => {
       )}
       {showAssessmentDetails && (
         <AssessmentProfileDetails
+        // assessmentId={}
+        linkExpiryDays= {linkExpiryDays}
           assessment={showAssessmentDetails}
           onCloseprofile={handleCloseProfile}
         />
@@ -997,6 +1010,10 @@ const Assessment = () => {
       {sidebarOpen && (
         <>
           <Sidebar
+          showLinkExpiryDay={showLinkExpiryDay}
+          setShowLinkExpiryDays={setShowLinkExpiryDays}
+          linkExpiryDays={linkExpiryDays}
+          setLinkExpiryDays={setLinkExpiryDays}
             onClose={closeSidebar}
             onOutsideClick={handleOutsideClick}
             onDataAdded={handleDataAdded}

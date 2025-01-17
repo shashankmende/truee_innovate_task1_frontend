@@ -15,6 +15,7 @@ import genderlessImage from "../../../Dashboard-Part/Images/transgender.png";
 import Tooltip from "@mui/material/Tooltip";
 // import Notification from "../Notifications/Notification.jsx";
 import { IoArrowBack } from "react-icons/io5";
+import Switch from 'react-switch'
 
 import { ReactComponent as IoIosArrowUp } from "../../../../icons/IoIosArrowUp.svg";
 import { ReactComponent as IoIosArrowDown } from "../../../../icons/IoIosArrowDown.svg";
@@ -24,10 +25,12 @@ import { ReactComponent as FiMoreHorizontal } from "../../../../icons/FiMoreHori
 import { ReactComponent as IoMdSearch } from "../../../../icons/IoMdSearch.svg";
 import { ReactComponent as HiOutlineExclamationCircle } from "../../../../icons/HiOutlineExclamationCircle.svg";
 import { ReactComponent as FaTrash } from "../../../../icons/FaTrash.svg";
-import { MdOutlineContentCopy } from "react-icons/md";
+import { MdOutlineContentCopy, MdSwipeLeft } from "react-icons/md";
 import { ReactComponent as MdMoreVert } from "../../../../icons/MdMoreVert.svg";
 
-const AssessmentPopup = ({ assessment, onCloseprofile }) => {
+import ScheduledAssessmentTab from "./ScheduledAssessmentTab.jsx";
+const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
+  
   const [isEditSectionPopupOpen, setIsEditSectionPopupOpen] = useState(false);
   const [sectionToEdit, setSectionToEdit] = useState(null);
   const { sharingPermissionscontext } = usePermissions();
@@ -48,6 +51,7 @@ const AssessmentPopup = ({ assessment, onCloseprofile }) => {
   const [isEditSectionModalOpen, setIsEditSectionModalOpen] = useState(false);
   const [editedSectionName, setEditedSectionName] = useState("");
 
+  
   const toggleSidebarAddQuestion = (SectionName) => {
     if (checkedCount >= questionsLimit) {
       setIsLimitReachedPopupOpen(true);
@@ -95,7 +99,7 @@ const AssessmentPopup = ({ assessment, onCloseprofile }) => {
   }, []);
 
   const [editMode, setEditMode] = useState(false);
-
+//shashank,-added status field
   const [formData, setFormData] = useState({
     AssessmentTitle: assessment.AssessmentTitle,
     AssessmentType: assessment.AssessmentType,
@@ -105,6 +109,9 @@ const AssessmentPopup = ({ assessment, onCloseprofile }) => {
     NumberOfQuestions: assessment.NumberOfQuestions,
     ExpiryDate: assessment.ExpiryDate,
     Sections: assessment.Sections || [],
+    status:assessment.status,
+    linkExpiryDays,
+
   });
 
   const [positions, setPositions] = useState([]);
@@ -1512,6 +1519,10 @@ const AssessmentPopup = ({ assessment, onCloseprofile }) => {
                     >
                       Questions
                     </span>
+                    <span className={`cursor-pointer ${activeTab === "scheduledAssessment"
+                        ? "text-custom-blue font-semibold pb-1 border-b-2 border-custom-blue"
+                        : "text-black"
+                        }`}  onClick={() => handleTabClick("scheduledAssessment")}>Scheduled Assessment</span>
                     <span
                       className={`cursor-pointer ${activeTab === "Candidates"
                         ? "text-custom-blue font-semibold pb-1 border-b-2 border-custom-blue"
@@ -1626,11 +1637,12 @@ const AssessmentPopup = ({ assessment, onCloseprofile }) => {
                         </div>
                       </div>
 
-                      <div className="flex mb-5">
-                        <div className="w-1/4  sm:w-1/2">
-                          <div>No.of Questions</div>
+                      <div className="grid grid-cols-2 ">
+                        <div className="w-full justify-between  flex mb-5 ">
+                        <div className="w-1/2  sm:w-1/2">
+                          <div className="w-[300px]">No.of Questions</div>
                         </div>
-                        <div className="w-1/4  sm:w-1/2">
+                        <div className="w-1/2  sm:w-1/2">
                           <input
                             name="Questions"
                             type="number"
@@ -1643,11 +1655,45 @@ const AssessmentPopup = ({ assessment, onCloseprofile }) => {
                               }`}
                             readOnly={!editMode}
                           />
+                          
                         </div>
+                      </div>
+                      {/* Assessment Status */}
+          <div className="w-full">
+            <div className="flex items-center gap-3">
+              <label className="block  leading-6 w-1/2 ">
+                Assessment Status
+              </label>
+              
+              <Switch
+              disabled={!editMode}
+                checked={formData.status==="Active"}
+                onChange={(value) => {
+                  
+                  setFormData((prev) => ({
+                    ...prev,
+                    status:value ? "Active":"Inactive"
+                  }));
+                }}
+                // onColor="#c2f0f0"
+                onColor="#98e6e6"
+                offColor="#ccc"
+                boxShadow="0px 0px 5px rgba(0, 0, 0, 0.2)"
+                height={20}
+                width={45}
+                onHandleColor="#227a8a"
+                offHandleColor="#9CA3AF"
+                handleDiameter={20}
+                checkedIcon={false}
+                uncheckedIcon={false}
+              />
+            </div>
+          </div>
                       </div>
 
                       <p className="font-semibold text-lg">
-                        Additional Details:
+                        {/* Additional Details: */}
+                        Position & Requirements:
                       </p>
 
                       <div className="flex mb-5 mt-3">
@@ -1717,6 +1763,11 @@ const AssessmentPopup = ({ assessment, onCloseprofile }) => {
                         </div>
                       </div>
 
+                      <p className="font-semibold text-lg">
+
+                        Timing & Validity
+                      </p>
+
                       <div className="flex mb-5 mt-3">
                         <div className="w-1/4  sm:w-1/2">
                           <div className="">Duration</div>
@@ -1775,6 +1826,12 @@ const AssessmentPopup = ({ assessment, onCloseprofile }) => {
                             />
                           </div>
                         </div>
+                        <div>
+                        <div className="">Link Expiry</div>
+                        <div>
+                          <input type="text" value={formData.linkExpiryDays}/>
+                        </div>
+                        </div>
                       </div>
 
                       <p className="font-semibold text-lg">System Details:</p>
@@ -1811,6 +1868,11 @@ const AssessmentPopup = ({ assessment, onCloseprofile }) => {
               {activeTab === "Questions" && (
                 <>{renderQuestions(assessment, arrowStates, toggleArrow)}</>
               )}
+              {
+                activeTab==="scheduledAssessment"&& (
+                <ScheduledAssessmentTab assessmentId={assessment._id}/>
+                )
+              }
               {activeTab === "Candidates" && (
                 <div className="mt-5">
                   <div>
