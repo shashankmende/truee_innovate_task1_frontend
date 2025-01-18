@@ -16,6 +16,7 @@ import Tooltip from "@mui/material/Tooltip";
 // import Notification from "../Notifications/Notification.jsx";
 import { IoArrowBack } from "react-icons/io5";
 import Switch from 'react-switch'
+import DatePicker from "react-datepicker";
 
 import { ReactComponent as IoIosArrowUp } from "../../../../icons/IoIosArrowUp.svg";
 import { ReactComponent as IoIosArrowDown } from "../../../../icons/IoIosArrowDown.svg";
@@ -30,7 +31,7 @@ import { ReactComponent as MdMoreVert } from "../../../../icons/MdMoreVert.svg";
 
 import ScheduledAssessmentTab from "./ScheduledAssessmentTab.jsx";
 const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
-  
+  console.log('assesview page props',assessment)
   const [isEditSectionPopupOpen, setIsEditSectionPopupOpen] = useState(false);
   const [sectionToEdit, setSectionToEdit] = useState(null);
   const { sharingPermissionscontext } = usePermissions();
@@ -137,6 +138,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
   }, [positionPermissions]);
 
   const handleEditClick = () => {
+    
     setEditMode(!editMode);
   };
 
@@ -190,8 +192,10 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
   };
 
   const handleSave = async () => {
+    alert("save is clicked ")
     try {
-      const response = await axios.put(
+      console.log("formdata",formData)
+      const response = await axios.patch(
         `${process.env.REACT_APP_API_URL}/assessment/${assessment._id}`,
         formData
       );
@@ -321,6 +325,9 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
     "Programming Questions",
     "Short Text(Single line)",
     "Long Text(Paragraph)",
+    "Number",
+    "Boolean",
+    "Mixed"
   ];
 
 
@@ -1575,36 +1582,46 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                         <p className="font-semibold text-lg">
                           Assessment Details:
                         </p>
+                        
+                          { editMode ?  <div className="flex gap-3">
+                            <button onClick={()=>setEditMode(false)} className="bg-[gray]  text-white px-3 py-1 rounded-md">Cancel</button>
+                            <button onClick={handleSave} className="bg-custom-blue text-white px-3 py-1 rounded-md">Save</button>
+                          </div>
+                        :
                         <button
                           className="bg-custom-blue text-white px-3 py-1 rounded-md"
-                          onClick={editMode ? handleSave : handleEditClick}
+                          onClick={handleEditClick}
                         >
-                          {editMode ? "Save" : "Edit"}
-                        </button>
+                         Edit
+                        </button>}
                       </div>
-                      <div className="flex mt-3 -mb-3">
-                        <div className="w-1/4  sm:w-1/2">
+                      {/* assessment name and assessement type */}
+                      <div className="grid grid-cols-2  mt-3 mb-3">
+                        <div className="w-[80%] flex justify-between items-center ]">
+                        <div className="w-1/2  sm:w-1/2">
                           <div className="">Assessment Name</div>
                         </div>
-                        <div className="w-1/4  sm:w-1/2">
+                        <div className="w-1/2  sm:w-1/2">
                           <input
                             name="AssessmentTitle"
                             type="text"
                             value={formData.AssessmentTitle}
                             onChange={handleChange}
-                            className={` text-gray-500 focus:outline-none  ${editMode
+                            className={` text-gray-500 w-[90%] focus:outline-none  ${editMode
                               ? "border-b border-gray-300"
                               : "border-none"
                               }`}
                             readOnly={!editMode}
                           />
                         </div>
-
-                        <div className="w-1/4  sm:w-1/2">
+                        </div>
+                        <div className="w-[80%] flex justify-between  items-center  ]">
+                        <div className="w-1/2  sm:w-1/2">
                           <div className="">Assessment Type</div>
                         </div>
-                        <div className="w-1/4 sm:w-1/2 relative">
+                        <div className="w-1/2 sm:w-1/2 relative">
                           <textarea
+                          
                             ref={textareaRef}
                             name="AssessmentType"
                             value={formData.AssessmentType.join(", ")}
@@ -1613,14 +1630,14 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                                 toggleDropdown();
                               }
                             }}
-                            className={`text-gray-500 focus:outline-none resize-none ${editMode
+                            className={`text-gray-500 w-full focus:outline-none resize-none ${editMode
                               ? "border-b border-gray-300"
                               : "border-none"
                               }`}
                             readOnly
                           />
                           {showDropdown && editMode && (
-                            <div className="absolute z-50 mt-1 w-[180px] bg-white shadow-lg text-sm rounded-sm border">
+                            <div className="absolute z-50 mt-1 w-full bg-white shadow-lg text-sm rounded-sm ">
                               {assessmentTypes.map((type) => (
                                 <div
                                   key={type}
@@ -1635,10 +1652,11 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                             </div>
                           )}
                         </div>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-2 ">
-                        <div className="w-full justify-between  flex mb-5 ">
+                        <div className="w-[80%] justify-between  flex mb-5 ">
                         <div className="w-1/2  sm:w-1/2">
                           <div className="w-[300px]">No.of Questions</div>
                         </div>
@@ -1649,7 +1667,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                             min="1"
                             value={formData.NumberOfQuestions}
                             onChange={handleChange}
-                            className={`text-gray-500 focus:outline-none  ${editMode
+                            className={`text-gray-500 w-[90%] focus:outline-none  ${editMode
                               ? "border-b border-gray-300"
                               : "border-none"
                               }`}
@@ -1659,7 +1677,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                         </div>
                       </div>
                       {/* Assessment Status */}
-          <div className="w-full">
+          <div className="w-[80%]">
             <div className="flex items-center gap-3">
               <label className="block  leading-6 w-1/2 ">
                 Assessment Status
@@ -1696,12 +1714,13 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                         Position & Requirements:
                       </p>
 
-                      <div className="flex mb-5 mt-3">
-                        <div className="w-1/4 sm:w-1/2">
+                      <div className="grid grid-cols-2  mb-5 mt-3">
+                        <div className="w-[80%] flex justify-between items-center">
+                        <div className="w-1/2 sm:w-1/2">
                           <div className="">Position</div>
                         </div>
 
-                        <div className="w-1/4 sm:w-1/2 relative">
+                        <div className="w-1/2 sm:w-1/2 relative">
                           <input
                             name="Position"
                             type="text"
@@ -1711,7 +1730,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                                 setShowPositionDropdown(!showPositionDropdown);
                               }
                             }}
-                            className={`text-gray-500 focus:outline-none ${editMode
+                            className={`text-gray-500 w-[90%] focus:outline-none ${editMode
                               ? "border-b border-gray-300"
                               : "border-none"
                               }`}
@@ -1731,17 +1750,18 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                             </div>
                           )}
                         </div>
-
-                        <div className="w-1/4  sm:w-1/2">
+                        </div>
+                        <div className="w-[80%] flex justify-between items-center">
+                        <div className="w-1/2  sm:w-1/2">
                           <div className="">Difficulty Level</div>
                         </div>
-                        <div className="relative">
+                        <div className="w-1/2 relative">
                           <input
                             name="DifficultyLevel"
                             type="text"
                             value={formData.DifficultyLevel}
                             onClick={toggleDropdownDifficulty}
-                            className={`text-gray-500 focus:outline-none ${editMode
+                            className={`text-gray-500 w-[90%] focus:outline-none ${editMode
                               ? "border-b border-gray-300"
                               : "border-none"
                               }`}
@@ -1761,6 +1781,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                             </div>
                           )}
                         </div>
+                        </div>
                       </div>
 
                       <p className="font-semibold text-lg">
@@ -1768,24 +1789,25 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                         Timing & Validity
                       </p>
 
-                      <div className="flex mb-5 mt-3">
-                        <div className="w-1/4  sm:w-1/2">
+                      <div className="grid grid-cols-2 gap-4 mb-5 mt-3">
+                        <div className="w-[80%]  flex items-center">
+                        <div className="w-1/2  sm:w-1/2">
                           <div className="">Duration</div>
                         </div>
-                        <div className="w-1/4 sm:w-1/2 relative">
+                        <div className="w-1/2 sm:w-1/2 relative">
                           <input
                             name="Duration"
                             type="text"
                             value={formData.Duration}
                             onClick={toggleDropdownDuration}
-                            className={`text-gray-500 focus:outline-none ${editMode
+                            className={`text-gray-500 w-[90%] focus:outline-none ${editMode
                               ? "border-b border-gray-300"
                               : "border-none"
                               }`}
                             readOnly
                           />
                           {showDropdownDuration && (
-                            <div className="absolute z-50 mt-1 w-[180px] bg-white shadow-lg text-sm rounded-sm border">
+                            <div className="absolute z-50 mt-1 w-full bg-white shadow-lg text-sm rounded-sm border">
                               {durationOptions.map((duration) => (
                                 <div
                                   key={duration}
@@ -1798,13 +1820,27 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                             </div>
                           )}
                         </div>
-
-                        <div className="w-1/4 sm:w-1/2">
+                        </div>
+                        <div className=" w-[80%] flex items-center">
+                        <div className="w-1/2 sm:w-1/2">
                           <div className="">Expiry Date</div>
                         </div>
-                        <div className="w-1/4 sm:w-1/2">
-                          <div className="w-1/4 sm:w-1/2">
-                            <input
+                        <div className={`w-1/2 sm:w-1/2 ${editMode  && 'border-b border-gray-300'}`}>
+                            <DatePicker
+                            disabled={!editMode}
+                            selected={formData.ExpiryDate}
+                            // dateFormat="dd-MM-yyyy"
+                            className={`focus:outline-none w-full bg-white`}
+                            timeIntervals={15} // Adjust the intervals (e.g., 15 minutes)
+                            dateFormat="dd-MM-yyyy, hh:mm a" 
+                            onChange={(date)=>{
+                              setFormData({
+                                ...formData,
+                                ExpiryDate:date,
+                              })
+                            }}
+                            />
+                            {/* <input
                               name="ExpiryDate"
                               type="date"
                               value={
@@ -1818,47 +1854,51 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                                   ExpiryDate: e.target.value,
                                 })
                               }
-                              className={`text-gray-500 focus:outline-none  ${editMode
+                              className={`text-gray-500 w-[90%] focus:outline-none  ${editMode
                                 ? "border-b border-gray-300"
                                 : "border-none"
                                 }`}
                               readOnly={!editMode}
-                            />
-                          </div>
+                            /> */}
+                          {/* </div> */}
                         </div>
-                        <div>
-                        <div className="">Link Expiry</div>
-                        <div>
-                          <input type="text" value={formData.linkExpiryDays}/>
+                        </div>
+                        <div className="w-[80%] flex items-center">
+                        <div className="w-1/2">Link Expiry(Days)</div>
+                        <div className="w-1/2">
+                          <input type="text " className={`text-[gray] w-[90%] outline-none ${editMode ? "border-b border-gray-300":"border-none"}`} value={formData.linkExpiryDays} readOnly={!editMode}/>
                         </div>
                         </div>
                       </div>
 
                       <p className="font-semibold text-lg">System Details:</p>
 
-                      <div className="flex mb-5 mt-3">
-                        <div className="w-1/4  sm:w-1/2">
+                      <div className="grid grid-cols-2 items-center  mt-3">
+                        <div className='w-[80%] flex items-start'>
+                        <div className="w-1/2  sm:w-1/2">
                           <div className="">Created By</div>
                         </div>
-                        <div className="w-1/4 sm:w-1/2">
+                        <div className="w-1/2 sm:w-1/2">
                           <textarea
                             value={assessment.CreatedBy}
-                            className="text-gray-500 border-none resize-none"
-                            readOnly
+                            className="text-gray-500 w-full border-none resize-none"
+                            readOnly={!editMode}
                             rows={2}
                           />
                         </div>
-
-                        <div className="w-1/4  sm:w-1/2">
+                        </div>
+                        <div className="w-[80%] flex items-start">
+                        <div className="w-1/2  sm:w-1/2">
                           <div className="">Modified By</div>
                         </div>
-                        <div className="w-1/4 sm:w-1/2">
-                          <input
-                            type="text"
-                            value={assessment.modifiedBY}
-                            className="text-gray-500 border-none"
-                            readOnly
+                        <div className="w-1/2 sm:w-1/2">
+                        <textarea
+                            value={assessment.CreatedBy}
+                            className="text-gray-500 w-full border-none resize-none"
+                            readOnly={!editMode}
+                            rows={2}
                           />
+                        </div>
                         </div>
                       </div>
                     </div>

@@ -1,23 +1,42 @@
 
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { ReactComponent as IoIosArrowBack } from "../../../../icons/IoIosArrowBack.svg";
 import { ReactComponent as IoIosArrowForward } from "../../../../icons/IoIosArrowForward.svg";
 import { ReactComponent as LuFilterX } from "../../../../icons/LuFilterX.svg";
 import { ReactComponent as FiFilter } from "../../../../icons/FiFilter.svg";
 import { ReactComponent as FiMoreHorizontal } from '../../../../icons/FiMoreHorizontal.svg';
+import {ReactComponent as IoIosArrowDownBlack} from '../../../../icons/IoIosArrowDownBlack.svg'
+// import { ReactComponent as FiMoreHorizontal } from '../../../../icons/FiMoreHorizontal.svg';
+// import { ReactComponent as IoIosArrowUp } from "../../../../icons/IoIosArrowUp.svg";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import manImage from '../../Images/man.png'
 import axios from 'axios';
 import { useMemo } from 'react';
 import Tooltip from "@mui/material/Tooltip";
+import { toggleButtonClasses } from '@mui/material';
 
 const ScheduledAssessmentTab = ({assessmentId}) => {
   const [scheduledAssessmentData,setScheduledAssessmentData]=useState([])
   const [filteredScheduledAssessmentData,setFilteredScheduledAssessmentData]=useState([])
     const [isScheduledAssessmentFilterOpen,setIScheduledAssessmentFilterOpen]=useState(false)
+
+  const [candidateAssessmentData,setCandidateAssessmentData]=useState({})
+
+  const [actionViewMore, setActionViewMore] = useState({});
+  const [assessmentActionViewMore,setAssessmentActionViewMore]=useState("")
+
+  const toggleAssessmentActionMore =(id)=>{
+    setAssessmentActionViewMore(prev=>prev===id?null:id)
+  }
+
+  const toggleAction = (id) => {
+    setActionViewMore((prev) => (prev === id ? null : id));
+  };
     const onClickFilterIcons=()=>{
         setIScheduledAssessmentFilterOpen(!isScheduledAssessmentFilterOpen)
     }
+    const [selectedAssessment,setSelectedAssessment]=useState("")
     const [currentPage,setCurrentPage]=useState(1)
 
     const itemsPerPage = 3;
@@ -30,8 +49,23 @@ const ScheduledAssessmentTab = ({assessmentId}) => {
           console.log('assessment id',assessmentId)
               const url =`${process.env.REACT_APP_API_URL}/schedule-assessment/${assessmentId}`
                 const response = await axios.get(url)
-              setScheduledAssessmentData(response.data.scheduledAssessment)
-              setFilteredScheduledAssessmentData(response.data.scheduledAssessment)
+                if (response.data.success){
+                  const data = response.data.scheduledAssessment
+                  setScheduledAssessmentData(data||[])
+                  setFilteredScheduledAssessmentData(data||[])
+                  
+                  const candidateAssessmentPromises = data.map(async(item)=>{
+                    const candidateResponse = await axios.get(`${process.env.REACT_APP_API_URL}/candidate-assessment/${item._id}`)
+                    return {id:item._id,assessments:candidateResponse.data.candidateAssessments}
+                  })
+                  const candidateAssessments = await Promise.all(candidateAssessmentPromises)
+                  const newObj= candidateAssessments.reduce((acc,{id,assessments})=>{
+                    acc[id]=assessments;
+                    return acc;
+                  },{})
+
+                  setCandidateAssessmentData(newObj)
+                }
             } catch (error) {
                 console.error("error in getting scheduled assessments from frontend",error.message)
                 
@@ -61,6 +95,30 @@ const ScheduledAssessmentTab = ({assessmentId}) => {
       )
     },[filteredScheduledAssessmentData,currentPage])
 
+
+    const fetchAssessmentCandidate = useCallback(async(id)=>{
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/candidate-assessment/${id}`)
+        if (response.data.success){
+          setCandidateAssessmentData(response.data.candidateAssessments||[])
+          // alert(`${response.data.message}`)
+        }
+      } catch (error) {
+        console.log(`${error.message}`)
+        // alert(`${error.message}`)
+      }
+    },[selectedAssessment])
+
+
+    const onClickExpandArrow =(id)=>{
+      // fetchAssessmentCandidate(id)
+      setSelectedAssessment(id)
+    }
+
+    const onClickCloseArrow =()=>{
+      setSelectedAssessment("")
+    }
+    console.log("candidate assessment",candidateAssessmentData)
 
   return (
     <div className='mt-4'>
@@ -98,6 +156,7 @@ const ScheduledAssessmentTab = ({assessmentId}) => {
                 <th className='p-1 text-md  font-semibold text-center '>Candidates</th>
                 <th className='p-1 text-md font-semibold  text-center '>Expiry At</th>
                 <th className='p-1 text-md font-semibold text-center '>Status</th>
+                <th></th>
                 <th className='p-1 text-md font-semibold text-center '>Action</th>
             </thead>
           
@@ -113,6 +172,7 @@ const ScheduledAssessmentTab = ({assessmentId}) => {
     </tr>
   ) : (
     paginatedData.map((assessment) => (
+      <>
       <tr key={assessment._id} className="border-b-[1px] border-[#8080808f]">
         <td className="text-center p-2 text-[#227a8a]">
           assessment-{assessment._id.slice(-5, -1)}
@@ -137,12 +197,99 @@ const ScheduledAssessmentTab = ({assessmentId}) => {
         }).format(new Date(assessment.expiryAt)).replace("am",'AM').replace("pm","PM")}</td>
         
         <td className="text-center p-2">{assessment.status}</td>
+        <td >{ selectedAssessment===assessment._id?<IoIosArrowUp onClick={()=>onClickCloseArrow()} className="text-2xl font-bold cursor-pointer"/>: <IoIosArrowDown onClick={()=>onClickExpandArrow(assessment._id)}  className="text-2xl font-bold cursor-pointer"/>}</td>
         <td className="text-center p-2">
-          <div className="flex justify-center">
+          <div className="flex justify-center cursor-pointer" onClick={()=>toggleAssessmentActionMore(assessment._id)}>
             <FiMoreHorizontal className="text-2xl" />
           </div>
+          {assessment._id===assessmentActionViewMore && (
+            <div className='absolute z-10 w-28 bg-white p-2 shadow-lg border border-gray-200 rounded-sm '>
+              <div className="flex flex-col gap-2">
+          <button className="py-2 px-4 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
+            View
+          </button>
+          <button onClick={()=>toggleAssessmentActionMore("")} className="py-2 px-4 text-sm text-red-600 bg-red-50 rounded-md hover:bg-red-100">
+            Cancel
+          </button>
+        </div>
+            </div>
+          )}
         </td>
       </tr>
+      {
+  assessment._id === selectedAssessment && (
+    <tr>
+      <td colSpan="6" className="">
+        <div className="mx-10">
+          <table className="w-full rounded-sm border-collapse border border-gray-500">
+            <thead className='px-2 border-collapse border border-gray-500'>
+              <tr className='border-collapse'>
+                <th className="p-1 text-md text-[#227a8a] font-semibold text-center">Candidate Name</th>
+                <th className="p-1 text-md text-[#227a8a]  font-semibold text-center">Status</th>
+                <th className="p-1 text-md text-[#227a8a]  font-semibold text-center">Expiry At</th>
+                <th className="p-1 text-md text-[#227a8a]  font-semibold text-center">Started At</th>
+                <th className="p-1 text-md text-[#227a8a]  font-semibold text-center">Ended At</th>
+                <th className="p-1 text-md text-[#227a8a]  font-semibold text-center">Progress</th>
+                <th className="p-1 text-md text-[#227a8a]  font-semibold text-center">Total Score</th>
+                <th className="p-1 text-md text-[#227a8a]  font-semibold text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {candidateAssessmentData[assessment._id].length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="text-center p-2">
+                    No candidate data available
+                  </td>
+                </tr>
+              ) : (
+                candidateAssessmentData[assessment._id].map((candidateAssessment, index) => (
+                  <tr key={index} className='border-b border-gray-500 border-collapse'>
+                    <td className="text-center p-2 ">{candidateAssessment.candidateId.FirstName}</td>
+                    <td className="text-center  p-2">{candidateAssessment.status}</td>
+                    <td className="text-center  p-2">{new Date(candidateAssessment.expiryAt).toLocaleDateString("en-GB",{
+                      day:"2-digit",
+                      month:"2-digit",
+                      year:"numeric",
+                      hour:'2-digit',
+                      minute:'2-digit',
+                      hour12:true
+                    }).replace("am","AM").replace("pm",'PM')}</td>
+                    <td className="text-center  p-2">{candidateAssessment.startedAt || "-"}</td>
+                    <td className="text-center  p-2">{candidateAssessment.endedAt || "-"}</td>
+                    <td className="text-center  p-2">{candidateAssessment.progress}</td>
+                    <td className="text-center  p-2">{candidateAssessment.totalScore}</td>
+                    <td className="text-center p-2">
+  <div className="relative flex justify-center items-center cursor-pointer">
+    <button onClick={() => toggleAction(candidateAssessment._id)}>
+      <FiMoreHorizontal className="text-2xl text-gray-600 hover:text-gray-800" />
+    </button>
+    {actionViewMore === candidateAssessment._id && (
+      <div className="absolute top-5 z-10 p-4 w-40 rounded-md shadow-lg bg-white border border-gray-200 ">
+        <div className="flex flex-col gap-2">
+          <button className="py-2 px-4 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
+            View
+          </button>
+          <button onClick={()=>toggleAction("")} className="py-2 px-4 text-sm text-red-600 bg-red-50 rounded-md hover:bg-red-100">
+            Cancel
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+</td>
+
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </td>
+    </tr>
+  )
+}
+
+      </>
     ))
   )}
 </tbody>

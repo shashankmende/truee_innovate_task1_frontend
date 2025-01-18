@@ -292,9 +292,7 @@ const Assessment = () => {
   const [showLinkExpiryDay,setShowLinkExpiryDays]=useState(false)
     const [linkExpiryDays,setLinkExpiryDays]=useState(3)
     
-    // useEffect(()=>{
-    //   Cookies.set("linkExpiryDays",linkExpiryDays)
-    // },[linkExpiryDays])
+
   //
 
   const toggleSidebar = () => {

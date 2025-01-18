@@ -482,7 +482,7 @@ const MyQuestionsList1 = forwardRef(({ question, fromcreate, closeDropdown, from
     };
     const handleAddToList = async (listIds, questionId) => {
         const questionData = {
-            tenentListId: listIds,
+            tenantListId: listIds,
             suggestedQuestionId: questionId,
             ownerId: userId,
         };

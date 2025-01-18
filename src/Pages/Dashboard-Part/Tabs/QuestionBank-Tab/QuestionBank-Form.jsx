@@ -57,10 +57,9 @@ const Interviewcq = ({
     questionType: "",
     skill: "",
     difficultyLevel: "",
-    score: "",
     correctAnswer: "",
     options: [],
-    tenentListId: [],
+    tenantListId: [],
     hints: "",
     minexperience: "",
     maxexperience: "",
@@ -132,7 +131,7 @@ const Interviewcq = ({
       setAutoAssessment(question.isAutoAssessment || false);
       setAnswerMatching(question.autoAssessment?.criteria || "");
       setCharLimits(question.charLimits || { min: 1, max: 100 });
-      const labelNames = question.tenentListId.map(tenant => tenant);
+      const labelNames = question.tenantListId.map(tenant => tenant);
       setSelectedLabels(labelNames);
     }
   }, [isEdit, question]);
@@ -145,7 +144,7 @@ const Interviewcq = ({
       score: "",
       correctAnswer: "",
       options: [],
-      tenentListId: [],
+      tenantListId: [],
       hints: "",
     });
 
@@ -174,7 +173,7 @@ const Interviewcq = ({
 
   const handleSubmit = async (e, isSaveAndNext) => {
     e.preventDefault();
-    const updatedFormData = { ...formData, tenentListId: selectedListId };
+    const updatedFormData = { ...formData, tenantListId: selectedListId };
     const newErrors = validateQuestionBankData(updatedFormData, mcqOptions,section);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -186,7 +185,7 @@ const Interviewcq = ({
       minexperience: parseInt(selectedMinExperience),
       maxexperience: parseInt(selectedMaxExperience),
       isCustom: true,
-      tenentListId: selectedListId,
+      tenantListId: selectedListId,
       difficultyLevel: selectedDifficultyLevel,
       questionType: selectedQuestionType,
       skill: selectedSkill,
@@ -241,7 +240,7 @@ const Interviewcq = ({
     }
 
     if (orgId) {
-      questionData.tenentId = orgId;
+      questionData.tenantId = orgId;
     }
 
     console.log("questionData", questionData);
@@ -474,7 +473,7 @@ const Interviewcq = ({
 
   const handleErrorClear = () => {
     setErrors((prevErrors) => {
-      const { tenentListId, ...rest } = prevErrors;
+      const { tenantListId, ...rest } = prevErrors;
       return rest;
     });
   };
@@ -620,7 +619,7 @@ const Interviewcq = ({
                       </div>
                     </div>
                   </div>
-                  <MyQuestionList fromform={true} onSelectList={handleListSelection} ref={listRef} error={errors.tenentListId} defaultTenantList={selectedLabels}
+                  <MyQuestionList fromform={true} onSelectList={handleListSelection} ref={listRef} error={errors.tenantListId} defaultTenantList={selectedLabels}
                     onErrorClear={handleErrorClear}
                   />
                   {/* Skill/Technology */}

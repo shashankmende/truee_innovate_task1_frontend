@@ -73,10 +73,11 @@ const CustomProvider = ({ children }) => {
         "tenentquestions",
         sharingPermissions
       );
-      console.log(filteredPositions, "filteredPositions");
       const newObject = {};
       for (const key in filteredPositions) {
-        const valuesList = filteredPositions[key].map(each => ({ ...each, isAdded: false }))
+        const valuesList = Array.isArray(filteredPositions[key])
+          ? filteredPositions[key].map(each => ({ ...each, isAdded: false }))
+          : [];
         newObject[key] = valuesList
       }
       setMyQuestionsList(newObject);
