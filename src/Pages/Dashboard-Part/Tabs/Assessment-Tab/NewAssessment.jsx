@@ -418,7 +418,8 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
     
       if (currentTab === "Candidates") {
         setIsLoading(true);
-        await handleShareClick(response.data._id);
+        alert("candidate condition block")
+        await handleShareClick(tabsSubmitStatus.responseId);
         setIsLoading(false);
       }
       // handleClose();
@@ -433,10 +434,11 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
  
 
   const handleShareClick = async(assessmentId)=>{
+    alert("entered into handleshare click methond",assessmentId)
     try {
       setIsLoading(true)
       if (!assessmentId) {
-        console.error("Failed to save assessment or retrieve assessmentId");
+        console.error("Failed to save assessment or retrieve assessmentId",assessmentId);
         return;
       }
       if (selectedCandidates.length === 0) {
@@ -456,6 +458,7 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
            }
       const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
       if (scheduleAssessmentResponse.data.success){
+        alert("scheduled assessment")
         const CandidateAssessmentsList = selectedCandidates.map(candidateId=>({
           scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,
           candidateId,
@@ -467,6 +470,9 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
         }))
         console.log("candidate assessment list",CandidateAssessmentsList)
           const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment`,CandidateAssessmentsList)
+          if (CandidateAssessmentResponse.data.success){
+            alert("assessment shared with candidiates")
+          }
         setIsLoading(false)
         setSelectedCandidates([])
         onClose()

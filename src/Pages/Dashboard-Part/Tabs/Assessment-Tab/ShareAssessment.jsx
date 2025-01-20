@@ -214,6 +214,7 @@ const ShareAssessment = ({
       return;
     }
     setIsLoading(true);
+    alert("share is clicked")
     try {
       const reqBody = {
         assessmentId,
@@ -225,8 +226,9 @@ const ShareAssessment = ({
       }
       const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
       const selectedCandidateIds = selectedCandidates.map(candidate => candidate._id);
-      
+        
         if (scheduleAssessmentResponse.data.success){
+          alert(`${scheduleAssessmentResponse.data.message}`)
           const CandidateAssessmentsList = selectedCandidateIds.map(candidateId=>({
             scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,
             candidateId,
@@ -238,7 +240,7 @@ const ShareAssessment = ({
           }))
           console.log("candidate assessment list",CandidateAssessmentsList)
           const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment`,CandidateAssessmentsList)
-
+          alert(`${CandidateAssessmentResponse.data.message}`)
           setIsLoading(false)
 
           onCloseshare();

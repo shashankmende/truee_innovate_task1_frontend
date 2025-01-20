@@ -30,6 +30,7 @@ import { MdOutlineContentCopy, MdSwipeLeft } from "react-icons/md";
 import { ReactComponent as MdMoreVert } from "../../../../icons/MdMoreVert.svg";
 
 import ScheduledAssessmentTab from "./ScheduledAssessmentTab.jsx";
+import ScheduledAssessmentViewPage from "./ScheduledAssessmentViewPage.jsx";
 const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
   console.log('assesview page props',assessment)
   const [isEditSectionPopupOpen, setIsEditSectionPopupOpen] = useState(false);
@@ -52,6 +53,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
   const [isEditSectionModalOpen, setIsEditSectionModalOpen] = useState(false);
   const [editedSectionName, setEditedSectionName] = useState("");
 
+  const [showScheduledAssessmentViewPage,setShowScheduledAssessmentViewPage]=useState(false)
   
   const toggleSidebarAddQuestion = (SectionName) => {
     if (checkedCount >= questionsLimit) {
@@ -115,8 +117,48 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
 
   });
 
+  const [showAddSectionPopup, setShowAddSectionPopup] = useState(false);
+  const [newSectionName, setNewSectionName] = useState("");
+  const [newSectionNameError, setNewSectionNameError] = useState("");
+  // const [addedSections, setAddedSections] = useState([]); // State to store added sections
+  
+  const onClickAddSection = () => {
+    setShowAddSectionPopup((prev) => !prev); 
+    setNewSectionName(""); 
+    setNewSectionNameError(""); 
+  };
+  
+  const onChangeNewSectionName = (e) => {
+    const value = e.target.value.trim(); 
+    setNewSectionName(value);
+    setNewSectionNameError(value === "" ? "Section name is required" : ""); 
+  };
+  
+  const onClickAddButton = () => {
+    if (newSectionName === "") {
+      setNewSectionNameError("Section name is required"); 
+      return;
+    }
+  
+    // Add new section to the list
+    setAddedSections((prev) => [...prev, newSectionName]);
+  
+    // Reset state and close popup
+    setShowAddSectionPopup(false);
+    setNewSectionName("");
+  };
+  
   const [positions, setPositions] = useState([]);
   const [showPositionDropdown, setShowPositionDropdown] = useState(false);
+
+  const [ScheduledAssessmentViewPageId,setScheduledAssessmentViewPageId]=useState('')
+
+  const onClickViewButtonOfScheduledAssessment =(scheduledAssessment)=>{
+    setScheduledAssessmentViewPageId(scheduledAssessment)
+    setShowScheduledAssessmentViewPage(true)
+  }
+
+
 
   useEffect(() => {
     const fetchSkillsData = async () => {
@@ -686,26 +728,32 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
 
     return (
       <>
+      <div className="relative">
         <p
-          className="float-end -mt-9 border rounded-sm p-2 bg-custom-blue text-white"
-          onClick={toggleSidebarForSection}
+          className="float-end -mt-9 border rounded-sm p-2 bg-custom-blue text-white cursor-pointer"
+          // onClick={toggleSidebarForSection}
+          // onClick={()=>{setShowAddSectionPopup(!showAddSectionPopup);setNewSectionNameError("")}}
+          onClick={onClickAddSection}
+
         >
           Add Section
+         
         </p>
-        <AddSection1
-          isOpen={sidebarOpenForSection}
-          onClose={closeSidebarForSection}
-          onOutsideClick={handleOutsideClickForSection}
-          ref={sidebarRefForSection}
-          position={position}
-          onSectionAdded={handleSectionAdded}
-          skills={skillsForSelectedPosition}
-          selectedSkills={selectedSkills}
-          setSelectedSkills={setSelectedSkills}
-          addedSections={addedSections}
-          assessmentId={assessment._id}
-          isFromProfileDetails={true}
-        />
+        {showAddSectionPopup && <div className="absolute z-20 right-0 shadow-lg w-[300px] rounded-sm p-3 border border-gray-300 bg-white">
+          <div className="flex flex-col gap-4">
+            <input type="text" value={newSectionName} placeholder="section name" className="border-b border-gray-300 outline-none" 
+            // onChange = {e=>setNewSectionName(e.target.value)}
+            onChange={onChangeNewSectionName}
+            />
+            {newSectionNameError && <p className="text-[red] text-sm -mt-4">{newSectionNameError}</p>}
+            <div className="flex justify-end ">
+
+            <button className="bg-[#227a8a] rounded-sm text-white px-4" onClick={onClickAddButton}>Add</button>
+            </div>
+          </div>
+        </div>}
+        </div>
+
 
         <div className="mt-10 border rounded-md mb-5">
           <div className="w-full text-left border rounded-md">
@@ -1447,7 +1495,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
   return (
     <>
       <div>
-        {showMainContent && (
+        {(showMainContent && !showScheduledAssessmentViewPage) && (
           <div className="container mx-auto bg-white">
             <div className="mx-10">
               <div className="flex items-center">
@@ -1910,7 +1958,10 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
               )}
               {
                 activeTab==="scheduledAssessment"&& (
-                <ScheduledAssessmentTab assessmentId={assessment._id}/>
+                <ScheduledAssessmentTab assessmentId={assessment._id}
+                onClickViewButtonOfScheduledAssessment={onClickViewButtonOfScheduledAssessment}
+
+                />
                 )
               }
               {activeTab === "Candidates" && (
@@ -2566,16 +2617,15 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
           </div>
         )}
 
-        {/* {sidebarOpenAddQuestion && (
-     <AddQuestion1
-      isOpen={sidebarOpenAddQuestion}
-      onClose={onCloseprofile}
-      onSectionAdded={handleSectionAdded}
-      addedSections={addedSections}
-      assessmentId={assessment._id}
-      fromProfileDetails={true}
-     />
-    )} */}
+
+        {showScheduledAssessmentViewPage && (
+          <ScheduledAssessmentViewPage 
+          candidates = {""}
+          assessment={ScheduledAssessmentViewPageId}
+          setShowScheduledAssessmentViewPage={setShowScheduledAssessmentViewPage}
+          />
+        )}
+
 
         {isEditQuestionModalOpen && (
           <Editassesmentquestion
