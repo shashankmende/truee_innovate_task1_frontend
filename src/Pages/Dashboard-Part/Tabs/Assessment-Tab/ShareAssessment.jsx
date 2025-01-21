@@ -110,16 +110,7 @@ const ShareAssessment = ({
   const [notesValue, setNotesValue] = useState("");
 
 
-  // const handleNotesChange = (event) => {
-  //   const value = event.target.value;
-  //   if (value.length <= 250) {
-  //     setNotesValue(value);
-  //     event.target.style.height = "auto";
-  //     event.target.style.height = event.target.scrollHeight + "px";
-  //     setFormData({ ...formData, notes: value });
-  //     setErrors({ ...errors, notes: "" });
-  //   }
-  // };
+
 
   const [filteredCandidates, setFilteredCandidates] = useState([]);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
@@ -214,7 +205,6 @@ const ShareAssessment = ({
       return;
     }
     setIsLoading(true);
-    alert("share is clicked")
     try {
       const reqBody = {
         assessmentId,
@@ -226,9 +216,9 @@ const ShareAssessment = ({
       }
       const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
       const selectedCandidateIds = selectedCandidates.map(candidate => candidate._id);
+      const selectedCandidatesEmails = selectedCandidates.map(candidate=>candidate.Email)
         
         if (scheduleAssessmentResponse.data.success){
-          alert(`${scheduleAssessmentResponse.data.message}`)
           const CandidateAssessmentsList = selectedCandidateIds.map(candidateId=>({
             scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,
             candidateId,
@@ -240,7 +230,12 @@ const ShareAssessment = ({
           }))
           console.log("candidate assessment list",CandidateAssessmentsList)
           const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment`,CandidateAssessmentsList)
-          alert(`${CandidateAssessmentResponse.data.message}`)
+          if (CandidateAssessmentResponse.data.success){
+            const response = await axios.post( `${process.env.REACT_APP_API_URL}/send-assessment-link`,
+              {scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,candidateEmails:selectedCandidatesEmails})
+            alert(`${response.data.message}`)
+          }
+          
           setIsLoading(false)
 
           onCloseshare();

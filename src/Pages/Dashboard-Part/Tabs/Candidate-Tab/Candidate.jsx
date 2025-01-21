@@ -503,23 +503,36 @@ const Candidate = ({ isAssessmentContext = false, onSelectCandidates }) => {
   // };
 
   const [selectedCandidates, setSelectedCandidates] = useState([]);
-
+  const [emails, setEmails] = useState([]);
+  
   const handleSelectCandidate = (candidateId) => {
     setSelectedCandidates((prevSelected) => {
-      const isSelected = prevSelected.includes(candidateId);
+      // Check if the candidate is already selected
+      const isSelected = prevSelected.includes(candidateId); // Correctly check in the array
+      // Update the selected candidates list
       const updatedSelection = isSelected
-        ? prevSelected.filter((id) => id !== candidateId)
-        : [...prevSelected, candidateId];
-
-      return updatedSelection;
+        ? prevSelected.filter((id) => id !== candidateId) // Remove if already selected
+        : [...prevSelected, candidateId]; // Add if not selected
+  
+      // Extract emails of the selected candidates
+      const updatedEmails = currentFilteredRows
+        .filter((row) => updatedSelection.includes(row._id)) // Filter selected candidates
+        .map((row) => row.Email); // Map to extract emails
+  
+      // Update emails state
+      setEmails(updatedEmails);
+  
+      return updatedSelection; // Return the updated selection
     });
   };
+  
+ 
 
   useEffect(() => {
     if (onSelectCandidates) {
-      onSelectCandidates(selectedCandidates);
+      onSelectCandidates(selectedCandidates,emails);
     }
-  }, [selectedCandidates, onSelectCandidates]);
+  }, [selectedCandidates,emails, onSelectCandidates]);
 
   const handleSelectAll = () => {
     if (selectedCandidates.length === candidateData.length) {

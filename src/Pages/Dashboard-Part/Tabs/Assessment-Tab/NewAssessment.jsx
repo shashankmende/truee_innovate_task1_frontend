@@ -27,19 +27,7 @@ import ConfirmationPopup from "./ConfirmationPopup.jsx";
 // import { handleShareClick as shareAssessment } from '../../../../utils/EmailShare';
 
 
-import { ReactComponent as MdArrowDropDown } from "../../../../icons/MdArrowDropDown.svg";
-import { ReactComponent as IoIosArrowUp } from "../../../../icons/IoIosArrowUp.svg";
-import { ReactComponent as IoIosArrowDown } from "../../../../icons/IoIosArrowDown.svg";
-import { ReactComponent as SlPencil } from "../../../../icons/SlPencil.svg";
-import { ReactComponent as IoIosAddCircle } from "../../../../icons/IoIosAddCircle.svg";
-import { ReactComponent as HiOutlineExclamationCircle } from "../../../../icons/HiOutlineExclamationCircle.svg";
-import { ReactComponent as MdOutlineCancel } from "../../../../icons/MdOutlineCancel.svg";
-import { ReactComponent as IoArrowBack } from "../../../../icons/IoArrowBack.svg";
-import { ReactComponent as FaTrash } from "../../../../icons/FaTrash.svg";
-import { ReactComponent as CgInfo } from "../../../../icons/CgInfo.svg";
-import { ReactComponent as MdMoreVert } from "../../../../icons/MdMoreVert.svg";
-import Popup from "reactjs-popup";
-import QuestionBank from "../QuestionBank-Tab/QuestionBank.jsx";
+
 import BasicDetailsTab from "./BasicDetailsTab.jsx";
 import AssessmentTestDetailsTab from "./AssessmentTestDetailsTab.jsx";
 import AssessmentQuestionsTab from "./AssessmentQuestionsTab.jsx";
@@ -54,8 +42,8 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   );
 
   const organizationId = Cookies.get("organizationId");
-  const [activeTab, setActiveTab] = useState("Basicdetails");
-  // const [activeTab, setActiveTab] = useState("Candidates");
+  // const [activeTab, setActiveTab] = useState("Basicdetails");
+  const [activeTab, setActiveTab] = useState("Candidates");
   const [position, setPosition] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [showMessage, setShowMessage] = useState(false);
@@ -418,7 +406,6 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
     
       if (currentTab === "Candidates") {
         setIsLoading(true);
-        alert("candidate condition block")
         await handleShareClick(tabsSubmitStatus.responseId);
         setIsLoading(false);
       }
@@ -434,7 +421,7 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
  
 
   const handleShareClick = async(assessmentId)=>{
-    alert("entered into handleshare click methond",assessmentId)
+    
     try {
       setIsLoading(true)
       if (!assessmentId) {
@@ -458,7 +445,7 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
            }
       const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
       if (scheduleAssessmentResponse.data.success){
-        alert("scheduled assessment")
+      
         const CandidateAssessmentsList = selectedCandidates.map(candidateId=>({
           scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,
           candidateId,
@@ -471,7 +458,10 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
         console.log("candidate assessment list",CandidateAssessmentsList)
           const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment`,CandidateAssessmentsList)
           if (CandidateAssessmentResponse.data.success){
-            alert("assessment shared with candidiates")
+            const response = await axios.post( `${process.env.REACT_APP_API_URL}/send-assessment-link`,
+              {scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,candidateEmails:candidateEmails})
+            toast.success(`${response.data.message}`)
+            
           }
         setIsLoading(false)
         setSelectedCandidates([])
@@ -1048,10 +1038,13 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   }, []);
 
   const [selectedCandidates, setSelectedCandidates] = useState([]);
+  const [candidateEmails,setCandidateEmails]=useState([])
+  
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSelectCandidates = (candidates) => {
+  const handleSelectCandidates = (candidates,emails) => {
     setSelectedCandidates(candidates);
+    setCandidateEmails(emails)
   };
 
   // ashraf
@@ -1489,7 +1482,7 @@ const updateQuestionsInAddedSectionFromQuestionBank = async (secName, question) 
   const updatedSectionsWithOrder = recalculateOrder(updatedSections);
   console.log("updated sections with order",updatedSectionsWithOrder)
 
-  // Step 3: Find the exact updated question with the new order
+  // Step 3: Find the exact updated question with the new order 
   const updatedQuestion = updatedSectionsWithOrder
     .find((section) => section.SectionName === secName) // Locate the correct section
     .Questions.find((q) => q._id === question._id); // Locate the question in that section
@@ -1511,6 +1504,11 @@ const updateQuestionsInAddedSectionFromQuestionBank = async (secName, question) 
     order: updatedQuestion.order,
     customizations: "customization",
   };
+
+if (updatedQuestion.questionType ==="Short Text" || updatedQuestion.questionType==="Long Text"){
+  
+  reqBody.snapshot.autoAssessment= question.autoAssessment
+}
 
   try {
     // Step 5: Send the updated question to the backend

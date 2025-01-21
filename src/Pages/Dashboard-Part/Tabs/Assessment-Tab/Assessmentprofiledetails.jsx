@@ -17,6 +17,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { IoArrowBack } from "react-icons/io5";
 import Switch from 'react-switch'
 import DatePicker from "react-datepicker";
+import toast from "react-hot-toast";
 
 import { ReactComponent as IoIosArrowUp } from "../../../../icons/IoIosArrowUp.svg";
 import { ReactComponent as IoIosArrowDown } from "../../../../icons/IoIosArrowDown.svg";
@@ -68,28 +69,6 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
     setIsLimitReachedPopupOpen(false);
   };
 
-  // const [assessment, setAssessmentData] = useState([]);
-
-  // const fetchAssessmentData = useCallback(async () => {
-  //   try {
-  //     const filteredAssessments = await fetchFilterData(
-  //       "assessment",
-  //       assessmentPermissions
-  //     );
-
-  //     // Filter the assessments to find the one that matches assessmentmain._id
-  //     const matchedAssessment = filteredAssessments.find(
-  //       (assessment) => assessment._id === assessmentmain._id
-  //     );
-
-  //     // Set the matched assessment data
-  //     setAssessmentData(matchedAssessment ? [matchedAssessment] : []);
-  //     setCurrentPage(0);
-  //   } catch (error) {
-  //     console.error("Error fetching assessment data:", error);
-  //   }
-  // }, [assessmentPermissions, assessmentmain._id]);
-
   const [editingIndex, setEditingIndex] = useState(null);
   const handleEditSection = (index, currentSectionName) => {
     setEditingIndex(index);
@@ -120,7 +99,54 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
   const [showAddSectionPopup, setShowAddSectionPopup] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
   const [newSectionNameError, setNewSectionNameError] = useState("");
-  // const [addedSections, setAddedSections] = useState([]); // State to store added sections
+  
+  //for scheduled assessment view page
+  const [scheduledAssessmentData, setScheduledAssessmentData] = useState([]);
+    const [candidateAssessmentData, setCandidateAssessmentData] = useState({});
+    const [filteredScheduledAssessmentData, setFilteredScheduledAssessmentData] =
+      useState([]);
+    const [scheduledAssessmentId,setScheduledAssessmentId]=useState("")
+
+      const getScheduledAssessments = async () => {
+        try {
+          const url = `${process.env.REACT_APP_API_URL}/schedule-assessment/${assessment._id}`;
+          const response = await axios.get(url);
+          if (response.data.success) {
+            const data = response.data.scheduledAssessment;
+            setScheduledAssessmentData(data || []);
+            setFilteredScheduledAssessmentData(data || []);
+    
+            const candidateAssessmentPromises = data.map(async (item) => {
+              const candidateResponse = await axios.get(
+                `${process.env.REACT_APP_API_URL}/candidate-assessment/${item._id}`
+              );
+              return {
+                id: item._id,
+                assessments: candidateResponse.data.candidateAssessments,
+              };
+            });
+            const candidateAssessments = await Promise.all(
+              candidateAssessmentPromises
+            );
+            const newObj = candidateAssessments.reduce(
+              (acc, { id, assessments }) => {
+                acc[id] = assessments;
+                return acc;
+              },
+              {}
+            );
+    
+            setCandidateAssessmentData(newObj);
+          }
+        } catch (error) {
+          toast.error("some thing went wrong");
+          console.error(
+            "error in getting scheduled assessments from frontend",
+            error.message
+          );
+        }
+      };  
+  
   
   const onClickAddSection = () => {
     setShowAddSectionPopup((prev) => !prev); 
@@ -155,10 +181,9 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
 
   const onClickViewButtonOfScheduledAssessment =(scheduledAssessment)=>{
     setScheduledAssessmentViewPageId(scheduledAssessment)
+    setScheduledAssessmentId(scheduledAssessment._id)
     setShowScheduledAssessmentViewPage(true)
   }
-
-
 
   useEffect(() => {
     const fetchSkillsData = async () => {
@@ -1526,12 +1551,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                     </div>
                   </div>
                 )}
-                {/* <button
-                  className="sm:w-8 md:hidden lg:hidden xl:hidden 2xl:hidden"
-                  onClick={onCloseprofile}
-                >
-                  <IoArrowBack className="text-2xl" />
-                </button> */}
+                
                 <p className="text-xl flex items-center">
                   <span
                     className="text-custom-blue font-semibold cursor-pointer"
@@ -1543,16 +1563,9 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                     </span>
                   </span>
                 </p>
-                {/* <div className="ml-auto">
-                  <button
-                    className="bg-custom-blue text-white px-1 py-1 rounded-md"
-                    onClick={handleEditClick}
-                  >
-                    Add Question
-                  </button>
-                </div> */}
+                
               </div>
-              {/* 3 */}
+
               <div>
                 <div className="pt-5 pb-2 sm:hidden md:hidden">
                   <p className="text-xl space-x-10">
@@ -1888,27 +1901,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                               })
                             }}
                             />
-                            {/* <input
-                              name="ExpiryDate"
-                              type="date"
-                              value={
-                                new Date(formData.ExpiryDate)
-                                  .toISOString()
-                                  .split("T")[0]
-                              }
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  ExpiryDate: e.target.value,
-                                })
-                              }
-                              className={`text-gray-500 w-[90%] focus:outline-none  ${editMode
-                                ? "border-b border-gray-300"
-                                : "border-none"
-                                }`}
-                              readOnly={!editMode}
-                            /> */}
-                          {/* </div> */}
+                            
                         </div>
                         </div>
                         <div className="w-[80%] flex items-center">
@@ -1958,7 +1951,15 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
               )}
               {
                 activeTab==="scheduledAssessment"&& (
-                <ScheduledAssessmentTab assessmentId={assessment._id}
+                <ScheduledAssessmentTab
+                getScheduledAssessments={getScheduledAssessments}
+                scheduledAssessmentData={scheduledAssessmentData}
+                setScheduledAssessmentData={setScheduledAssessmentData}
+                candidateAssessmentData={candidateAssessmentData}
+                setCandidateAssessmentData={setCandidateAssessmentData}
+                filteredScheduledAssessmentData={filteredScheduledAssessmentData}
+                setFilteredScheduledAssessmentData={setFilteredScheduledAssessmentData}
+                 assessmentId={assessment._id}
                 onClickViewButtonOfScheduledAssessment={onClickViewButtonOfScheduledAssessment}
 
                 />
@@ -2620,7 +2621,8 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
 
         {showScheduledAssessmentViewPage && (
           <ScheduledAssessmentViewPage 
-          candidates = {""}
+          
+          candidates = {candidateAssessmentData[scheduledAssessmentId]}
           assessment={ScheduledAssessmentViewPageId}
           setShowScheduledAssessmentViewPage={setShowScheduledAssessmentViewPage}
           />

@@ -18,11 +18,11 @@ import { useMemo } from "react";
 import Tooltip from "@mui/material/Tooltip";
 import { toggleButtonClasses } from "@mui/material";
 
-const ScheduledAssessmentTab = ({ assessmentId, onClickViewButtonOfScheduledAssessment }) => {
-  const [scheduledAssessmentData, setScheduledAssessmentData] = useState([]);
-  const [candidateAssessmentData, setCandidateAssessmentData] = useState({});
-  const [filteredScheduledAssessmentData, setFilteredScheduledAssessmentData] =
-    useState([]);
+const ScheduledAssessmentTab = ({getScheduledAssessments,filteredScheduledAssessmentData,setFilteredScheduledAssessmentData,candidateAssessmentData,setCandidateAssessmentData,scheduledAssessmentData,setScheduledAssessmentData, assessmentId, onClickViewButtonOfScheduledAssessment }) => {
+  // const [scheduledAssessmentData, setScheduledAssessmentData] = useState([]);
+  // const [candidateAssessmentData, setCandidateAssessmentData] = useState({});
+  // const [filteredScheduledAssessmentData, setFilteredScheduledAssessmentData] =
+  //   useState([]);
   const [isScheduledAssessmentFilterOpen, setIScheduledAssessmentFilterOpen] =
     useState(false);
 
@@ -75,46 +75,7 @@ const ScheduledAssessmentTab = ({ assessmentId, onClickViewButtonOfScheduledAsse
   const itemsPerPage = 3;
   const totalPages = Math.ceil(scheduledAssessmentData.length / itemsPerPage);
 
-  const getScheduledAssessments = async () => {
-    try {
-      console.log("assessment id", assessmentId);
-      const url = `${process.env.REACT_APP_API_URL}/schedule-assessment/${assessmentId}`;
-      const response = await axios.get(url);
-      if (response.data.success) {
-        const data = response.data.scheduledAssessment;
-        setScheduledAssessmentData(data || []);
-        setFilteredScheduledAssessmentData(data || []);
-
-        const candidateAssessmentPromises = data.map(async (item) => {
-          const candidateResponse = await axios.get(
-            `${process.env.REACT_APP_API_URL}/candidate-assessment/${item._id}`
-          );
-          return {
-            id: item._id,
-            assessments: candidateResponse.data.candidateAssessments,
-          };
-        });
-        const candidateAssessments = await Promise.all(
-          candidateAssessmentPromises
-        );
-        const newObj = candidateAssessments.reduce(
-          (acc, { id, assessments }) => {
-            acc[id] = assessments;
-            return acc;
-          },
-          {}
-        );
-
-        setCandidateAssessmentData(newObj);
-      }
-    } catch (error) {
-      toast.error("some thing went wrong");
-      console.error(
-        "error in getting scheduled assessments from frontend",
-        error.message
-      );
-    }
-  };
+ 
   useEffect(() => {
     getScheduledAssessments();
   }, []);
@@ -259,34 +220,28 @@ const ScheduledAssessmentTab = ({ assessmentId, onClickViewButtonOfScheduledAsse
                       assessment-{assessment._id.slice(-5, -1)}
                     </td>
                     <td className="text-center p-2">
-                      {/* <div className="flex justify-center">
-            <img
-              src={manImage}
-              alt="candidate profile"
-              className="w-8 aspect-square rounded-full"
-            />
-          </div> */}
+
                       <div className="flex justify-center relative items-center">
                         <div className="relative w-[80px] h-10 ">
                           <img
                             src={manImage}
                             alt="First"
-                            className="w-8 rounded-full aspect-square absolute z-40"
+                            className="w-10 rounded-full aspect-square absolute z-40 text-white  border-2 border-gray-900 "
                           />
                           <img
                             src={profile}
                             alt="Second"
-                            className="w-8 rounded-full aspect-square absolute left-[20px] z-30"
+                            className="w-10 rounded-full aspect-square absolute left-[20px] z-30  border-2 border-gray-900 "
                           />
                           <img
                             src={womanImage}
                             alt="Third"
-                            className="w-8 rounded-full aspect-square absolute left-[40px] z-20"
+                            className="w-10 rounded-full aspect-square absolute left-[40px] z-20  border-2 border-gray-900 "
                           />
                           <img
                             src={profile}
                             alt="Fourth"
-                            className="w-8 rounded-full aspect-square absolute left-[60px] z-10"
+                            className="w-10 rounded-full aspect-square absolute left-[60px] z-10  border-2 border-gray-900 "
                           />
                         </div>
                       </div>
@@ -323,9 +278,10 @@ const ScheduledAssessmentTab = ({ assessmentId, onClickViewButtonOfScheduledAsse
                     <td className="text-center p-2">
                       <div
                         className="flex justify-center cursor-pointer"
-                        onClick={() =>
+                        onClick={() =>{
+                       
                           toggleAssessmentActionMore(assessment._id)
-                        }
+                        }}
                       >
                         <FiMoreHorizontal className="text-2xl" />
                       </div>
@@ -440,17 +396,20 @@ const ScheduledAssessmentTab = ({ assessmentId, onClickViewButtonOfScheduledAsse
                                       <td className="text-center  p-2">
                                         {candidateAssessment.totalScore}
                                       </td>
-                                      <td className="text-center p-2">
+                                      <td className="text-center p-2 ">
                                         <div className="relative flex justify-center items-center cursor-pointer">
                                           <button
-                                            
+                                            onClick={() =>
+                                              toggleAction(
+                                                candidateAssessment._id
+                                              )}
                                           >
                                             <FiMoreHorizontal className="text-2xl text-gray-600 hover:text-gray-800" />
                                           </button>
                                           {actionViewMore ===
                                             candidateAssessment._id && (
-                                            <div className="absolute top-5 z-10 p-4 w-40 rounded-md shadow-lg bg-white border border-gray-200 ">
-                                              <div className="flex flex-col gap-2">
+                                            <div className="   flex flex-col gap-2 absolute top-5 right-1 z-20 w-28 bg-white p-2 shadow-lg border border-gray-200 rounded-sm ">
+                                              
                                                 <button
                                                  onClick={() =>
                                               toggleAction(
@@ -470,7 +429,7 @@ const ScheduledAssessmentTab = ({ assessmentId, onClickViewButtonOfScheduledAsse
                                                 >
                                                   Cancel
                                                 </button>
-                                              </div>
+                                              
                                             </div>
                                           )}
                                         </div>

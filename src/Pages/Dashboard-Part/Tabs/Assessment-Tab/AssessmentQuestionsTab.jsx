@@ -120,11 +120,7 @@ const AssessmentQuestionsTab = ({
                 <div className="flex">
                   <div className="flex items-center font-bold">
                     <p className="pr-4 sm:pr-0 ml-2 sm:ml-0 w-36 sm:w-24 sm:text-xs">
-                      {/* {Array.isArray(questionsBySection[sectionName]) && (
-                      <span className="bg-white px-2 py-0 mr-2 rounded-sm">
-                        {questionsBySection[sectionName].length}
-                      </span>
-                    )} */}
+
                       <span className="bg-white px-2 py-0 mr-2 rounded-sm whitespace-normal">
                         {addedSections[index].Questions?.length}
                       </span>
@@ -133,16 +129,6 @@ const AssessmentQuestionsTab = ({
                   </div>
                   <p className="border-r-gray-600 border"></p>
                   {/* CHANGES DONE BY SHASHSANK ON - [07/01/2025 ; 5.30PM] */}
-                  {/* <div
-                  className="flex items-center sm:text-xs"
-                  onClick={() => {
-                    toggleSidebarAddQuestion(sectionName);
-                  }}
-                >
-                  <p className="rounded px-2 ml-2 sm:ml-0 cursor-pointer text-custom-blue">
-                    Add Questions 
-                  </p>
-                </div> */}
                   <div className="flex items-center sm:text-xs">
                     <Popup
                       trigger={
@@ -197,12 +183,6 @@ const AssessmentQuestionsTab = ({
                             <p
                               className="hover:bg-gray-200 p-1 rounded pl-3 cursor-pointer"
                               //shashank - [11/01/2025]
-                              // onClick={() =>
-                              //   handleDeleteClick("section", {
-                              //     index,
-                              //     sectionName,
-                              //   })
-                              // }
                               onClick={()=>handleDeleteClick("section",sectionName)}
                             >
                               Delete
@@ -218,33 +198,16 @@ const AssessmentQuestionsTab = ({
                   >
                     {toggleStates[index] ? (
                       <span>
-                        {/* <IoIosArrowUp style={{ color: "red" }}  /> */}
                         <MdOutlineKeyboardArrowUp />
                       </span>
                     ) : (
-                      // <IoIosArrowDown style={{ color: "red" }}  />
                       <MdOutlineKeyboardArrowDown />
                     )}
                   </div>
                 </div>
               </div>
-
-              {/* {isAddQuestionModalOpen && (
-                <AddQuestion1
-                  isOpen={isAddQuestionModalOpen}
-                  onClose={() => setIsAddQuestionModalOpen(false)}
-                  sectionName={currentSectionName}
-                  onQuestionAdded={handleQuestionAdded}
-                  selectedAssessmentType={selectedAssessmentType}
-                  questionsLimit={questionsLimit}
-                  checkedCount={checkedCount}
-                  // questionToEdit={selectedQuestion}
-                />
-              )} */}
-
               {toggleStates[index] && (
                 <div>
-                  {/* <h1>display :{addedSections[index]?.Questions[0].questionText}</h1> */}
                   {addedSections.map((each) => {
                     if (each.SectionName === sectionName.SectionName) {
                       return each.Questions.map((question, questionIndex) => (
@@ -257,7 +220,6 @@ const AssessmentQuestionsTab = ({
                               <div className="relative group mx-3">
                                 <hr
                                   className={`w-1 h-10 ${getDifficultyColorClass(
-                                    // question.DifficultyLevel
                                     question.difficultyLevel
                                   )}`}
                                 />
@@ -321,27 +283,9 @@ const AssessmentQuestionsTab = ({
                                     questionIndex && (
                                     <div className="absolute z-10 w-36 rounded-md shadow-lg bg-white ring-1 p-4 ring-black ring-opacity-5 right-0 mt-2">
                                       <div className="space-y-1">
-                                        {/* <p
-                                          className="hover:bg-gray-200 p-1 rounded pl-3 cursor-pointer"
-                                          onClick={() =>
-                                            handleEditClick(
-                                              question,
-                                              sectionName.SectionName,
-                                              questionIndex
-                                            )
-                                          }
-                                        >
-                                          Edit
-                                        </p> */}
                                         <p
                                           className="hover:bg-gray-200 p-1 rounded pl-3 cursor-pointer"
                                           //shashank-[11/01/2025]
-                                          // onClick={() =>
-                                          //   handleDeleteClick("question", {
-                                          //     sectionName,
-                                          //     questionIndex,
-                                          //   })
-                                          // }
                                           onClick={()=>handleDeleteClick("question",question,sectionName.SectionName)}
                                         >
                                           Delete

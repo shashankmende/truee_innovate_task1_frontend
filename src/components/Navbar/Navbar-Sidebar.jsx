@@ -686,19 +686,17 @@ const Navbar = () => {
                           pathname: "/questionBank",
                           state: { section: "questionBankTab" },
                         }}
-                        // onClick={() => { setAssessmentDropdown(false); }}
+                        
                         onClick={() => {
-                          console.log("NavLink state:", {
-                            section: "questionBankTab",
-                          });
+                      
                           setAssessmentDropdown(false);
                         }}
                       >
                         Question Bank
                       </NavLink>
-                      {/* <NavLink className="block px-4 py-1 hover:bg-gray-200 hover:text-custom-blue rounded-md" activeclassname="bg-gray-200 text-gray-800" to="/assessmenttest" onClick={() => { setAssessmentDropdown(false); }} >
+                      <NavLink className="block px-4 py-1 hover:bg-gray-200 hover:text-custom-blue rounded-md" activeclassname="bg-gray-200 text-gray-800" to="/assessmenttest" onClick={() => { setAssessmentDropdown(false); }} >
                         Assessment Test
-                      </NavLink> */}
+                      </NavLink>
                     </div>
                   </div>
                 )}

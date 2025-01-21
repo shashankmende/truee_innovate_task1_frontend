@@ -331,19 +331,7 @@ const Assessment = () => {
   };
 
   const handleShareClick = async (assessment) => {
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/shareassessment`,
-        {
-          assessmentId: assessment._id,
-          email: recipientEmail,
-          programmingDetails: assessment.ProgrammingDetails,
-        }
-      );
-      console.log("Assessment shared:", response.data);
-    } catch (error) {
-      console.error("Error sharing assessment:", error);
-    }
+
     setIsShareOpen(assessment);
     setActionViewMore(false);
   };
