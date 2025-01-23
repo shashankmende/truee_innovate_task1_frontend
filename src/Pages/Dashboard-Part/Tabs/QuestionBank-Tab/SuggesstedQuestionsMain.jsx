@@ -30,6 +30,7 @@ const SuggestedQuestionsComponent = ({
     onAddQuestion
     // -->
 }) => {
+    console.log("fromScheduleLater",fromScheduleLater)
     const [tab, setTab] = useState(1);
     const {
         getInterviewerQuestions,
@@ -229,6 +230,8 @@ const SuggestedQuestionsComponent = ({
             setCurrentPage((prev) => prev + 1);
         }
     };
+
+    
 
     const paginatedData = useMemo(
         () =>
@@ -942,7 +945,10 @@ const SuggestedQuestionsComponent = ({
                                     )}
                                     {/* --> */}
 
-                                    {!section && !fromScheduleLater && ( // <-- (mansoor) added fromScheduleLater -->
+
+                                 
+
+                                    {/* {( (!section  )) && ( // <-- (mansoor) added fromScheduleLater -->
                                         <div className="w-[15%] flex justify-center flex-grow-1 relative">
                                             <button
                                                 className="border-[1px] cursor-pointer rounded-sm p-1 font-bold border-custom-blue text-custom-blue"
@@ -957,7 +963,28 @@ const SuggestedQuestionsComponent = ({
                                                 />
                                             )}
                                         </div>
+                                    )} */}
+
+                                    { (!section && !fromScheduleLater) && (
+                                        <div className="w-[15%] flex justify-center flex-grow-1 relative">
+                                        <button
+                                            className="border-[1px] cursor-pointer rounded-sm p-1 font-bold border-custom-blue text-custom-blue"
+                                            onClick={() => toggleDropdown(item._id)}
+                                        >
+                                            {<FaPlus />}
+                                        </button>
+                                        {dropdownOpen === item._id && (
+                                            <MyQuestionList
+                                                question={item}
+                                                closeDropdown={closeDropdown}
+                                            />
+                                        )}
+                                    </div>
                                     )}
+
+
+
+
 
                                     {/* Changes done by Shashank on -[09/01/2025] */}
                                     {/* {RenderAddButtonBasedOnSection()} */}

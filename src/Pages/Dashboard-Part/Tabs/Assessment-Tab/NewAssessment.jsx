@@ -43,7 +43,7 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
 
   const organizationId = Cookies.get("organizationId");
   // const [activeTab, setActiveTab] = useState("Basicdetails");
-  const [activeTab, setActiveTab] = useState("Candidates");
+  const [activeTab, setActiveTab] = useState("Questions");
   const [position, setPosition] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [showMessage, setShowMessage] = useState(false);

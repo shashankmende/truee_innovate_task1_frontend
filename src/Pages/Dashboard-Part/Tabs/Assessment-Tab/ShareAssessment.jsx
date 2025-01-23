@@ -398,9 +398,10 @@ const ShareAssessment = ({
                     {showDropdownCandidate && (
                       <div ref={dropdownRef} className="absolute z-30 -mt-5 w-96 rounded-md bg-white shadow-lg">
                         <p className="p-1 font-medium">Recent Candidates</p>
-                        <ul>
+                        <ul className="">
                           {filteredCandidates.length > 0 ? (
                             filteredCandidates.slice(0, 4).map((candidate) => (
+                            // filteredCandidates.map((candidate) => (
                               <li
                                 key={candidate._id}
                                 className="bg-white border-b cursor-pointer p-1 hover:bg-gray-100"
@@ -409,6 +410,7 @@ const ShareAssessment = ({
                                 }
                               >
                                 {candidate.LastName}
+                                
                               </li>
                             ))
                           ) : (

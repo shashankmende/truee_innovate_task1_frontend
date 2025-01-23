@@ -27,12 +27,12 @@ const AssessmentQuestion = () => {
             console.log('Fetched assessment data:', assessmentData);
             setAssessment(assessmentData);
             setSelectedOptions(
-                assessmentData.Sections.map(section =>
+                assessmentData.assessmentId.Sections.map(section =>
                     Array(section.Questions.length).fill("")
                 )
             );
             setAnswerLater(
-                assessmentData.Sections.map(section =>
+                assessmentData.assessmentId.Sections.map(section =>
                     Array(section.Questions.length).fill(false)
                 )
             );
@@ -136,6 +136,7 @@ const AssessmentQuestion = () => {
         setShowMainContent(false);
         setShowPreview(true);
         const score = calculateAnsweredQuestionsScore();
+        
         setAnsweredQuestionsScore(score);
     };
 
@@ -147,11 +148,11 @@ const AssessmentQuestion = () => {
 
     const handleSubmit = async () => {
         try {
-            const totalQuestions = assessment.Sections.reduce((total, section) => total + section.Questions.length, 0);
+            const totalQuestions = assessment.assessmentId.Sections.reduce((total, section) => total + section.Questions.length, 0);
             const formattedTimeSpent = formatTimeSpent(timeSpent);
 
             // Prepare questions data
-            const questionsData = assessment.Sections.flatMap((section, sectionIndex) =>
+            const questionsData = assessment.assessmentId.Sections.flatMap((section, sectionIndex) =>
                 section.Questions.map((question, questionIndex) => {
                     let givenAnswer = selectedOptions[sectionIndex][questionIndex];
                     const correctAnswer = question.Answer;
@@ -211,7 +212,7 @@ const AssessmentQuestion = () => {
             );
 
             // Prepare section data
-            const sectionsData = assessment.Sections.map((section, sectionIndex) => {
+            const sectionsData = assessment.assessmentId.Sections.map((section, sectionIndex) => {
                 const answeredQuestions = selectedOptions[sectionIndex].filter(option => option !== "").length;
                 const totalQuestions = section.Questions.length;
                 const passScore = section.Questions.reduce((total, question) => total + question.Score, 0);
@@ -228,17 +229,19 @@ const AssessmentQuestion = () => {
 
             // Log the entire questionsData array
             console.log('Questions Data:', questionsData);
+            const Assessment = assessment.assessmentId
 
             const response = await fetch(`${process.env.REACT_APP_API_URL}/assessmenttest`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                
                 body: JSON.stringify({
-                    assessmentId: assessment._id,
+                    assessmentId: Assessment._id,
                     answeredQuestionsScore: answeredQuestionsScore,
-                    totalScore: assessment.totalScore,
-                    passScore: assessment.passScore,
+                    totalScore: Assessment.totalScore,
+                    passScore: Assessment.passScore,
                     candidateId: candidateId,
                     answeredQuestions: calculateAnsweredQuestions(),
                     totalQuestions: totalQuestions,
@@ -248,9 +251,10 @@ const AssessmentQuestion = () => {
                 }),
             });
 
-            if (response.ok) {
+            // if (response.ok) {
+            if (true) {
                 console.log('Score submitted successfully');
-                navigate('/assessmentsubmit', { state: { assessmentName: assessment.AssessmentTitle } });
+                navigate('/assessmentsubmit', { state: { assessmentName: Assessment.AssessmentTitle } });
             } else {
                 console.error('Failed to submit score');
             }
@@ -260,6 +264,7 @@ const AssessmentQuestion = () => {
     };
 
     const handleQuestionClick = (sectionIndex, questionIndex) => {
+        alert(`question is clicked ${sectionIndex} ${questionIndex}`)
         setSelectedSection(sectionIndex);
         setCurrentQuestionIndex(questionIndex);
         setShowMainContent(true);
@@ -298,14 +303,13 @@ const AssessmentQuestion = () => {
     const calculateAnsweredQuestionsScore = () => {
         let score = 0;
         
-        assessment.Sections.forEach((section, sectionIndex) => {
+        assessment.assessmentId.Sections.forEach((section, sectionIndex) => {
             section.Questions.forEach((question, questionIndex) => {
 
                 if (answerLater[sectionIndex][questionIndex]) {
                     return;
                 }
-                console.log("selected options",selectedOptions,sectionIndex,questionIndex)
-                // alert("before")
+                
                 const userAnswerIndex = selectedOptions[sectionIndex][questionIndex];
                  let userAnswerText;
                 if (typeof userAnswerIndex !== String){
@@ -331,7 +335,7 @@ const AssessmentQuestion = () => {
                 let isCorrect = false;
                 if (question.snapshot.questionType === "MCQ") {
                     isCorrect = userAnswerText === correctAnswerText;
-                    alert(`entered in mcq`)
+                    
                 } else if (question.snapshot.questionType === "Number") {
                     const userAnswer = parseFloat(selectedOptions[sectionIndex][questionIndex]);
                     const correctAnswer = parseFloat(correctAnswerText);
@@ -361,7 +365,7 @@ const AssessmentQuestion = () => {
                         isCorrect = userAnswerText === correctAnswerText;
                     }
                 }
-                alert(` iscorrect:${isCorrect?"true":'false'}`)
+                
                 if (isCorrect) {
                     score += question.Score;
                 }
@@ -385,6 +389,7 @@ const AssessmentQuestion = () => {
             newSelectedOptions[selectedSection][questionIndex] = optionIndex;
             return newSelectedOptions;
         });
+        alert(`score:${calculateAnsweredQuestionsScore()}`)
         setAnswerLater(prevAnswerLater => {
             const newAnswerLater = [...prevAnswerLater];
             newAnswerLater[selectedSection][questionIndex] = false;
@@ -441,6 +446,8 @@ const AssessmentQuestion = () => {
         return answeredQuestionsCount;
     };
 
+    
+
     const QuestionHeader = ({ answeredQuestionsCount, totalQuestionsAcrossSections, remainingTime }) => (
         <div className="flex justify-between items-center mb-3">
             <p className="text-2xl font-semibold">Questions</p>
@@ -460,12 +467,13 @@ const AssessmentQuestion = () => {
     const renderQuestion = () => {
         if (!assessment || selectedSection === null) return null;
 
-        const section = assessment.Sections[selectedSection];
+        const section = assessment.assessmentId.Sections[selectedSection];
         if (!section || !section.Questions || !section.Questions[currentQuestionIndex]) {
             return <p className="text-red-500">Question data is not available.</p>;
         }
+        
+        const totalQuestionsAcrossSections = assessment.assessmentId.Sections.reduce((total, section) => total + section.Questions.length, 0);
 
-        const totalQuestionsAcrossSections = assessment.Sections.reduce((total, section) => total + section.Questions.length, 0);
         const totalTimeAllowed = 30 * 60;
         const remainingTime = totalTimeAllowed - timeSpent;
         const answeredQuestionsCount = calculateAnsweredQuestions();
@@ -486,7 +494,7 @@ const AssessmentQuestion = () => {
             if (!areAllQuestionsAnswered()) {
                 return;
             }
-            if (selectedSection < assessment.Sections.length - 1) {
+            if (selectedSection < assessment.assessmentId.Sections.length - 1) {
                 setSelectedSection(selectedSection + 1);
                 setCurrentQuestionIndex(0);
                 // Clear errors when moving to the next section
@@ -523,7 +531,7 @@ const AssessmentQuestion = () => {
             });
 
             // Validate input length
-            const charLimits = assessment.Sections[selectedSection].Questions[questionIndex].CharLimits  || {min:0,max:250};
+            const charLimits = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex].CharLimits  || {min:0,max:250};
             if (charLimits) {
                 const { min, max } = charLimits;
                 setValidationErrors(prevErrors => {
@@ -546,8 +554,9 @@ const AssessmentQuestion = () => {
                     {/* side bar */}
                     <div className="col-span-1">
                         <div className="border border-custom-blue rounded h-full">
-                            {assessment.Sections.map((section, index) => {
+                            {assessment.assessmentId.Sections.map((section, index) => {
                                 const answeredCount = selectedOptions[index].filter(option => option !== null && option !== undefined && option !== "").length;
+                                // const answeredCount =3
                                 return (
                                     <div
                                         key={index}
@@ -576,7 +585,7 @@ const AssessmentQuestion = () => {
                                     />
                                     <label>Answer at a later time</label>
                                 </div>
-                                <p className="font-semibold text-md mb-1">{`${questionIndex + 1}. ${question.snapshot.questionText}`}</p>
+                                <p className="font-semibold text-md mb-1">{`${questionIndex + 1}. ${question.snapshot.questionText} ghtrt`}</p>
                                 {question.Hint && (
                                     <p className="text-gray-500 mb-2 text-xs">Hint: {question.Hint}</p>
                                 )}
@@ -599,8 +608,8 @@ const AssessmentQuestion = () => {
                                     </div>
                                 )}
 
-                                {/* {question.snapshot.questionType === "Short Text(Single line)" && ( */}
-                                {question.snapshot.questionType === "Short Text" && (
+{/* {question.snapshot.questionType === "Short Text" && ( */}
+                                {(question.snapshot.questionType === "Short Text(Single line)" || question.snapshot.questionType === "Short Text") && (
                                     <div>
                                         <textarea
                                             className="w-full p-2 border rounded focus:outline-none"
@@ -752,7 +761,7 @@ const AssessmentQuestion = () => {
                             className="text-white py-1 px-7 rounded mr-3 footer-button"
                             onClick={handleNextSectionClick}
                         >
-                            {selectedSection === assessment.Sections.length - 1 ? "Finish" : "Next"}
+                            {selectedSection === assessment.assessmentId.Sections.length - 1 ? "Finish" : "Next"}
                         </button>
                         {assessmentCompleted && showMainContent && (
                             <button
@@ -770,7 +779,7 @@ const AssessmentQuestion = () => {
     };
 
     const renderPreview = ({ assessment, selectedOptions, score, questionScores = [] }) => {
-        const totalQuestionsAcrossSections = assessment.Sections.reduce((total, section) => total + section.Questions.length, 0);
+        const totalQuestionsAcrossSections = assessment.assessmentId.Sections.reduce((total, section) => total + section.Questions.length, 0);
         const totalTimeAllowed = 30 * 60;
         const remainingTime = totalTimeAllowed - timeSpent;
         const answeredQuestionsCount = calculateAnsweredQuestions();
@@ -786,7 +795,7 @@ const AssessmentQuestion = () => {
                     <p className="font-semibold text-lg mb-2">Answered Questions Score: {answeredQuestionsScore}</p>
                 </div>
                 <div className="border p-3 rounded-md">
-                    {assessment.Sections.map((section, sectionIndex) => (
+                    {assessment.assessmentId.Sections.map((section, sectionIndex) => (
                         <div key={sectionIndex}>
                             <h3 className="font-semibold text-lg mb-2">{section.SectionName}</h3>
                             <div className="grid grid-cols-2 gap-4 mb-2">
@@ -795,7 +804,7 @@ const AssessmentQuestion = () => {
                                     return (
                                         <div
                                             key={questionIndex}
-                                            className={`cursor-pointer ${question.QuestionType === "MCQ" ? "col-span-1" : "col-span-2"}`}
+                                            className={`cursor-pointer ${question.QuestionType === "MCQ" ? "col-span-1 " : "col-span-2"}`}
                                             onClick={() => handleQuestionClick(sectionIndex, questionIndex)}
                                         >
                                             <div className="flex">
@@ -841,6 +850,8 @@ const AssessmentQuestion = () => {
 
             </div>
         );
+    
+    
     };
 
     return (
@@ -851,16 +862,20 @@ const AssessmentQuestion = () => {
                         <img src={logo} alt="Logo" className="w-28" />
                     </div>
                 </div>
+                
             </div>
+         
             {!assessment ? (
                 <div>Loading assessment...</div>
             ) : (
                 <>
                     {showMainContent && renderQuestion()}
-                    {showPreview && assessment.Sections && renderPreview({ assessment, selectedOptions, score: calculateScore })}
+                    s
+                    {(showPreview && assessment.assessmentId.Sections) && renderPreview({ assessment, selectedOptions, score: calculateScore })}                                        
                 </>
             )}
         </div>
+
     );
 };
 

@@ -1,5 +1,7 @@
 import axios from "axios";
+
 import CryptoJS from 'crypto-js';
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
@@ -20,86 +22,155 @@ const AssessmentTest = () => {
   const location = useLocation();
   const [positionTitle, setPositionTitle] = useState("");
   console.log(positionTitle, "positionTitle");
+  const [scheduledAssessmentId,setScheduledAssessmentID]=useState("")
+  const [candidateId,setCandidateId]=useState("")
   // const [sections, setSections] = useState([]);
   // const [questions, setQuestions] = useState([]);
 console.log("location",location)
   const [candidate, setCandidate] = useState(null);
 
-  const decrypt = (encryptedText, secretKey) => {
-    const bytes = CryptoJS.AES.decrypt(encryptedText, secretKey);
-    return bytes.toString(CryptoJS.enc.Utf8); // Convert decrypted bytes to string
-  };
+  // const decrypt = (encryptedText, secretKey) => {
+  //   try {
+  //     // Remove spaces and decode URL
+  //     const sanitizedText = decodeURIComponent(encryptedText.replace(/\s+/g, ''));
+  //     console.log('Sanitized Encrypted Text:', sanitizedText);
+  
+  //     const bytes = CryptoJS.AES.decrypt(sanitizedText, secretKey);
+  //     const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+  
+  //     if (!decryptedText) {
+  //       throw new Error('Decryption resulted in an empty string');
+  //     }
+  
+  //     return decryptedText;
+  //   } catch (error) {
+  //     console.error('Decryption failed:', error.message);
+  //     return null; // Return null if decryption fails
+  //   }
+  // };
 
+  const verifyOtp = async (candidateId, otp, scheduledAssessmentId) => {
+    const url = `${process.env.REACT_APP_API_URL}/verify-otp`;
+    try {
+      const response = await axios.post(url, { candidateId, otp, scheduledAssessmentId });
+  
+      if (response.status === 200) {
+        alert(response.data.message); // Success message
+        return response.data.isValid;
+      } else {
+        alert(response.data.message); // Handle unexpected status
+        return false;
+      }
+    } catch (error) {
+      // Improved error handling
+      if (error.response) {
+        // Server responded with a status other than 200
+        alert(`Error: ${error.response.data.message}`);
+        return false;
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error('No response received:', error.request);
+        alert('Network error: Unable to reach the server. Please try again.');
+      } else {
+        // Something else happened
+        console.error('Error:', error.message);
+        alert('An unexpected error occurred. Please try again.');
+      }
+      return false;
+    }
+  };
+  
+
+
+  
   useEffect(() => {
     const fetchAssessmentAndCandidate = async () => {
+      const secretKey = 'test';
       const queryParams = new URLSearchParams(window.location.search);
-const encryptedAssessmentId = queryParams.get('assessmentId');
-const encryptedCandidateId = queryParams.get('candidateId');
-      console.log("encrypted assessmentid,candidateid",encryptedAssessmentId,encryptedCandidateId)
-      // const assessmentId = params.get('assessmentId');
-      // const assessmentId = "678e2b16f3b407f88a54d21c";
-      // const assessmentId = "678e2136f3b407f88a54d0b2";
-      // const candidateId = params.get('candidateId');
-      // const candidateId = "678656d72bae36e33114c49d";
-      if (encryptedAssessmentId && encryptedCandidateId) {
-        try {
-          // Fetch assessment details
-          // const response = await axios.get(`${process.env.REACT_APP_API_URL}/assessment/${assessmentId}/details`);
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/assessment-details/${encryptedCandidateId}`);
-          setAssessment(response.data);
-          console.log(response.data, "response.data assessment");
-
-          // Fetch candidate-specific data
-          const candidateResponse = await axios.get(`${process.env.REACT_APP_API_URL}/candidate/${encryptedCandidateId}`);
-          const candidateData = candidateResponse.data;
-
-
-          // Check if candidateData is an array or an object
-          if (Array.isArray(candidateData)) {
-            const candidatesWithImages = candidateData.map((candidate) => {
-              if (candidate.ImageData && candidate.ImageData.filename) {
-                const imageUrl = `${process.env.REACT_APP_API_URL}/${candidate.ImageData.path.replace(/\\/g, '/')}`;
-                return { ...candidate, imageUrl };
-              }
-              return candidate;
-            });
-            setCandidate(candidatesWithImages);
-            console.log(candidatesWithImages, "Candidate data");
-          } else {
-            // If candidateData is a single object
-            if (candidateData.ImageData && candidateData.ImageData.filename) {
-              const imageUrl = `${process.env.REACT_APP_API_URL}/${candidateData.ImageData.path.replace(/\\/g, '/')}`;
-              candidateData.imageUrl = imageUrl;
+      
+      // Fetch and sanitize encrypted parameters
+      // const encryptedAssessmentId = queryParams.get('assessmentId');
+      // const encryptedCandidateId = queryParams.get('candidateId');
+      // console.log('Raw Encrypted IDs:', { encryptedAssessmentId, encryptedCandidateId });
+  
+      // if (!encryptedAssessmentId || !encryptedCandidateId) {
+      //   console.error('Missing assessmentId or candidateId in query parameters');
+      //   setError('Assessment ID or Candidate ID is missing.');
+      //   return;
+      // }
+  
+      // Decrypt sanitized data
+      // const scheduledAssessmentId = decrypt(encryptedAssessmentId, secretKey);
+      const scheduledAssessmentId = queryParams.get('assessmentId');
+      // const scheduledAssessmentId = queryParams.get('assessmentId');
+      const candidateId = queryParams.get('candidateId');
+      // const candidateId = decrypt(encryptedCandidateId, secretKey);
+      console.log('Decrypted IDs:', { scheduledAssessmentId, candidateId });
+  
+      if (!scheduledAssessmentId || !candidateId) {
+        setError('Invalid Assessment ID or Candidate ID.');
+        return;
+      }
+      setScheduledAssessmentID(scheduledAssessmentId)
+      
+      setCandidateId(candidateId)
+      
+      
+      try {
+        // Fetch assessment details
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessments-list/${scheduledAssessmentId}`);
+        setAssessment(response.data);
+        console.log('Assessment Data:', response.data);
+  
+        // Fetch candidate details
+        const candidateResponse = await axios.get(`${process.env.REACT_APP_API_URL}/candidate/${candidateId}`);
+        const candidateData = candidateResponse.data;
+  
+        // Handle candidate images
+        if (Array.isArray(candidateData)) {
+          const candidatesWithImages = candidateData.map((candidate) => {
+            if (candidate.ImageData?.filename) {
+              const imageUrl = `${process.env.REACT_APP_API_URL}/${candidate.ImageData.path.replace(/\\/g, '/')}`;
+              return { ...candidate, imageUrl };
             }
-            setCandidate(candidateData);
-            console.log(candidateData, "Candidate data");
+            return candidate;
+          });
+          setCandidate(candidatesWithImages);
+        } else {
+          if (candidateData.ImageData?.filename) {
+            const imageUrl = `${process.env.REACT_APP_API_URL}/${candidateData.ImageData.path.replace(/\\/g, '/')}`;
+            candidateData.imageUrl = imageUrl;
           }
-
-          // Fetch position details using position ID from candidate data
-          if (candidateData.PositionId) {
-            const positionResponse = await axios.get(`${process.env.REACT_APP_API_URL}/position/${candidateData.PositionId}`);
-            setPositionTitle(positionResponse.data.title); // Set position title
-          }
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          setError("Failed to load data. Please try again.");
+          setCandidate(candidateData);
         }
-      } else {
-        console.error('Assessment ID or Candidate ID is missing');
-        setError("Assessment ID or Candidate ID is missing.");
+  
+        // Fetch position title
+        if (candidateData.PositionId) {
+          const positionResponse = await axios.get(`${process.env.REACT_APP_API_URL}/position/${candidateData.PositionId}`);
+          setPositionTitle(positionResponse.data.title);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error.message);
+        setError('Failed to load data. Please try again.');
       }
     };
+  
     fetchAssessmentAndCandidate();
   }, [location]);
+  
 
   useEffect(() => {
     const fetchAssessment = async () => {
+      const secretKey = 'test'
       const params = new URLSearchParams(location.search);
-      const assessmentId = params.get('assessmentId');
+      const assessmentId =  params.get('assessmentId');
+      // const encryptedAssessmentId =  params.get('assessmentId');
+      // const assessmentId =decrypt(encryptedAssessmentId,secretKey)
       if (assessmentId) {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/assessment/${assessmentId}/details`);
-          setAssessment(response.data);
+          // const response = await axios.get(`${process.env.REACT_APP_API_URL}/assessment/${assessmentId}/details`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessments-list/${assessmentId}`);
+          setAssessment(response.data.scheduledAssessment);
           console.log(response.data, "response.data");
         } catch (error) {
           console.error("Error fetching assessment:", error);
@@ -119,17 +190,30 @@ const encryptedCandidateId = queryParams.get('candidateId');
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
-    if (otp.length !== 4) {
-      setError("OTP must be 4 digits");
-    } else if (otp !== "1234") {
+    if (otp.length !== 5) {
+      setError("OTP must be 5 digits");
+    } 
+    // else if(otp==='1234'){
+    //   setError("");
+    //   setOtp("");
+    //   setIsNextPageActive(true);
+    // }
+    else{
+     const isValid =  await verifyOtp(candidateId,otp,scheduledAssessmentId)
+     console.log("response=",isValid)
+
+     if (isValid){
+     setError("");
+     setOtp("");
+     setIsNextPageActive(true);
+     }
+     else{
       setError("Invalid OTP");
-    } else {
-      setError("");
-      setOtp("");
-      setIsNextPageActive(true);
+     }
     }
+
   };
 
   const handleBackToBasicDetails = () => {
@@ -159,11 +243,22 @@ const encryptedCandidateId = queryParams.get('candidateId');
     }
   };
 
-  const handleResendOtp = () => {
+  const handleResendOtp =async () => {
     console.log("Resend OTP clicked");
+    try {
+    const response =  await axios.post(`${process.env.REACT_APP_API_URL}/resend-link`,{
+        candidateId,
+        scheduledAssessmentId
+      })
+      alert(`${response.data.message}`)
+      
+    } catch (error) {
+      console.log("error in resendign email")
+    }
   };
 
-  const allQuestions = assessment.Sections.flatMap(section => section.Questions);
+  const allQuestions = assessment.assessmentId?.Sections?.flatMap(section => section.Questions);
+  console.log('all questions',allQuestions)
 
   return (
     <React.Fragment>
@@ -501,14 +596,16 @@ const encryptedCandidateId = queryParams.get('candidateId');
               please contact our support team at [support email/phone number].
               We're here to help!
             </p>
-            <form onSubmit={handleSubmit} className="mt-10">
+            <form 
+            // onSubmit={handleSubmit} 
+            className="mt-10">
               <div className="flex items-center">
                 <div>
                   <p
                     htmlFor="otp"
                     className="text-lg text-custom-blue font-medium"
                   >
-                    Please enter the 4-digit OTP
+                    Please enter the 5-digit OTP
                   </p>
                 </div>
                 <div className="ml-24">
@@ -521,13 +618,14 @@ const encryptedCandidateId = queryParams.get('candidateId');
                   />
                 </div>
                 <button
+                type="button"
                   onClick={handleResendOtp}
                   className="text-sm ml-4" >
                   Resend
                 </button>
               </div>
               <div>
-                <button type="submit" className="bg-custom-blue text-white py-1 px-2 mt-5 rounded-md ml-[400px]">
+                <button onClick={handleSubmit} type="button" className="bg-custom-blue text-white py-1 px-2 mt-5 rounded-md ml-[400px]">
                   Submit
                 </button>
               </div>

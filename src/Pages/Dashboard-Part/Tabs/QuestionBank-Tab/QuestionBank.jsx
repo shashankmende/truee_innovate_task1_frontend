@@ -90,7 +90,8 @@ const QuestionBank = ({ assessmentId, sectionName,updateQuestionsInAddedSectionF
   const [interviewQuestionsList,setInterviewQuestionsList]=useState([])
 
   const location = useLocation()
-   const section = location.state?.section || sectionProp || "questionBank"
+   const section = location.state?.section || sectionProp || ""
+  //  const section = location.state?.section || sectionProp || "questionBank"
   //  const section = location?.state?.section || sectionProp || "assessment";
 
    console.log('location state from qb',location.state)
