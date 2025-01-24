@@ -42,8 +42,8 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   );
 
   const organizationId = Cookies.get("organizationId");
-  // const [activeTab, setActiveTab] = useState("Basicdetails");
-  const [activeTab, setActiveTab] = useState("Questions");
+  const [activeTab, setActiveTab] = useState("Basicdetails");
+  // const [activeTab, setActiveTab] = useState("Questions");
   const [position, setPosition] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [showMessage, setShowMessage] = useState(false);
@@ -452,7 +452,7 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
           status:"pending",
           expiryAt:new Date(new Date().setDate(new Date().getDate()+linkExpiryDays)),
           isActive:true,
-          assessmentLink:"http://truleeinnovative.com/asssessment/eedgewwf22342343"
+          // assessmentLink:"http://truleeinnovative.com/asssessment/eedgewwf22342343"
   
         }))
         console.log("candidate assessment list",CandidateAssessmentsList)

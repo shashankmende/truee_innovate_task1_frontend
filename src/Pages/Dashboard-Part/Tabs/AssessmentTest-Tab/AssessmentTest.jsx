@@ -79,32 +79,52 @@ console.log("location",location)
       return false;
     }
   };
+
+
+  const getCandidateAssessmentDetails  = async(candidateAssessmentId)=>{
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/candidate-assessment/details/${candidateAssessmentId}`)
+      console.log("response=",response)
+      if (response.data.success){
+        
+        const document = response.data.candidateAssessment
+        const idsObj = {scheduledAssessmentId:document.scheduledAssessmentId,candidateId:document.candidateId}
+        
+        return idsObj
+      }
+    } catch (error) {
+      console.error("error in getting ids from candidate assessment")
+      
+    }
+  }
+
+  const decrypt = (encryptedText, secretKey) => {
+    
+    const decodedText = decodeURIComponent(encryptedText);
+  
+    
+    const bytes = CryptoJS.AES.decrypt(decodedText, secretKey);
+  
+    
+    const originalText = bytes.toString(CryptoJS.enc.Utf8);
+  
+    return originalText;
+  };
   
 
 
   
   useEffect(() => {
     const fetchAssessmentAndCandidate = async () => {
-      const secretKey = 'test';
-      const queryParams = new URLSearchParams(window.location.search);
       
-      // Fetch and sanitize encrypted parameters
-      // const encryptedAssessmentId = queryParams.get('assessmentId');
-      // const encryptedCandidateId = queryParams.get('candidateId');
-      // console.log('Raw Encrypted IDs:', { encryptedAssessmentId, encryptedCandidateId });
-  
-      // if (!encryptedAssessmentId || !encryptedCandidateId) {
-      //   console.error('Missing assessmentId or candidateId in query parameters');
-      //   setError('Assessment ID or Candidate ID is missing.');
-      //   return;
-      // }
-  
-      // Decrypt sanitized data
-      // const scheduledAssessmentId = decrypt(encryptedAssessmentId, secretKey);
-      const scheduledAssessmentId = queryParams.get('assessmentId');
-      // const scheduledAssessmentId = queryParams.get('assessmentId');
-      const candidateId = queryParams.get('candidateId');
-      // const candidateId = decrypt(encryptedCandidateId, secretKey);
+      const queryParams = new URLSearchParams(window.location.search);
+
+      const candidateAssessmentId = queryParams.get('candidateAssessmentId')
+      const decryptedId = decrypt(candidateAssessmentId,'test')
+      console.log("decrypted id",decryptedId)
+      
+      const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
+      console.log("candidateId,scheduledAssessmentId",candidateId,scheduledAssessmentId)
       console.log('Decrypted IDs:', { scheduledAssessmentId, candidateId });
   
       if (!scheduledAssessmentId || !candidateId) {
@@ -119,7 +139,7 @@ console.log("location",location)
       try {
         // Fetch assessment details
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessments-list/${scheduledAssessmentId}`);
-        setAssessment(response.data);
+        setAssessment(response.data.scheduledAssessment);
         console.log('Assessment Data:', response.data);
   
         // Fetch candidate details
@@ -163,13 +183,18 @@ console.log("location",location)
     const fetchAssessment = async () => {
       const secretKey = 'test'
       const params = new URLSearchParams(location.search);
-      const assessmentId =  params.get('assessmentId');
+      // const assessmentId =  params.get('assessmentId');
+      const candidateAssessmentId = params.get('candidateAssessmentId')
+      const decryptedId = decrypt(candidateAssessmentId,'test')
+      console.log("decrypted id",decryptedId)
+      
+      const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
       // const encryptedAssessmentId =  params.get('assessmentId');
       // const assessmentId =decrypt(encryptedAssessmentId,secretKey)
-      if (assessmentId) {
+      if (scheduledAssessmentId) {
         try {
           // const response = await axios.get(`${process.env.REACT_APP_API_URL}/assessment/${assessmentId}/details`);
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessments-list/${assessmentId}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessments-list/${scheduledAssessmentId}`);
           setAssessment(response.data.scheduledAssessment);
           console.log(response.data, "response.data");
         } catch (error) {
@@ -237,7 +262,7 @@ console.log("location",location)
 
   const handleStartButtonClick = () => {
     if (assessment && candidate) {
-      navigate("/assessmenttext", { state: { assessment, candidate, candidateId: candidate._id } });
+      navigate("/assessmenttext", {replace:true, state: { assessment, candidate, candidateId: candidate._id } });
     } else {
       setError("Assessment data not loaded. Please try again.");
     }

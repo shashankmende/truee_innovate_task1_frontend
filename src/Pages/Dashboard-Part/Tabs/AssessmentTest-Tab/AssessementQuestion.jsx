@@ -251,10 +251,10 @@ const AssessmentQuestion = () => {
                 }),
             });
 
-            // if (response.ok) {
-            if (true) {
+            if (response.ok) {
+            // if (true) {
                 console.log('Score submitted successfully');
-                navigate('/assessmentsubmit', { state: { assessmentName: Assessment.AssessmentTitle } });
+                navigate('/assessmentsubmit', {replace:true, state: { assessmentName: Assessment.AssessmentTitle } });
             } else {
                 console.error('Failed to submit score');
             }
@@ -264,7 +264,7 @@ const AssessmentQuestion = () => {
     };
 
     const handleQuestionClick = (sectionIndex, questionIndex) => {
-        alert(`question is clicked ${sectionIndex} ${questionIndex}`)
+    
         setSelectedSection(sectionIndex);
         setCurrentQuestionIndex(questionIndex);
         setShowMainContent(true);
@@ -312,12 +312,16 @@ const AssessmentQuestion = () => {
                 
                 const userAnswerIndex = selectedOptions[sectionIndex][questionIndex];
                  let userAnswerText;
-                if (typeof userAnswerIndex !== String){
-
+                if (typeof userAnswerIndex !== "string"){
+                    
                     userAnswerText = question.snapshot.options[userAnswerIndex];
+                    
                 }
-                userAnswerText = userAnswerIndex
-                console.log("user answer index",userAnswerIndex,'---------','user ansower text',userAnswerText)
+                else{
+
+                    userAnswerText = userAnswerIndex
+                }
+                
 
                 let correctAnswerText = question.snapshot.correctAnswer;
         
@@ -335,6 +339,7 @@ const AssessmentQuestion = () => {
                 let isCorrect = false;
                 if (question.snapshot.questionType === "MCQ") {
                     isCorrect = userAnswerText === correctAnswerText;
+                    // alert(`mcq: is correct;${isCorrect}`)
                     
                 } else if (question.snapshot.questionType === "Number") {
                     const userAnswer = parseFloat(selectedOptions[sectionIndex][questionIndex]);
@@ -367,7 +372,7 @@ const AssessmentQuestion = () => {
                 }
                 
                 if (isCorrect) {
-                    score += question.Score;
+                    score += question.snapshot.score;
                 }
             });
         });
@@ -389,7 +394,6 @@ const AssessmentQuestion = () => {
             newSelectedOptions[selectedSection][questionIndex] = optionIndex;
             return newSelectedOptions;
         });
-        alert(`score:${calculateAnsweredQuestionsScore()}`)
         setAnswerLater(prevAnswerLater => {
             const newAnswerLater = [...prevAnswerLater];
             newAnswerLater[selectedSection][questionIndex] = false;
@@ -556,7 +560,6 @@ const AssessmentQuestion = () => {
                         <div className="border border-custom-blue rounded h-full">
                             {assessment.assessmentId.Sections.map((section, index) => {
                                 const answeredCount = selectedOptions[index].filter(option => option !== null && option !== undefined && option !== "").length;
-                                // const answeredCount =3
                                 return (
                                     <div
                                         key={index}
@@ -585,15 +588,16 @@ const AssessmentQuestion = () => {
                                     />
                                     <label>Answer at a later time</label>
                                 </div>
-                                <p className="font-semibold text-md mb-1">{`${questionIndex + 1}. ${question.snapshot.questionText} ghtrt`}</p>
+                                <p className="font-semibold text-md mb-1">{`${questionIndex + 1}. ${question.snapshot.questionText}`}</p>
                                 {question.Hint && (
                                     <p className="text-gray-500 mb-2 text-xs">Hint: {question.Hint}</p>
                                 )}
                                 {question.snapshot.questionType === "MCQ" && (
                                     <div className="grid grid-cols-2 gap-2 mb-1 text-sm mx-4">
                                         {question.snapshot.options.map((option, index) => (
-                                            <div key={index} className="flex items-center">
+                                            <div key={index} className="flex items-center ">
                                                 <input
+                                                id={`${option}-${index}`}
                                                     type="radio"
                                                     // name={`question-${selectedSection}-${questionIndex}`} // Ensure unique name for each question
                                                     value={index}
@@ -602,7 +606,7 @@ const AssessmentQuestion = () => {
                                                     checked={selectedOptions[selectedSection][questionIndex] === index} // Check if the index is selected
                                                     required={!answerLater[selectedSection][questionIndex]}
                                                 />
-                                                <label>{option}</label>
+                                                <label htmlFor={`${option}-${index}`}>{option}</label>
                                             </div>
                                         ))}
                                     </div>
@@ -870,7 +874,7 @@ const AssessmentQuestion = () => {
             ) : (
                 <>
                     {showMainContent && renderQuestion()}
-                    s
+                    
                     {(showPreview && assessment.assessmentId.Sections) && renderPreview({ assessment, selectedOptions, score: calculateScore })}                                        
                 </>
             )}
