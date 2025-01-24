@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import logo from "../../Images/upinterviewLogo.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import { evaluate } from 'mathjs';
+import axios from "axios";
 
 const AssessmentQuestion = () => {
     const [assessment, setAssessment] = useState(null);
@@ -20,7 +21,9 @@ const AssessmentQuestion = () => {
     const [answeredQuestionsScore, setAnsweredQuestionsScore] = useState(0);
     const [validationErrors, setValidationErrors] = useState([]);
     const candidateId = location.state?.candidate._id;
-
+    const candidateAssessmentId = location.state?.candidateAssessmentId
+    const candidateAssessmentDetails = location.state?.candidateAssessmentDetails
+    console.log("location state",location.state)
     useEffect(() => {
         const assessmentData = location.state?.assessment;
         if (assessmentData) {
@@ -212,49 +215,101 @@ const AssessmentQuestion = () => {
             );
 
             // Prepare section data
+            // const sectionsData = assessment.assessmentId.Sections.map((section, sectionIndex) => {
+            //     const answeredQuestions = selectedOptions[sectionIndex].filter(option => option !== "").length;
+            //     const totalQuestions = section.Questions.length;
+            //     const passScore = section.Questions.reduce((total, question) => total + question.Score, 0);
+            //     const totalScore = section.Questions.reduce((total, question) => total + question.Score, 0);
             const sectionsData = assessment.assessmentId.Sections.map((section, sectionIndex) => {
+                
                 const answeredQuestions = selectedOptions[sectionIndex].filter(option => option !== "").length;
                 const totalQuestions = section.Questions.length;
-                const passScore = section.Questions.reduce((total, question) => total + question.Score, 0);
-                const totalScore = section.Questions.reduce((total, question) => total + question.Score, 0);
+                const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
+                const totalScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
 
+                // return {
+                //     sectionId: section._id,
+                //     answeredQuestions,
+                //     totalQuestions,
+                //     passScore,
+                //     totalScore
+                // };
+                // const userAnswer = selectedOptions[sectionIndex][index] === q.snapshot.correctAnswer
+                // if (typeof userAnswer ==="string"){
+                //     userAnswer =
+                // }
                 return {
-                    sectionId: section._id,
-                    answeredQuestions,
-                    totalQuestions,
+                    
+                    Answers: section.Questions.map((q, index) => {
+                        let userAnswer = selectedOptions[sectionIndex][index];
+                        
+                
+                        
+                        if (typeof userAnswer === "number") {
+                            userAnswer = q.snapshot.options[userAnswer];
+                        }
+                        const isCorrect = userAnswer === q.snapshot.correctAnswer;
+                        return {
+                            questionId: q._id,
+                            answer: userAnswer,
+                            isCorrect,
+                            score: isCorrect ? q.snapshot.score : 0,
+                            isAnswerLater: answerLater[sectionIndex][index],
+                            submittedAt: new Date(),
+                        };
+                    }),
+                    totalScore,
                     passScore,
-                    totalScore
+                    sectionResult: totalScore >= passScore ? "pass" : "fail",
+                    SectionName: section.SectionName,
                 };
+                
             });
 
             // Log the entire questionsData array
             console.log('Questions Data:', questionsData);
             const Assessment = assessment.assessmentId
 
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/assessmenttest`, {
-                method: 'POST',
+            const reqBody = {
+                // completionTime:new Date(),
+                sections:sectionsData,
+                
+
+            }
+            console.log("req body=",reqBody)
+            // const response = await fetch(`${process.env.REACT_APP_API_URL}/assessmenttest`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`, {
+                // method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 
-                body: JSON.stringify({
-                    assessmentId: Assessment._id,
-                    answeredQuestionsScore: answeredQuestionsScore,
-                    totalScore: Assessment.totalScore,
-                    passScore: Assessment.passScore,
-                    candidateId: candidateId,
-                    answeredQuestions: calculateAnsweredQuestions(),
-                    totalQuestions: totalQuestions,
-                    timeSpent: formattedTimeSpent,
-                    questions: questionsData,
-                    sections: sectionsData
-                }),
+                // body: JSON.stringify({
+                //     assessmentId: Assessment._id,
+                //     answeredQuestionsScore: answeredQuestionsScore,
+                //     totalScore: Assessment.totalScore,
+                //     passScore: Assessment.passScore,
+                //     candidateId: candidateId,
+                //     answeredQuestions: calculateAnsweredQuestions(),
+                //     totalQuestions: totalQuestions,
+                //     timeSpent: formattedTimeSpent,
+                //     questions: questionsData,
+                //     sections: sectionsData
+                // }),
+                body:JSON.stringify(reqBody)
             });
 
             if (response.ok) {
             // if (true) {
                 console.log('Score submitted successfully');
+                const durationInMs = new Date() - new Date(candidateAssessmentDetails.startedAt)
+                const hours = Math.floor(durationInMs/(1000*60*60))
+                const minutes = Math.floor((durationInMs%(1000*60*60))/(1000*60))
+                
+                // navigate('/assessmentsubmit', { state: { assessmentName: Assessment.AssessmentTitle } });
                 navigate('/assessmentsubmit', {replace:true, state: { assessmentName: Assessment.AssessmentTitle } });
+                await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed", endedAt:new Date(),completionTime:new Date(durationInMs)})
             } else {
                 console.error('Failed to submit score');
             }
@@ -286,6 +341,7 @@ const AssessmentQuestion = () => {
 
     useEffect(() => {
         const totalTimeAllowed = 30 * 60;
+        
         const timer = setInterval(() => {
             setTimeSpent((prevTimeSpent) => {
                 if (prevTimeSpent < totalTimeAllowed) {
@@ -379,12 +435,18 @@ const AssessmentQuestion = () => {
         return score;
     };
 
+    
     useEffect(() => {
-        const totalTimeAllowed = 30 * 60;
+        const timeOutEvent = async()=>{
+            const totalTimeAllowed = 30 * 60;
+            
         if (timeSpent >= totalTimeAllowed) {
+            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed",endedAt:new Date()})
             handleSubmit();
             navigate('/timeout');
         }
+        }
+        timeOutEvent()
     }, [timeSpent, navigate]);
 
 

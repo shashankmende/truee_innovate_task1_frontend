@@ -23,11 +23,16 @@ const AssessmentTest = () => {
   const [positionTitle, setPositionTitle] = useState("");
   console.log(positionTitle, "positionTitle");
   const [scheduledAssessmentId,setScheduledAssessmentID]=useState("")
+  console.log("scheduledAssessmentId",scheduledAssessmentId)
   const [candidateId,setCandidateId]=useState("")
+  const [candidateAssessmentId,setCandidateAssessmentId]=useState("")
+  const [candidateAssessmentDetails,setCandidateAssessmentDetails]=useState("")
   // const [sections, setSections] = useState([]);
   // const [questions, setQuestions] = useState([]);
 console.log("location",location)
   const [candidate, setCandidate] = useState(null);
+
+  const [reSending,SetReSending]=useState(false)
 
   // const decrypt = (encryptedText, secretKey) => {
   //   try {
@@ -88,6 +93,7 @@ console.log("location",location)
       if (response.data.success){
         
         const document = response.data.candidateAssessment
+        setCandidateAssessmentDetails(document)
         const idsObj = {scheduledAssessmentId:document.scheduledAssessmentId,candidateId:document.candidateId}
         
         return idsObj
@@ -122,6 +128,7 @@ console.log("location",location)
       const candidateAssessmentId = queryParams.get('candidateAssessmentId')
       const decryptedId = decrypt(candidateAssessmentId,'test')
       console.log("decrypted id",decryptedId)
+      setCandidateAssessmentId(decryptedId)
       
       const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
       console.log("candidateId,scheduledAssessmentId",candidateId,scheduledAssessmentId)
@@ -260,9 +267,15 @@ console.log("location",location)
     setIsThirdPageActive(true);
   };
 
-  const handleStartButtonClick = () => {
+  const handleStartButtonClick = async() => {
     if (assessment && candidate) {
-      navigate("/assessmenttext", {replace:true, state: { assessment, candidate, candidateId: candidate._id } });
+    if (assessment.isActive && candidateAssessmentDetails.isActive){
+      await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{status:"in_progress",startedAt:new Date()})
+      navigate("/assessmenttext", {replace:true, state: {candidateAssessmentId, assessment, candidate, candidateId: candidate._id,candidateAssessmentDetails } });
+    }
+    else{
+      alert(`your assessment is expired`)
+    }
     } else {
       setError("Assessment data not loaded. Please try again.");
     }
@@ -271,11 +284,15 @@ console.log("location",location)
   const handleResendOtp =async () => {
     console.log("Resend OTP clicked");
     try {
+      SetReSending(true)
     const response =  await axios.post(`${process.env.REACT_APP_API_URL}/resend-link`,{
         candidateId,
         scheduledAssessmentId
       })
-      alert(`${response.data.message}`)
+      // alert(`${response.data.message}`)
+      if(response.data.success){
+        SetReSending(false)
+      }
       
     } catch (error) {
       console.log("error in resendign email")
@@ -646,7 +663,7 @@ console.log("location",location)
                 type="button"
                   onClick={handleResendOtp}
                   className="text-sm ml-4" >
-                  Resend
+                  {reSending ? "Resending...":"Resend"}
                 </button>
               </div>
               <div>

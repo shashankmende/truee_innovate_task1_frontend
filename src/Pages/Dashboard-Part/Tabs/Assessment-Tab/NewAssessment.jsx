@@ -1228,7 +1228,80 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   };
   
 
-  // Function to confirm deletion
+  // const confirmDelete = async () => {
+  //   try {
+  //     if (deleteType === "section") {
+  //       // Handle section deletion
+  //       setAddedSections((prev) =>
+  //         prev.filter((each) =>
+  //           each.Questions.every((q) => q.qId !== itemToDelete.qId)
+  //         )
+  //       );
+  //     } else if (deleteType === "question") {
+  //       // Delete the question from the backend
+        // await axios.delete(
+        //   `${process.env.REACT_APP_API_URL}/assessment-question/${itemToDelete.qId}`
+        // );
+  
+  //       // Update frontend state and reorder
+  //       const updatedSections = addedSections.map((section) => {
+  //         // Remove the specific question from the section based on qId
+          
+  //         // const filteredQuestions = section.Questions.filter(
+  //         //   (q) => q.qId !== itemToDelete.qId
+  //         // );
+  //         if (section.SectionName===itemToDelete.secName){
+  //           return section.Questions.filter(q=>q.qId!==itemToDelete.qId)
+  //         }
+  //         return section
+  
+  //         // console.log("Filtered questions after deleting:", filteredQuestions);
+  
+  //         // // Recalculate orders within this section
+  //         // const reorderedQuestions = filteredQuestions.map((q, index) => ({
+  //         //   ...q,
+  //         //   order: index + 1,
+  //         // }));
+  
+  //         // // Send updated orders to the backend
+  //         // updateQuestionOrdersInBackend(reorderedQuestions);
+  
+  //         // return { ...section, Questions: reorderedQuestions };
+  //       });
+  //       console.log("updated seciton after deleting",updatedSections)
+  
+  //       setAddedSections(updatedSections);
+  //     }
+  
+  //     // Close confirmation modal
+  //     setIsDeleteConfirmationOpen(false);
+  //     setItemToDelete(null);
+  //   } catch (error) {
+  //     console.error("Error deleting item:", error);
+  //     // Optionally, show a user-friendly error message
+  //     alert("An error occurred while deleting the item. Please try again.");
+  //   }
+  // };
+
+
+  
+
+
+  function deleteQuestion(sectionIndex, questionIndex) {
+    setAddedSections((prevSections) => {
+      const updatedSections = [...prevSections];
+  
+      // Remove the question from the target section
+      updatedSections[sectionIndex].Questions.splice(questionIndex, 1);
+  
+      // Synchronize order across all sections
+      return synchronizeOrder(updatedSections);
+    });
+  }
+  
+  
+  
+  
   const confirmDelete = async () => {
     try {
       if (deleteType === "section") {
@@ -1239,53 +1312,27 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
           )
         );
       } else if (deleteType === "question") {
-        // Delete the question from the backend
         await axios.delete(
           `${process.env.REACT_APP_API_URL}/assessment-question/${itemToDelete.qId}`
         );
-  
-        // Update frontend state and reorder
-        const updatedSections = addedSections.map((section) => {
-          // Remove the specific question from the section based on qId
-          
-          // const filteredQuestions = section.Questions.filter(
-          //   (q) => q.qId !== itemToDelete.qId
-          // );
-          if (section.SectionName===itemToDelete.secName){
-            return section.Questions.filter(q=>q.qId!==itemToDelete.qId)
-          }
-          return section
-  
-          // console.log("Filtered questions after deleting:", filteredQuestions);
-  
-          // // Recalculate orders within this section
-          // const reorderedQuestions = filteredQuestions.map((q, index) => ({
-          //   ...q,
-          //   order: index + 1,
-          // }));
-  
-          // // Send updated orders to the backend
-          // updateQuestionOrdersInBackend(reorderedQuestions);
-  
-          // return { ...section, Questions: reorderedQuestions };
-        });
-        console.log("updated seciton after deleting",updatedSections)
-  
-        setAddedSections(updatedSections);
+        const sectionIndex = addedSections.findIndex(section=>section.SectionName===itemToDelete.secName)
+        const questionIndex = addedSections.findIndex(section=>section.Questions.some(question=>question._id===itemToDelete._id))
+        deleteQuestion(sectionIndex,questionIndex)
       }
-  
-      // Close confirmation modal
       setIsDeleteConfirmationOpen(false);
       setItemToDelete(null);
     } catch (error) {
       console.error("Error deleting item:", error);
-      // Optionally, show a user-friendly error message
       alert("An error occurred while deleting the item. Please try again.");
     }
   };
   
   
-  // Function to cancel deletion
+  
+  
+  
+  
+  
   const cancelDelete = () => {
     setIsDeleteConfirmationOpen(false);
     setItemToDelete(null);
@@ -1465,60 +1512,63 @@ const recalculateOrder = (sections) => {
   }));
 };
 
-const updateQuestionsInAddedSectionFromQuestionBank = async (secName, question) => {
-  console.log("Updating question in section:", secName, question);
 
-  // Step 1: Add the new question with a temporary order of 0
-  const updatedSections = addedSections.map((section) =>
-    section.SectionName === secName
-      ? {
-          ...section,
-          Questions: [...section.Questions, { ...question, order: 0 }],
-        }
-      : section
-  );
-
-  // Step 2: Recalculate the order for all sections
-  const updatedSectionsWithOrder = recalculateOrder(updatedSections);
-  console.log("updated sections with order",updatedSectionsWithOrder)
-
-  // Step 3: Find the exact updated question with the new order 
-  const updatedQuestion = updatedSectionsWithOrder
-    .find((section) => section.SectionName === secName) // Locate the correct section
-    .Questions.find((q) => q._id === question._id); // Locate the question in that section
-
-  console.log("Updated question after recalculating order:", updatedQuestion);
-
-  // Step 4: Prepare the request body for the backend
-  const reqBody = {
-    assessmentId: tabsSubmitStatus.responseId,
-    questionId: updatedQuestion._id,
-    source: updatedQuestion.isCustom ? "custom" : "system",
-    snapshot: {
-      questionText: updatedQuestion.questionText,
-      options: updatedQuestion.options,
-      correctAnswer: updatedQuestion.correctAnswer,
-      questionType: updatedQuestion.questionType,
-      score: Number(updatedQuestion.score),
-    },
-    order: updatedQuestion.order,
-    customizations: "customization",
-  };
-
-if (updatedQuestion.questionType ==="Short Text" || updatedQuestion.questionType==="Long Text"){
-  
-  reqBody.snapshot.autoAssessment= question.autoAssessment
+function synchronizeOrder(addedSections) {
+  let currentOrder = 1; // Start the order from 1
+  return addedSections.map((section) => {
+    section.Questions = section.Questions.map((question) => ({
+      ...question,
+      order: currentOrder++, // Assign and increment the order
+    }));
+    return section;
+  });
 }
 
+
+function addQuestion(sectionIndex, newQuestion) {
+  setAddedSections((prevSections) => {
+    const updatedSections = [...prevSections];
+
+    // Add the new question to the target section
+    updatedSections[sectionIndex].Questions.push(newQuestion);
+
+    // Synchronize order across all sections
+    return synchronizeOrder(updatedSections);
+  });
+}
+
+const updateQuestionsInAddedSectionFromQuestionBank = async(secName,question)=>{
+  const sectionIndex = addedSections.findIndex(section=>section.SectionName===secName)
+  addQuestion(sectionIndex,question)
+  // console.log("added sections",addedSections)
+  const updatedQuestion = addedSections.find(section=>section.SectionName===secName).Questions.find(q=>q._id===question._id)
+  console.log("updated question=",updatedQuestion)
   try {
-    // Step 5: Send the updated question to the backend
+    const reqBody = {
+      assessmentId: tabsSubmitStatus.responseId,
+      questionId: updatedQuestion._id,
+      source: updatedQuestion.isCustom ? "custom" : "system",
+      snapshot: {
+        questionText: updatedQuestion.questionText,
+        options: updatedQuestion.options,
+        correctAnswer: updatedQuestion.correctAnswer,
+        questionType: updatedQuestion.questionType,
+        score: Number(updatedQuestion.score),
+      },
+      order: updatedQuestion.order,
+      customizations: "customization",
+    };
+    if (updatedQuestion.questionType ==="Short Text" || updatedQuestion.questionType ==="Short Text(Single Line)" || updatedQuestion.questionType ==="Long Text" || updatedQuestion.questionType==="Long Text"){
+  
+      reqBody.snapshot.autoAssessment= question.autoAssessment
+    }
+
     const response = await axios.post(
       `${process.env.REACT_APP_API_URL}/assessment-questions`,
       reqBody
     );
 
-    // Step 6: Update the section with the response from the backend
-    const finalSectionsUpdate = updatedSectionsWithOrder.map((section) =>
+    const finalSectionsUpdate = addedSections.map((section) =>
       section.SectionName === secName
         ? {
             ...section,
@@ -1531,13 +1581,86 @@ if (updatedQuestion.questionType ==="Short Text" || updatedQuestion.questionType
         : section
     );
 
-    // Step 7: Update the state with the final sections
     setAddedSections(finalSectionsUpdate);
-    console.log("Successfully updated sections:", finalSectionsUpdate);
+    
   } catch (error) {
-    console.error("Error pushing updated question to backend:", error);
+        console.error("Error pushing updated question to backend:", error);
   }
-};
+}
+
+// const updateQuestionsInAddedSectionFromQuestionBank = async (secName, question) => {
+//   console.log("Updating question in section:", secName, question);
+
+//   // Step 1: Add the new question with a temporary order of 0
+//   const updatedSections = addedSections.map((section) =>
+//     section.SectionName === secName
+//       ? {
+//           ...section,
+//           Questions: [...section.Questions, { ...question, order: 0 }],
+//         }
+//       : section
+//   );
+
+//   // Step 2: Recalculate the order for all sections
+//   const updatedSectionsWithOrder = recalculateOrder(updatedSections);
+//   console.log("updated sections with order",updatedSectionsWithOrder)
+
+//   // Step 3: Find the exact updated question with the new order 
+//   const updatedQuestion = updatedSectionsWithOrder
+//     .find((section) => section.SectionName === secName) // Locate the correct section
+//     .Questions.find((q) => q._id === question._id); // Locate the question in that section
+
+//   console.log("Updated question after recalculating order:", updatedQuestion);
+
+//   // Step 4: Prepare the request body for the backend
+  // const reqBody = {
+  //   assessmentId: tabsSubmitStatus.responseId,
+  //   questionId: updatedQuestion._id,
+  //   source: updatedQuestion.isCustom ? "custom" : "system",
+  //   snapshot: {
+  //     questionText: updatedQuestion.questionText,
+  //     options: updatedQuestion.options,
+  //     correctAnswer: updatedQuestion.correctAnswer,
+  //     questionType: updatedQuestion.questionType,
+  //     score: Number(updatedQuestion.score),
+  //   },
+  //   order: updatedQuestion.order,
+  //   customizations: "customization",
+  // };
+
+// if (updatedQuestion.questionType ==="Short Text" || updatedQuestion.questionType==="Long Text"){
+  
+//   reqBody.snapshot.autoAssessment= question.autoAssessment
+// }
+
+//   try {
+//     // Step 5: Send the updated question to the backend
+    // const response = await axios.post(
+    //   `${process.env.REACT_APP_API_URL}/assessment-questions`,
+    //   reqBody
+    // );
+
+//     // Step 6: Update the section with the response from the backend
+    // const finalSectionsUpdate = updatedSectionsWithOrder.map((section) =>
+    //   section.SectionName === secName
+    //     ? {
+    //         ...section,
+    //         Questions: section.Questions.map((each) =>
+    //           each._id === updatedQuestion._id
+    //             ? { ...updatedQuestion, qId: response.data.question._id }
+    //             : each
+    //         ),
+    //       }
+    //     : section
+    // );
+
+//     // Step 7: Update the state with the final sections
+    // setAddedSections(finalSectionsUpdate);
+//     console.log("Successfully updated sections:", finalSectionsUpdate);
+//   } catch (error) {
+//     console.error("Error pushing updated question to backend:", error);
+//   }
+// };
 
 
 console.log('added sections',addedSections)

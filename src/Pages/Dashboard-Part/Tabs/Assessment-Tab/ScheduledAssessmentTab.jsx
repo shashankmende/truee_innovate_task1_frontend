@@ -58,7 +58,7 @@ const ScheduledAssessmentTab = ({getScheduledAssessments,filteredScheduledAssess
 
     try {
       const response = await axios.patch(
-        `${process.env.REACT_APP_API_URL}/candidate-assessment/${id}`
+        `${process.env.REACT_APP_API_URL}/candidate-assessment/${id}`,{status:"cancelled"}
       );
       // alert(`${response.data.message}`)
       getScheduledAssessments();
@@ -359,8 +359,7 @@ const ScheduledAssessmentTab = ({getScheduledAssessments,filteredScheduledAssess
                                     >
                                       <td className="text-center p-2 ">
                                         {
-                                          candidateAssessment.candidateId
-                                            .FirstName
+                                          candidateAssessment.candidateId.FirstName
                                         }
                                       </td>
                                       <td className="text-center  p-2">
