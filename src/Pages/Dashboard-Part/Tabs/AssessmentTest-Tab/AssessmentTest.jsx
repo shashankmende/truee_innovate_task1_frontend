@@ -269,7 +269,8 @@ console.log("location",location)
 
   const handleStartButtonClick = async() => {
     if (assessment && candidate) {
-    if (assessment.isActive && candidateAssessmentDetails.isActive){
+      const currentTime = new Date();
+    if (assessment.isActive && candidateAssessmentDetails.isActive && currentTime <= new Date(candidateAssessmentDetails.expiryAt) && currentTime <= new Date(assessment.expiryAt) ){
       await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{status:"in_progress",startedAt:new Date()})
       navigate("/assessmenttext", {replace:true, state: {candidateAssessmentId, assessment, candidate, candidateId: candidate._id,candidateAssessmentDetails } });
     }
@@ -663,7 +664,7 @@ console.log("location",location)
                 type="button"
                   onClick={handleResendOtp}
                   className="text-sm ml-4" >
-                  {reSending ? "Resending...":"Resend"}
+                  {reSending ? "sending...":"Resend"}
                 </button>
               </div>
               <div>

@@ -23,7 +23,7 @@ const AssessmentQuestion = () => {
     const candidateId = location.state?.candidate._id;
     const candidateAssessmentId = location.state?.candidateAssessmentId
     const candidateAssessmentDetails = location.state?.candidateAssessmentDetails
-    console.log("location state",location.state)
+    // console.log("location state",location.state)
     useEffect(() => {
         const assessmentData = location.state?.assessment;
         if (assessmentData) {
@@ -214,37 +214,15 @@ const AssessmentQuestion = () => {
                 })
             );
 
-            // Prepare section data
-            // const sectionsData = assessment.assessmentId.Sections.map((section, sectionIndex) => {
-            //     const answeredQuestions = selectedOptions[sectionIndex].filter(option => option !== "").length;
-            //     const totalQuestions = section.Questions.length;
-            //     const passScore = section.Questions.reduce((total, question) => total + question.Score, 0);
-            //     const totalScore = section.Questions.reduce((total, question) => total + question.Score, 0);
-            const sectionsData = assessment.assessmentId.Sections.map((section, sectionIndex) => {
-                
+            
+            const sectionsData = assessment.assessmentId.Sections.map((section, sectionIndex) => {                
                 const answeredQuestions = selectedOptions[sectionIndex].filter(option => option !== "").length;
                 const totalQuestions = section.Questions.length;
                 const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
-                const totalScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
-
-                // return {
-                //     sectionId: section._id,
-                //     answeredQuestions,
-                //     totalQuestions,
-                //     passScore,
-                //     totalScore
-                // };
-                // const userAnswer = selectedOptions[sectionIndex][index] === q.snapshot.correctAnswer
-                // if (typeof userAnswer ==="string"){
-                //     userAnswer =
-                // }
-                return {
-                    
+                const totalScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);              
+                return {                    
                     Answers: section.Questions.map((q, index) => {
-                        let userAnswer = selectedOptions[sectionIndex][index];
-                        
-                
-                        
+                        let userAnswer = selectedOptions[sectionIndex][index];                                                                
                         if (typeof userAnswer === "number") {
                             userAnswer = q.snapshot.options[userAnswer];
                         }
@@ -309,7 +287,7 @@ const AssessmentQuestion = () => {
                 
                 // navigate('/assessmentsubmit', { state: { assessmentName: Assessment.AssessmentTitle } });
                 navigate('/assessmentsubmit', {replace:true, state: { assessmentName: Assessment.AssessmentTitle } });
-                await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed", endedAt:new Date(),completionTime:new Date(durationInMs)})
+                await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed", endedAt:new Date(),completionTime:`${hours}H ${minutes}M`})
             } else {
                 console.error('Failed to submit score');
             }
@@ -450,7 +428,8 @@ const AssessmentQuestion = () => {
     }, [timeSpent, navigate]);
 
 
-    const handleMCQInputChange = (optionIndex, questionIndex) => {
+    const handleMCQInputChange = async(optionIndex, questionIndex) => {
+        
         setSelectedOptions(prevSelectedOptions => {
             const newSelectedOptions = [...prevSelectedOptions];
             newSelectedOptions[selectedSection][questionIndex] = optionIndex;
@@ -466,6 +445,37 @@ const AssessmentQuestion = () => {
             newErrors[questionIndex] = false;
             return newErrors;
         });
+
+        const questionId = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex]._id
+        try {
+            const userSelectedOption = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex].snapshot.options[optionIndex]
+            // const userSelectedOption = selectedOptions[selectedSection][questionIndex]
+            const {correctAnswer,score} = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex].snapshot
+            const {SectionName} = assessment.assessmentId.Sections[selectedSection]
+            const isCorrect  = userSelectedOption === correctAnswer
+            console.log("correct answer",correctAnswer,"-----"," user selected option",userSelectedOption,"*******","isCorrect", isCorrect)
+            const Answers = {
+                questionId,
+                answer: userSelectedOption,
+                isCorrect,
+                score: isCorrect? score:0,
+                isAnswerLater: answerLater[selectedSection][questionIndex]
+            }
+            const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);
+                const totalScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);              
+            const reqBody = {
+                SectionName,
+                Answers,
+                totalScore,
+                passScore,
+                sectionResult:totalScore>=passScore? "pass":"fail"
+            }
+            console.log("reqBody",reqBody)
+            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}/sections/${selectedSection}/questions/${questionId}`,reqBody)
+        } catch (error) {
+            console.error('Error updating answer:', error);
+
+        }
     };
 
 
@@ -478,7 +488,7 @@ const AssessmentQuestion = () => {
 
     const [questionErrors, setQuestionErrors] = useState([]);
 
-    const handleCheckboxChange = (questionIndex) => {
+    const handleCheckboxChange = async(questionIndex) => {
         setAnswerLater(prevAnswerLater => {
             const newAnswerLater = [...prevAnswerLater];
             newAnswerLater[selectedSection][questionIndex] = !newAnswerLater[selectedSection][questionIndex];
@@ -491,6 +501,37 @@ const AssessmentQuestion = () => {
             newErrors[questionIndex] = false;
             return newErrors;
         });
+
+        if (!answerLater[selectedSection][questionIndex]){
+
+        
+
+        const {SectionName}= assessment.assessmentId.Sections[selectedSection]
+        const questionId = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex]._id
+
+        const Answers = {
+            questionId,
+            answer:"",
+            isCorrect:null,
+            score:0,
+            isAnswerLater:true
+        }
+const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);
+        const reqBody = {
+            SectionName,
+            Answers,
+            totalScore:0,
+            passScore,
+            sectionResult:"fail"
+        }
+        console.log("reqBody",reqBody)
+            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}/sections/${selectedSection}/questions/${questionId}`,reqBody)
+    }
+
+    
+
+
+
     };
 
     const formatTime = (seconds) => {
@@ -575,7 +616,7 @@ const AssessmentQuestion = () => {
             return <div>Loading...</div>;
         }
 
-        const handleInputChange = (value, questionIndex) => {
+        const handleInputChange = async(value, questionIndex) => {
             setSelectedOptions(prevSelectedOptions => {
                 const newSelectedOptions = [...prevSelectedOptions];
                 newSelectedOptions[selectedSection][questionIndex] = value;
@@ -606,6 +647,33 @@ const AssessmentQuestion = () => {
                     return newErrors;
                 });
             }
+
+            const {SectionName} = assessment.assessmentId.Sections[selectedSection]
+            const questionId = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex]._id
+            const userAnswer = value
+            const {correctAnswer,score}=assessment.assessmentId.Sections[selectedSection].Questions[questionIndex].snapshot
+            const isCorrect = userAnswer === correctAnswer
+            console.log("correct answer",correctAnswer,"-----"," user selected option",userAnswer,"*******","isCorrect", isCorrect)
+            const Answers = {
+                questionId,
+                answer:userAnswer,
+                isCorrect,
+                score:isCorrect? score:0,
+                isAnswerLater:answerLater[selectedSection][questionIndex]
+            }
+            const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);
+            const totalScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);              
+            const reqBody = {
+                SectionName,
+                Answers,
+                totalScore,
+                passScore,
+                sectionResult:totalScore>=passScore? "pass":"fail"
+
+            }
+            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}/sections/${selectedSection}/questions/${questionId}`,reqBody)
+
+
         };
 
 
@@ -642,13 +710,14 @@ const AssessmentQuestion = () => {
                             <div key={questionIndex} className="bg-white shadow-md rounded px-3 py-1 my-3 mr-3 border relative">
                                 <div className="absolute top-1 right-2 flex items-center">
                                     <input
+                                    id={`answer-later-${questionIndex}`}
                                         type="checkbox"
                                         checked={answerLater[selectedSection][questionIndex] || false}
                                         onChange={() => handleCheckboxChange(questionIndex)}
                                         className="mr-2"
                                         disabled={selectedOptions[selectedSection][questionIndex] !== null && selectedOptions[selectedSection][questionIndex] !== undefined && selectedOptions[selectedSection][questionIndex] !== ""}
                                     />
-                                    <label>Answer at a later time</label>
+                                    <label htmlFor={`answer-later-${questionIndex}`}>Answer at a later time</label>
                                 </div>
                                 <p className="font-semibold text-md mb-1">{`${questionIndex + 1}. ${question.snapshot.questionText}`}</p>
                                 {question.Hint && (
@@ -667,6 +736,7 @@ const AssessmentQuestion = () => {
                                                     onChange={() => handleMCQInputChange(index, questionIndex)} // Pass index instead of option
                                                     checked={selectedOptions[selectedSection][questionIndex] === index} // Check if the index is selected
                                                     required={!answerLater[selectedSection][questionIndex]}
+                                                    disabled={answerLater[selectedSection][questionIndex]}
                                                 />
                                                 <label htmlFor={`${option}-${index}`}>{option}</label>
                                             </div>
@@ -687,6 +757,7 @@ const AssessmentQuestion = () => {
                                             minLength={question.CharLimits?.min}
                                             maxLength={question.CharLimits}
                                             // maxLength={question.CharLimits?.max}
+                                            readOnly={answerLater[selectedSection][questionIndex]}
                                         />
                                         <div className="text-gray-500 text-xs mt-1 flex justify-end">
                                             {selectedOptions[selectedSection][questionIndex]?.length || 0}/{question.CharLimits} char
@@ -708,6 +779,7 @@ const AssessmentQuestion = () => {
                                             required={!answerLater[selectedSection][questionIndex]}
                                             minLength={question.CharLimits}
                                             maxLength={question.CharLimits}
+                                            readOnly={answerLater[selectedSection][questionIndex]}
                                         />
                                         <div className="text-gray-500 text-xs mt-1 flex justify-end">
                                             {selectedOptions[selectedSection][questionIndex]?.length || 0}/{question.CharLimits} char
@@ -737,6 +809,7 @@ const AssessmentQuestion = () => {
                                             value={selectedOptions[selectedSection][questionIndex] || question.snapshot.ProgrammingDetails?.[0]?.code || ""}
                                             onChange={(e) => handleInputChange(e.target.value, questionIndex)}
                                             required={!answerLater[selectedSection][questionIndex]}
+                                            readOnly={answerLater[selectedSection][questionIndex]}
                                         />
                                         <button
                                             className="bg-blue-400 text-black py-1 px-7 rounded hover:bg-blue-500 mt-4"
@@ -757,6 +830,7 @@ const AssessmentQuestion = () => {
                                         value={selectedOptions[selectedSection][questionIndex] || ""}
                                         onChange={(e) => handleInputChange(Number(e.target.value) || "", questionIndex)}
                                         required={!answerLater[selectedSection][questionIndex]}
+                                        readOnly={answerLater[selectedSection][questionIndex]}
                                     />
                                 )}
 
@@ -771,6 +845,8 @@ const AssessmentQuestion = () => {
                                                     onChange={(e) => handleInputChange(e.target.value, questionIndex)}
                                                     checked={selectedOptions[selectedSection][questionIndex] === "true"}
                                                     required={!answerLater[selectedSection][questionIndex]}
+                                                    readOnly={answerLater[selectedSection][questionIndex]}
+                                                    
                                                 />
                                                 <label>True</label>
                                                 <input
@@ -780,6 +856,7 @@ const AssessmentQuestion = () => {
                                                     onChange={(e) => handleInputChange(e.target.value, questionIndex)}
                                                     checked={selectedOptions[selectedSection][questionIndex] === "false"}
                                                     required={!answerLater[selectedSection][questionIndex]}
+                                                    readOnly={answerLater[selectedSection][questionIndex]}
                                                 />
                                                 <label>False</label>
                                             </>

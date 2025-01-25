@@ -384,10 +384,38 @@ const ScheduledAssessmentTab = ({getScheduledAssessments,filteredScheduledAssess
                                           .replace("pm", "PM")}
                                       </td>
                                       <td className="text-center  p-2">
-                                        {candidateAssessment.startedAt || "-"}
+                                        {new Intl.DateTimeFormat("en-GB", {
+                                          day: "2-digit",
+                                          month: "short",
+                                          year: "numeric",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          hour12: true,
+                                        })
+                                          .format(
+                                            new Date(
+                                              candidateAssessment.startedAt
+                                            )
+                                          )
+                                          .replace("am", "AM")
+                                          .replace("pm", "PM") || "-"}
                                       </td>
                                       <td className="text-center  p-2">
-                                        {candidateAssessment.endedAt || "-"}
+                                        {new Intl.DateTimeFormat("en-GB", {
+                                          day: "2-digit",
+                                          month: "short",
+                                          year: "numeric",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          hour12: true,
+                                        })
+                                          .format(
+                                            new Date(
+                                              candidateAssessment.endedAt
+                                            )
+                                          )
+                                          .replace("am", "AM")
+                                          .replace("pm", "PM") || "-"}
                                       </td>
                                       <td className="text-center  p-2">
                                         {candidateAssessment.progress}
