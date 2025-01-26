@@ -28,6 +28,7 @@ const AssessmentQuestion = () => {
 
     const totalTimeAllowed = candidateAssessmentDetails.remainingTime || 30 * 60;
     const [totalScore,setTotalScore]=useState(0)
+    const [sectionWiseTotalScore,setSetSectionWiseTotalScore]=useState([])
     // console.log("location state",location.state)
     useEffect(() => {
         const assessmentData = location.state?.assessment;
@@ -44,6 +45,9 @@ const AssessmentQuestion = () => {
                     Array(section.Questions.length).fill(false)
                 )
             );
+            setSetSectionWiseTotalScore(
+                Array(assessmentData.assessmentId.Sections.length).fill(0)
+            )
         } else {
             console.error('No assessment data found in state');
             navigate("/error");
@@ -526,7 +530,10 @@ const AssessmentQuestion = () => {
             const {SectionName} = assessment.assessmentId.Sections[selectedSection]
             
             const isCorrect  = userSelectedOption === correctAnswer
-            const calculatedScore = isCorrect ? totalScore+score : totalScore
+            const calculatedScore = isCorrect ? sectionWiseTotalScore[selectedSection]+score : sectionWiseTotalScore[selectedSection]
+            const newScores = [...sectionWiseTotalScore]
+             newScores[selectedSection]= calculatedScore
+             setSetSectionWiseTotalScore(newScores)
             setTotalScore(calculatedScore)
             console.log("correct answer",correctAnswer,"-----"," user selected option",userSelectedOption,"*******","isCorrect", isCorrect)
             const Answers = {
@@ -542,7 +549,7 @@ const AssessmentQuestion = () => {
             const reqBody = {
                 SectionName,
                 Answers,
-                totalScore:calculatedScore,
+                totalScore: calculatedScore,
                 passScore,
                 sectionResult:totalScore>=passScore? "pass":"fail"
             }
@@ -740,8 +747,11 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
             }
             const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);
             // const totalScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);              
-            const calculatedScore = isCorrect ? totalScore + score : totalScore
-
+            // const calculatedScore = isCorrect ? totalScore + score : totalScore
+            const calculatedScore = isCorrect ? sectionWiseTotalScore[selectedSection] + score : sectionWiseTotalScore[selectedSection]
+            const newScores = [...sectionWiseTotalScore]
+            newScores[selectedSection]= calculatedScore
+            setSetSectionWiseTotalScore(newScores)
             setTotalScore(calculatedScore)
 
             const reqBody = {
