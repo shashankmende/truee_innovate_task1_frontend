@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import logo from "../../Images/upinterviewLogo.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import { evaluate } from 'mathjs';
@@ -17,12 +17,17 @@ const AssessmentQuestion = () => {
     const [selectedLanguage, setSelectedLanguage] = useState("");
     const [timeSpent, setTimeSpent] = useState(0);
     // console.log("timeSpent", timeSpent);
+    
     const [previewMode, setPreviewMode] = useState(false);
     const [answeredQuestionsScore, setAnsweredQuestionsScore] = useState(0);
     const [validationErrors, setValidationErrors] = useState([]);
     const candidateId = location.state?.candidate._id;
     const candidateAssessmentId = location.state?.candidateAssessmentId
     const candidateAssessmentDetails = location.state?.candidateAssessmentDetails
+    const [remainingTime,setRemainingTime]=useState(  candidateAssessmentDetails.remainingTime ||   30*60)//1800 seconds
+
+    const totalTimeAllowed = candidateAssessmentDetails.remainingTime || 30 * 60;
+    const [totalScore,setTotalScore]=useState(0)
     // console.log("location state",location.state)
     useEffect(() => {
         const assessmentData = location.state?.assessment;
@@ -44,6 +49,71 @@ const AssessmentQuestion = () => {
             navigate("/error");
         }
     }, [location.state, navigate]);
+
+    const remainingTimeRef = useRef(remainingTime); // Ref to store the current value of remainingTime
+
+    // Keep the ref updated with the latest state value
+    useEffect(() => {
+        remainingTimeRef.current = remainingTime;
+    }, [remainingTime]);
+
+    //update remaining time
+    useEffect(()=>{
+        const timer = setInterval(()=>{
+            setRemainingTime(prevTime=>{
+                if (prevTime <=1 ){
+                    clearInterval(timer)
+                    handleTimeout()
+                    return 0
+                }
+                return prevTime - 1
+            })
+        },1000)
+        // alert(`remaining time : ${remainingTime}`)
+
+        return ()=>clearInterval(timer)
+    },[])
+
+    const handleTimeout = async () => {
+        try {
+            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`, {
+                status: "completed",
+                endedAt: new Date(),
+            });
+            navigate("/timeout");
+        } catch (error) {
+            console.error("Error handling timeout:", error);
+        }
+    };
+
+    //auto-save
+    useEffect(()=>{
+        
+           const timerId =  setInterval(()=>{
+                autoSaveProgress()
+                
+            },30000)//save progress for every 30 seconds
+        
+            return ()=>clearInterval(timerId)
+    // },[selectedOptions,answerLater,remainingTime])
+    },[])
+
+    const autoSaveProgress = async()=>{
+        try {
+            const progress = {
+                remainingTime:remainingTimeRef.current
+                
+            }
+            console.log("progress",progress)
+            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}/save-progress`,progress)
+            console.log("Progress autosaved successfully");
+            
+        } catch (error) {
+            console.error("Error saving progress:", error);
+        }
+
+    }
+
 
     const handleRunClick = async () => {
         const question = assessment.Sections[selectedSection].Questions[currentQuestionIndex];
@@ -191,6 +261,7 @@ const AssessmentQuestion = () => {
                             break;
                         default:
                             console.warn(`Unhandled question type: ${question.QuestionType}`);
+                            return ""
                     }
 
                     const marks = isCorrect ? score : 0;
@@ -214,12 +285,14 @@ const AssessmentQuestion = () => {
                 })
             );
 
-            
+            let totalScore = calculateAnsweredQuestions()       
             const sectionsData = assessment.assessmentId.Sections.map((section, sectionIndex) => {                
                 const answeredQuestions = selectedOptions[sectionIndex].filter(option => option !== "").length;
                 const totalQuestions = section.Questions.length;
                 const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
-                const totalScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);              
+                // const totalScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);  
+                // let totalScore =0            
+                    
                 return {                    
                     Answers: section.Questions.map((q, index) => {
                         let userAnswer = selectedOptions[sectionIndex][index];                                                                
@@ -227,6 +300,7 @@ const AssessmentQuestion = () => {
                             userAnswer = q.snapshot.options[userAnswer];
                         }
                         const isCorrect = userAnswer === q.snapshot.correctAnswer;
+                        // totalScore += isCorrect + q.snapshot.score
                         return {
                             questionId: q._id,
                             answer: userAnswer,
@@ -317,10 +391,8 @@ const AssessmentQuestion = () => {
         setShowPreview((prevMode) => !prevMode);
     };
 
-    useEffect(() => {
-        const totalTimeAllowed = 30 * 60;
-        
-        const timer = setInterval(() => {
+    useEffect(() => { 
+            const timer = setInterval(() => {
             setTimeSpent((prevTimeSpent) => {
                 if (prevTimeSpent < totalTimeAllowed) {
                     return prevTimeSpent + 1;
@@ -416,7 +488,7 @@ const AssessmentQuestion = () => {
     
     useEffect(() => {
         const timeOutEvent = async()=>{
-            const totalTimeAllowed = 30 * 60;
+            // const totalTimeAllowed = 30 * 60;
             
         if (timeSpent >= totalTimeAllowed) {
             await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed",endedAt:new Date()})
@@ -452,7 +524,10 @@ const AssessmentQuestion = () => {
             // const userSelectedOption = selectedOptions[selectedSection][questionIndex]
             const {correctAnswer,score} = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex].snapshot
             const {SectionName} = assessment.assessmentId.Sections[selectedSection]
+            
             const isCorrect  = userSelectedOption === correctAnswer
+            const calculatedScore = isCorrect ? totalScore+score : totalScore
+            setTotalScore(calculatedScore)
             console.log("correct answer",correctAnswer,"-----"," user selected option",userSelectedOption,"*******","isCorrect", isCorrect)
             const Answers = {
                 questionId,
@@ -462,11 +537,12 @@ const AssessmentQuestion = () => {
                 isAnswerLater: answerLater[selectedSection][questionIndex]
             }
             const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);
-                const totalScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);              
+                // const totalScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);              
+                // const totalScore = calculateAnsweredQuestions()
             const reqBody = {
                 SectionName,
                 Answers,
-                totalScore,
+                totalScore:calculatedScore,
                 passScore,
                 sectionResult:totalScore>=passScore? "pass":"fail"
             }
@@ -520,9 +596,9 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
         const reqBody = {
             SectionName,
             Answers,
-            totalScore:0,
+            totalScore,
             passScore,
-            sectionResult:"fail"
+            sectionResult:totalScore > passScore ? "pass":'fail'
         }
         console.log("reqBody",reqBody)
             await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}/sections/${selectedSection}/questions/${questionId}`,reqBody)
@@ -564,6 +640,7 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                     <span className="font-semibold text-xl">{answeredQuestionsCount}/{totalQuestionsAcrossSections}</span>
                 </p>
                 <p>
+                    {/* <span>remaining time:{remainingTime}</span> */}
                     <span className="text-gray-500">Time Remaining: </span>
                     <span className="font-semibold text-lg">{formatTime(remainingTime)}</span>
                 </p>
@@ -581,7 +658,7 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
         
         const totalQuestionsAcrossSections = assessment.assessmentId.Sections.reduce((total, section) => total + section.Questions.length, 0);
 
-        const totalTimeAllowed = 30 * 60;
+        // const totalTimeAllowed = 30 * 60;
         const remainingTime = totalTimeAllowed - timeSpent;
         const answeredQuestionsCount = calculateAnsweredQuestions();
 
@@ -662,11 +739,15 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                 isAnswerLater:answerLater[selectedSection][questionIndex]
             }
             const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);
-            const totalScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);              
+            // const totalScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);              
+            const calculatedScore = isCorrect ? totalScore + score : totalScore
+
+            setTotalScore(calculatedScore)
+
             const reqBody = {
                 SectionName,
                 Answers,
-                totalScore,
+                totalScore:calculatedScore,
                 passScore,
                 sectionResult:totalScore>=passScore? "pass":"fail"
 
@@ -923,7 +1004,7 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
 
     const renderPreview = ({ assessment, selectedOptions, score, questionScores = [] }) => {
         const totalQuestionsAcrossSections = assessment.assessmentId.Sections.reduce((total, section) => total + section.Questions.length, 0);
-        const totalTimeAllowed = 30 * 60;
+        // const totalTimeAllowed = 30 * 60;
         const remainingTime = totalTimeAllowed - timeSpent;
         const answeredQuestionsCount = calculateAnsweredQuestions();
 

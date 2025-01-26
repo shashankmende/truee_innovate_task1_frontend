@@ -9,6 +9,7 @@ import logo from "../../Images/upinterviewLogo.png";
 import maleImage from "../../Images/man.png";
 import femaleImage from "../../Images/woman.png";
 import genderlessImage from "../../Images/transgender.png";
+import toast from 'react-hot-toast'
 
 const AssessmentTest = () => {
   const [otp, setOtp] = useState("");
@@ -267,20 +268,83 @@ console.log("location",location)
     setIsThirdPageActive(true);
   };
 
-  const handleStartButtonClick = async() => {
-    if (assessment && candidate) {
-      const currentTime = new Date();
-    if (assessment.isActive && candidateAssessmentDetails.isActive && currentTime <= new Date(candidateAssessmentDetails.expiryAt) && currentTime <= new Date(assessment.expiryAt) ){
-      await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{status:"in_progress",startedAt:new Date()})
-      navigate("/assessmenttext", {replace:true, state: {candidateAssessmentId, assessment, candidate, candidateId: candidate._id,candidateAssessmentDetails } });
+  const handleStartButtonClick = async () => {
+    if (!assessment || !candidate) {
+        setError("Assessment data not loaded. Please try again.");
+        return;
     }
-    else{
-      alert(`your assessment is expired`)
+
+    const currentTime = new Date();
+    const assessmentExpiryTime = new Date(assessment.expiryAt);
+    const candidateExpiryTime = new Date(candidateAssessmentDetails.expiryAt);
+
+    // Check if the assessment is expired
+    if (currentTime > candidateExpiryTime || currentTime > assessmentExpiryTime) {
+        toast.error("Your assessment has expired.");
+        return;
     }
-    } else {
-      setError("Assessment data not loaded. Please try again.");
+
+    // Check if the assessment and candidate assessment are active
+    if (!assessment.isActive || !candidateAssessmentDetails.isActive) {
+        toast.error("The assessment is no longer active.");
+        return;
     }
-  };
+
+    // Handle logic based on the status field
+    switch (candidateAssessmentDetails.status) {
+        case "pending":
+            try {
+                // Start a fresh assessment
+                toast.success("Starting a new assessment...");
+                await axios.patch(
+                    `${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,
+                    { status: "in_progress", startedAt: currentTime }
+                );
+                navigate("/assessmenttext", {
+                    replace: true,
+                    state: {
+                        candidateAssessmentId,
+                        assessment,
+                        candidate,
+                        candidateId: candidate._id,
+                        candidateAssessmentDetails,
+                    },
+                });
+            } catch (error) {
+                console.error("Error starting assessment:", error);
+                toast.error("Failed to start assessment. Please try again.");
+            }
+            break;
+
+        case "in_progress":
+            try {
+                // Resume the assessment
+                toast.success("Resuming your assessment...");
+                navigate("/assessmenttext", {
+                    replace: true,
+                    state: {
+                        candidateAssessmentId,
+                        assessment,
+                        candidate,
+                        candidateId: candidate._id,
+                        candidateAssessmentDetails,
+                    },
+                });
+            } catch (error) {
+                console.error("Error resuming assessment:", error);
+                toast.error("Failed to resume assessment. Please try again.");
+            }
+            break;
+
+        case "completed":
+            // Inform the user the assessment is already completed
+            toast.error("You have already completed this assessment.");
+            break;
+
+        default:
+            toast.error("Invalid assessment status. Please contact support.");
+    }
+};
 
   const handleResendOtp =async () => {
     console.log("Resend OTP clicked");
