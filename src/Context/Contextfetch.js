@@ -111,7 +111,10 @@ const CustomProvider = ({ children }) => {
     getQuestions();
   }, []);
 
-  const [candidateAssessmentDetails,setCandidateAssessmentDetails]=useState("")
+
+  const [assessment, setAssessment] = useState(null);
+
+  const [candidateAssessmentDetails,setCandidateAssessmentDetails]=useState(null)
   const [candidateAssessmentId,setCandidateAssessmentId]=useState(localStorage.getItem("candidateAssessmentId"))
 
   
@@ -145,6 +148,7 @@ const CustomProvider = ({ children }) => {
       value={{
         // candidateAssessmentId,
         // setCandidateAssessmentId,
+        assessment, setAssessment,
         getCandidateAssessmentDetails,
         candidateAssessmentDetails,
         setCandidateAssessmentDetails,

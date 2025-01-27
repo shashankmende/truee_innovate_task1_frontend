@@ -17,7 +17,7 @@ const AssessmentTest = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [isChecked, setIsChecked] = useState(false);
-  const [assessment, setAssessment] = useState(null);
+  // const [assessment, setAssessment] = useState(null);
   const navigate = useNavigate();
   const [isNextPageActive, setIsNextPageActive] = useState(false);
   const [isThirdPageActive, setIsThirdPageActive] = useState(false);
@@ -40,7 +40,8 @@ const AssessmentTest = () => {
   const {
     
     candidateAssessmentDetails,
-    setCandidateAssessmentDetails
+    setCandidateAssessmentDetails,
+    assessment, setAssessment
   } = useCustomContext()
   
 
