@@ -233,7 +233,8 @@ const ShareAssessment = ({
           if (CandidateAssessmentResponse.data.success){
             const response = await axios.post( `${process.env.REACT_APP_API_URL}/send-assessment-link`,
               {scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,candidateEmails:selectedCandidatesEmails})
-            alert(`${response.data.message}`)
+            // alert(`${response.data.message}`)
+            toast.success(`${response.data.message}`)
           }
           
           setIsLoading(false)

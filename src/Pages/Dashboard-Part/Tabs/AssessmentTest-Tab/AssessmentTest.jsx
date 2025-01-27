@@ -10,6 +10,7 @@ import maleImage from "../../Images/man.png";
 import femaleImage from "../../Images/woman.png";
 import genderlessImage from "../../Images/transgender.png";
 import toast from 'react-hot-toast'
+// import getCandidateAssessmentDetails from "../../../../utils/fetchCandidateAssessmentDetails";
 
 const AssessmentTest = () => {
   const [otp, setOtp] = useState("");
@@ -35,25 +36,6 @@ console.log("location",location)
 
   const [reSending,SetReSending]=useState(false)
 
-  // const decrypt = (encryptedText, secretKey) => {
-  //   try {
-  //     // Remove spaces and decode URL
-  //     const sanitizedText = decodeURIComponent(encryptedText.replace(/\s+/g, ''));
-  //     console.log('Sanitized Encrypted Text:', sanitizedText);
-  
-  //     const bytes = CryptoJS.AES.decrypt(sanitizedText, secretKey);
-  //     const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-  
-  //     if (!decryptedText) {
-  //       throw new Error('Decryption resulted in an empty string');
-  //     }
-  
-  //     return decryptedText;
-  //   } catch (error) {
-  //     console.error('Decryption failed:', error.message);
-  //     return null; // Return null if decryption fails
-  //   }
-  // };
 
   const verifyOtp = async (candidateId, otp, scheduledAssessmentId) => {
     const url = `${process.env.REACT_APP_API_URL}/verify-otp`;
@@ -61,26 +43,31 @@ console.log("location",location)
       const response = await axios.post(url, { candidateId, otp, scheduledAssessmentId });
   
       if (response.status === 200) {
-        alert(response.data.message); // Success message
+        
+        toast.success(response.data.message)
         return response.data.isValid;
       } else {
-        alert(response.data.message); // Handle unexpected status
+        
+        toast.error(response.data.message)
         return false;
       }
     } catch (error) {
       // Improved error handling
       if (error.response) {
         // Server responded with a status other than 200
-        alert(`Error: ${error.response.data.message}`);
+        
+        toast.error(`Error: ${error.response.data.message}`)
         return false;
       } else if (error.request) {
         // Request was made but no response received
         console.error('No response received:', error.request);
-        alert('Network error: Unable to reach the server. Please try again.');
+        
+        toast.error('Network error: Unable to reach the server. Please try again.')
       } else {
         // Something else happened
         console.error('Error:', error.message);
-        alert('An unexpected error occurred. Please try again.');
+        
+        toast.error('An unexpected error occurred. Please try again.')
       }
       return false;
     }
@@ -131,7 +118,8 @@ console.log("location",location)
       console.log("decrypted id",decryptedId)
       setCandidateAssessmentId(decryptedId)
       
-      const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
+      // const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
+      const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId,setCandidateAssessmentDetails)
       console.log("candidateId,scheduledAssessmentId",candidateId,scheduledAssessmentId)
       console.log('Decrypted IDs:', { scheduledAssessmentId, candidateId });
   
@@ -185,23 +173,21 @@ console.log("location",location)
   
     fetchAssessmentAndCandidate();
   }, [location]);
+
+ 
   
 
   useEffect(() => {
     const fetchAssessment = async () => {
       const secretKey = 'test'
       const params = new URLSearchParams(location.search);
-      // const assessmentId =  params.get('assessmentId');
       const candidateAssessmentId = params.get('candidateAssessmentId')
       const decryptedId = decrypt(candidateAssessmentId,'test')
       console.log("decrypted id",decryptedId)
       
       const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
-      // const encryptedAssessmentId =  params.get('assessmentId');
-      // const assessmentId =decrypt(encryptedAssessmentId,secretKey)
       if (scheduledAssessmentId) {
         try {
-          // const response = await axios.get(`${process.env.REACT_APP_API_URL}/assessment/${assessmentId}/details`);
           const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessments-list/${scheduledAssessmentId}`);
           setAssessment(response.data.scheduledAssessment);
           console.log(response.data, "response.data");
@@ -286,7 +272,7 @@ console.log("location",location)
 
     // Check if the assessment and candidate assessment are active
     if (!assessment.isActive || !candidateAssessmentDetails.isActive) {
-        toast.error("The assessment is no longer active.");
+        toast.error("The assessment is no longer active. You might have already completed this assessment");
         return;
     }
 
@@ -295,7 +281,7 @@ console.log("location",location)
         case "pending":
             try {
                 // Start a fresh assessment
-                toast.success("Starting a new assessment...");
+                // toast.success("Starting a new assessment...");
                 await axios.patch(
                     `${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,
                     { status: "in_progress", startedAt: currentTime }
@@ -303,6 +289,8 @@ console.log("location",location)
                 navigate("/assessmenttext", {
                     replace: true,
                     state: {
+                      // getCandidateAssessmentDetails:getCandidateAssessmentDetails,
+                      // setCandidateAssessmentDetails,
                         candidateAssessmentId,
                         assessment,
                         candidate,
@@ -319,10 +307,11 @@ console.log("location",location)
         case "in_progress":
             try {
                 // Resume the assessment
-                toast.success("Resuming your assessment...");
+                // toast.success("Resuming your assessment...");
                 navigate("/assessmenttext", {
                     replace: true,
                     state: {
+                      // getCandidateAssessmentDetails:getCandidateAssessmentDetails,
                         candidateAssessmentId,
                         assessment,
                         candidate,
@@ -354,7 +343,7 @@ console.log("location",location)
         candidateId,
         scheduledAssessmentId
       })
-      // alert(`${response.data.message}`)
+      
       if(response.data.success){
         SetReSending(false)
       }

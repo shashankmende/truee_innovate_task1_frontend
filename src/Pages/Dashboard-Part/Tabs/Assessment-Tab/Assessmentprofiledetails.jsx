@@ -259,7 +259,7 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
   };
 
   const handleSave = async () => {
-    alert("save is clicked ")
+    
     try {
       console.log("formdata",formData)
       const response = await axios.patch(

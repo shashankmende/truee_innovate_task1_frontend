@@ -3,6 +3,8 @@ import logo from "../../Images/upinterviewLogo.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import { evaluate } from 'mathjs';
 import axios from "axios";
+import toast from "react-hot-toast";
+// import getCandidateAssessmentDetails from "../../../../utils/fetchCandidateAssessmentDetails";
 
 const AssessmentQuestion = () => {
     const [assessment, setAssessment] = useState(null);
@@ -24,21 +26,56 @@ const AssessmentQuestion = () => {
     const candidateId = location.state?.candidate._id;
     const candidateAssessmentId = location.state?.candidateAssessmentId
     const candidateAssessmentDetails = location.state?.candidateAssessmentDetails
+    // const getCandidateAssessmentDetails = location.state?.getCandidateAssessmentDetails
+    const setCandidateAssessmentDetails = location.state?.setCandidateAssessmentDetails
     const [remainingTime,setRemainingTime]=useState(  candidateAssessmentDetails.remainingTime ||   30*60)//1800 seconds
 
     const totalTimeAllowed = candidateAssessmentDetails.remainingTime || 30 * 60;
     const [totalScore,setTotalScore]=useState(0)
     const [sectionWiseTotalScore,setSetSectionWiseTotalScore]=useState([])
+
+
+    //after refreshing
+    useEffect(()=>{ 
+
+        const handlePageLoad = ()=>{
+            // alert("calling candidates update function")
+            // getCandidateAssessmentDetails(candidateAssessmentId,setCandidateAssessmentDetails)
+            // alert("calling done")
+        }
+        window.addEventListener("load",handlePageLoad)
+
+        return ()=>window.removeEventListener("load",handlePageLoad)
+    },[candidateAssessmentId])
+
+//before refreshing
+    useEffect(()=>{
+        const handleBeforeUnload = (event)=>{
+            autoSaveProgress()
+            event.preventDefault()
+            // event.returnValue=''
+        }
+
+
+        window.addEventListener("beforeunload",handleBeforeUnload)
+        return ()=>{ window.removeEventListener("beforeunload",handleBeforeUnload)}
+    },[])
+
     // console.log("location state",location.state)
     useEffect(() => {
         const assessmentData = location.state?.assessment;
+        const existingSections = candidateAssessmentDetails.sections 
+        const newSelectedOptions = assessmentData.assessmentId.Sections.map(section =>
+            Array(section.Questions.length).fill("")
+        )
+        console.log("existing sections**********",existingSections)
+        if (existingSections.length === 0){
+            
         if (assessmentData) {
             console.log('Fetched assessment data:', assessmentData);
             setAssessment(assessmentData);
             setSelectedOptions(
-                assessmentData.assessmentId.Sections.map(section =>
-                    Array(section.Questions.length).fill("")
-                )
+                newSelectedOptions
             );
             setAnswerLater(
                 assessmentData.assessmentId.Sections.map(section =>
@@ -52,6 +89,67 @@ const AssessmentQuestion = () => {
             console.error('No assessment data found in state');
             navigate("/error");
         }
+    }
+    else{
+        toast.success("Your session resumed..")
+        
+        // const newScores = Array(existingSections.length).fill(0)
+
+        // existingSections.forEach((section, sectionIndex) => {
+        //     console.log(`Processing section: ${section.SectionName}, Index: ${sectionIndex}`);
+        //     const {totalScore}=section 
+        //     newScores[sectionIndex]=totalScore
+        //     setSetSectionWiseTotalScore(newScores)
+        //     console.log(`section index`,section.SectionName)
+        //      section.Answers.map((answerItem,answerIndex) => {
+        //         // console.log('ANSWER ITEM',answerItem)
+        //         const { questionId,answer } = answerItem;
+        //         const question = assessmentData.assessmentId.Sections[sectionIndex].Questions.find(q=>q._id===questionId).snapshot
+        //         // console.log('question',questionId,question)
+        //         const {questionType,options} = question
+                
+        //         if (questionType==='MCQ'){
+        //             console.log("answer",answer)
+        //                const optionIndex = options.findIndex(option=>option===answer)
+        //             newSelectedOptions[sectionIndex][answerIndex] = optionIndex
+        //             setSelectedOptions(newSelectedOptions)
+                    
+        //         }
+        //         else if (questionType==="Short Text" || questionType==="Short TextShort Text(Single line)" || questionType==="Long Text"){
+        //             console.log('question',questionId,question)
+        //             newSelectedOptions[sectionIndex][answerIndex]=answer
+        //             console.log('sectionIndex, answerIndex',sectionIndex,answerIndex,answer)
+        //             setSelectedOptions(newSelectedOptions)
+        //         }
+        //     });
+        // });
+
+        setAssessment(assessmentData)
+
+        const restoredOptions = existingSections.map((section, sectionIndex) =>
+            section.Answers.map((answer, questionIndex) => {
+                const question = assessmentData.assessmentId.Sections[sectionIndex]?.Questions.find(
+                    (q) => q._id === answer.questionId
+                );
+                return question?.snapshot.questionType === "MCQ"
+                    ? question?.snapshot.options.indexOf(answer.answer)
+                    : answer.answer;
+            })
+        );
+    
+
+        setSelectedOptions(restoredOptions);
+
+        const restoredAnswerLater = existingSections.map((section) =>
+            section.Answers.map((answer) => answer.isAnswerLater || false)
+        );
+        console.log("restoredAnswerLater",restoredAnswerLater)
+        setAnswerLater(restoredAnswerLater);
+
+        const restoredScores = existingSections.map((section) => section.totalScore || 0);
+        setSetSectionWiseTotalScore(restoredScores);
+
+    }
     }, [location.state, navigate]);
 
     const remainingTimeRef = useRef(remainingTime); // Ref to store the current value of remainingTime
@@ -301,7 +399,7 @@ const AssessmentQuestion = () => {
                     Answers: section.Questions.map((q, index) => {
                         let userAnswer = selectedOptions[sectionIndex][index];                                                                
                         if (typeof userAnswer === "number") {
-                            userAnswer = q.snapshot.options[userAnswer];
+                            userAnswer = q.snapshot?.options[userAnswer];
                         }
                         const isCorrect = userAnswer === q.snapshot.correctAnswer;
                         // totalScore += isCorrect + q.snapshot.score
@@ -328,6 +426,7 @@ const AssessmentQuestion = () => {
 
             const reqBody = {
                 // completionTime:new Date(),
+                remainingTime:remainingTimeRef.current,
                 sections:sectionsData,
                 
 
@@ -746,8 +845,7 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                 isAnswerLater:answerLater[selectedSection][questionIndex]
             }
             const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);
-            // const totalScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);              
-            // const calculatedScore = isCorrect ? totalScore + score : totalScore
+            
             const calculatedScore = isCorrect ? sectionWiseTotalScore[selectedSection] + score : sectionWiseTotalScore[selectedSection]
             const newScores = [...sectionWiseTotalScore]
             newScores[selectedSection]= calculatedScore
@@ -775,12 +873,13 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                     totalQuestionsAcrossSections={totalQuestionsAcrossSections}
                     remainingTime={remainingTime}
                 />
-                <div className="grid grid-cols-8 gap-3 border rounded h-[28.5rem]">
+                {/* <div className="grid grid-cols-8 gap-3 border rounded h-[28.5rem]"> */}
+                <div className="grid grid-cols-8 gap-3  rounded h-[34rem] my-3">
                     {/* side bar */}
                     <div className="col-span-1">
                         <div className="border border-custom-blue rounded h-full">
                             {assessment.assessmentId.Sections.map((section, index) => {
-                                const answeredCount = selectedOptions[index].filter(option => option !== null && option !== undefined && option !== "").length;
+                                const answeredCount = selectedOptions[index]?.filter(option => option !== null && option !== undefined && option !== "").length;
                                 return (
                                     <div
                                         key={index}
@@ -798,7 +897,7 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                     {/* main content */}
                     <div className="col-span-7 overflow-y-auto">
                         {section.Questions.map((question, questionIndex) => (
-                            <div key={questionIndex} className="bg-white shadow-md rounded px-3 py-1 my-3 mr-3 border relative">
+                            <div key={questionIndex} className="bg-white shadow-md rounded px-3 py-1 mb-3  mr-3 border relative">
                                 <div className="absolute top-1 right-2 flex items-center">
                                     <input
                                     id={`answer-later-${questionIndex}`}
@@ -1101,10 +1200,9 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
          
             {!assessment ? (
                 <div>Loading assessment...</div>
-            ) : (
+            ) : assessment.assessmentId.Sections.length === 0 ? <div className="w-full h-full flex justify-center items-center bg-red-500"><p>No questions in this assessment</p></div>: (
                 <>
                     {showMainContent && renderQuestion()}
-                    
                     {(showPreview && assessment.assessmentId.Sections) && renderPreview({ assessment, selectedOptions, score: calculateScore })}                                        
                 </>
             )}
