@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import logo from "../../Images/upinterviewLogo.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import { evaluate } from 'mathjs';
 import axios from "axios";
 import toast from "react-hot-toast";
-// import getCandidateAssessmentDetails from "../../../../utils/fetchCandidateAssessmentDetails";
+import { useCustomContext } from "../../../../Context/Contextfetch";
+
 
 const AssessmentQuestion = () => {
     const [assessment, setAssessment] = useState(null);
@@ -25,51 +26,81 @@ const AssessmentQuestion = () => {
     const [validationErrors, setValidationErrors] = useState([]);
     const candidateId = location.state?.candidate._id;
     const candidateAssessmentId = location.state?.candidateAssessmentId
+    // const {candidateAssessmentDetails,getCandidateAssessmentDetails}=useCustomContext()
     const candidateAssessmentDetails = location.state?.candidateAssessmentDetails
+    // const [candidateAssessmentDetails,setCandidateAssessmentDetails]= candidateAssessment
     // const getCandidateAssessmentDetails = location.state?.getCandidateAssessmentDetails
-    const setCandidateAssessmentDetails = location.state?.setCandidateAssessmentDetails
-    const [remainingTime,setRemainingTime]=useState(  candidateAssessmentDetails.remainingTime ||   30*60)//1800 seconds
+    // const setCandidateAssessmentDetails = location.state?.setCandidateAssessmentDetails
+    // const {  candidateAssessmentDetails,setCandidateAssessmentDetails }=useCustomContext()
+    
+    // const [candidateAssessmentDetails, setCandidateAssessmentDetails] = useState(null);
+    // const [remainingTime,setRemainingTime]=useState(   30*60)//1800 seconds
+    const [remainingTime,setRemainingTime]=useState( candidateAssessmentDetails.remainingTime ||   30*60)//1800 seconds
 
-    const totalTimeAllowed = candidateAssessmentDetails.remainingTime || 30 * 60;
+    let totalTimeAllowed = candidateAssessmentDetails.remainingTime || 30 * 60;
+    
     const [totalScore,setTotalScore]=useState(0)
     const [sectionWiseTotalScore,setSetSectionWiseTotalScore]=useState([])
 
 
-    //after refreshing
-    useEffect(()=>{ 
 
-        const handlePageLoad = ()=>{
-            // alert("calling candidates update function")
-            // getCandidateAssessmentDetails(candidateAssessmentId,setCandidateAssessmentDetails)
-            // alert("calling done")
-        }
-        window.addEventListener("load",handlePageLoad)
+    // useLayoutEffect(() => {
+        
+    //     const getDetails = async () => {
+    //         try {
+    //             const response = await axios.get(
+    //                 `${process.env.REACT_APP_API_URL}/candidate-assessment/details/${candidateAssessmentId}`
+    //             );
+    //             console.log("response=", response);
+    //             if (response.data.success) {
+    //                 const document = response.data.candidateAssessment;
+    //                 setCandidateAssessmentDetails(document);
+    //                 setRemainingTime(document.remainingTime || 30 * 60);
+    //                 totalTimeAllowed = candidateAssessmentDetails.remainingTime || 30*60
+    //             }
+    //         } catch (error) {
+    //             console.error("Error in getting candidate assessment details:", error);
+    //         }
+    //     };
+    //     if (candidateAssessmentId) {
+    //         getDetails();
+    //     }
+    // }, [candidateAssessmentId]);
+    
+    
+    // useEffect(()=>{ 
 
-        return ()=>window.removeEventListener("load",handlePageLoad)
-    },[candidateAssessmentId])
+    //     // const handlePageLoad = ()=>{
+    //     //     getCandidateAssessmentDetails(candidateAssessmentId)
+    //     // }
+    //     // window.addEventListener("load",handlePageLoad)
+
+    //     return ()=>window.removeEventListener("load",handlePageLoad)
+    // },[candidateAssessmentId])
 
 //before refreshing
-    useEffect(()=>{
-        const handleBeforeUnload = (event)=>{
-            autoSaveProgress()
-            event.preventDefault()
-            // event.returnValue=''
-        }
+    // useEffect(()=>{
+    //     const handleBeforeUnload = (event)=>{
+    //         autoSaveProgress()
+    //         event.preventDefault()
+    //         // event.returnValue=''
+    //     }
 
 
-        window.addEventListener("beforeunload",handleBeforeUnload)
-        return ()=>{ window.removeEventListener("beforeunload",handleBeforeUnload)}
-    },[])
+    //     window.addEventListener("beforeunload",handleBeforeUnload)
+    //     return ()=>{ window.removeEventListener("beforeunload",handleBeforeUnload)}
+    // },[])
 
     // console.log("location state",location.state)
+
     useEffect(() => {
         const assessmentData = location.state?.assessment;
-        const existingSections = candidateAssessmentDetails.sections 
+        const existingSections = candidateAssessmentDetails?.sections 
         const newSelectedOptions = assessmentData.assessmentId.Sections.map(section =>
             Array(section.Questions.length).fill("")
         )
         console.log("existing sections**********",existingSections)
-        if (existingSections.length === 0){
+        if (existingSections?.length === 0){
             
         if (assessmentData) {
             console.log('Fetched assessment data:', assessmentData);
@@ -92,57 +123,44 @@ const AssessmentQuestion = () => {
     }
     else{
         toast.success("Your session resumed..")
-        
-        // const newScores = Array(existingSections.length).fill(0)
-
-        // existingSections.forEach((section, sectionIndex) => {
-        //     console.log(`Processing section: ${section.SectionName}, Index: ${sectionIndex}`);
-        //     const {totalScore}=section 
-        //     newScores[sectionIndex]=totalScore
-        //     setSetSectionWiseTotalScore(newScores)
-        //     console.log(`section index`,section.SectionName)
-        //      section.Answers.map((answerItem,answerIndex) => {
-        //         // console.log('ANSWER ITEM',answerItem)
-        //         const { questionId,answer } = answerItem;
-        //         const question = assessmentData.assessmentId.Sections[sectionIndex].Questions.find(q=>q._id===questionId).snapshot
-        //         // console.log('question',questionId,question)
-        //         const {questionType,options} = question
-                
-        //         if (questionType==='MCQ'){
-        //             console.log("answer",answer)
-        //                const optionIndex = options.findIndex(option=>option===answer)
-        //             newSelectedOptions[sectionIndex][answerIndex] = optionIndex
-        //             setSelectedOptions(newSelectedOptions)
-                    
-        //         }
-        //         else if (questionType==="Short Text" || questionType==="Short TextShort Text(Single line)" || questionType==="Long Text"){
-        //             console.log('question',questionId,question)
-        //             newSelectedOptions[sectionIndex][answerIndex]=answer
-        //             console.log('sectionIndex, answerIndex',sectionIndex,answerIndex,answer)
-        //             setSelectedOptions(newSelectedOptions)
-        //         }
-        //     });
-        // });
 
         setAssessment(assessmentData)
+        const assessmentSections = assessmentData.assessmentId.Sections
 
-        const restoredOptions = existingSections.map((section, sectionIndex) =>
-            section.Answers.map((answer, questionIndex) => {
-                const question = assessmentData.assessmentId.Sections[sectionIndex]?.Questions.find(
-                    (q) => q._id === answer.questionId
-                );
-                return question?.snapshot.questionType === "MCQ"
-                    ? question?.snapshot.options.indexOf(answer.answer)
-                    : answer.answer;
-            })
-        );
+
+    let restoredOptions
+         restoredOptions = assessmentSections.map((section,sectionIndex)=>{
+            const isSectionExist = existingSections[sectionIndex]
+            if (isSectionExist){
+                return isSectionExist.Answers.map((answer,questionIndex)=>{
+                    const question = assessmentData.assessmentId.Sections[sectionIndex]?.Questions.find(q=>q._id===answer.questionId)
+                    return question?.snapshot.questionType==="MCQ"?
+                    question?.snapshot.options.indexOf(answer.answer)
+                    : answer.answer
+
+                })
+            }
+            else{
+                return Array(section.Questions.length).fill("")
+            }
+         }
+            
+        )
+
     
 
         setSelectedOptions(restoredOptions);
 
-        const restoredAnswerLater = existingSections.map((section) =>
-            section.Answers.map((answer) => answer.isAnswerLater || false)
-        );
+
+const restoredAnswerLater = assessmentSections.map((section, sectionIndex) => {
+    const isSectionExist = existingSections[sectionIndex];
+    if (isSectionExist) {
+        return isSectionExist.Answers.map((answer) => answer.isAnswerLater || false);
+    } else {
+        return Array(section.Questions.length).fill(false);
+    }
+});
+
         console.log("restoredAnswerLater",restoredAnswerLater)
         setAnswerLater(restoredAnswerLater);
 
@@ -464,7 +482,7 @@ const AssessmentQuestion = () => {
                 
                 // navigate('/assessmentsubmit', { state: { assessmentName: Assessment.AssessmentTitle } });
                 navigate('/assessmentsubmit', {replace:true, state: { assessmentName: Assessment.AssessmentTitle } });
-                await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed", endedAt:new Date(),completionTime:`${hours}H ${minutes}M`})
+                await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed", endedAt:new Date(),completionTime:`${hours}M ${minutes}S`})
             } else {
                 console.error('Failed to submit score');
             }
@@ -879,6 +897,7 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                     <div className="col-span-1">
                         <div className="border border-custom-blue rounded h-full">
                             {assessment.assessmentId.Sections.map((section, index) => {
+                                
                                 const answeredCount = selectedOptions[index]?.filter(option => option !== null && option !== undefined && option !== "").length;
                                 return (
                                     <div
@@ -886,7 +905,7 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                                         className={`flex justify-between px-2 text-sm py-2 ${index === selectedSection ? 'bg-custom-blue text-white' : ''}`}
                                     >
                                         <p className="truncate w-24" title={section.SectionName}>
-                                            {section.SectionName}
+                                            {section.SectionName} 
                                         </p>
                                         <p>{`${answeredCount}/${section.Questions.length}`}</p>
                                     </div>

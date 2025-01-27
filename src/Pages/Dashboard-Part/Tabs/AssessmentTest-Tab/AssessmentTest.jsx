@@ -10,7 +10,7 @@ import maleImage from "../../Images/man.png";
 import femaleImage from "../../Images/woman.png";
 import genderlessImage from "../../Images/transgender.png";
 import toast from 'react-hot-toast'
-// import getCandidateAssessmentDetails from "../../../../utils/fetchCandidateAssessmentDetails";
+import { useCustomContext } from "../../../../Context/Contextfetch";
 
 const AssessmentTest = () => {
   const [otp, setOtp] = useState("");
@@ -28,13 +28,21 @@ const AssessmentTest = () => {
   console.log("scheduledAssessmentId",scheduledAssessmentId)
   const [candidateId,setCandidateId]=useState("")
   const [candidateAssessmentId,setCandidateAssessmentId]=useState("")
-  const [candidateAssessmentDetails,setCandidateAssessmentDetails]=useState("")
+  // const [candidateAssessmentDetails,setCandidateAssessmentDetails]=useState("")
   // const [sections, setSections] = useState([]);
   // const [questions, setQuestions] = useState([]);
-console.log("location",location)
+
+  console.log("location",location)
   const [candidate, setCandidate] = useState(null);
 
   const [reSending,SetReSending]=useState(false)
+
+  const {
+    
+    candidateAssessmentDetails,
+    setCandidateAssessmentDetails
+  } = useCustomContext()
+  
 
 
   const verifyOtp = async (candidateId, otp, scheduledAssessmentId) => {
@@ -106,6 +114,11 @@ console.log("location",location)
   };
   
 
+  useEffect(()=>{
+    const handlePageLoad = ()=>{
+      getCandidateAssessmentDetails(candidateAssessmentId)
+    }
+  },[candidateAssessmentId])
 
   
   useEffect(() => {
@@ -116,10 +129,10 @@ console.log("location",location)
       const candidateAssessmentId = queryParams.get('candidateAssessmentId')
       const decryptedId = decrypt(candidateAssessmentId,'test')
       console.log("decrypted id",decryptedId)
+      localStorage.setItem("candidateAssessmentId",decryptedId)
       setCandidateAssessmentId(decryptedId)
       
-      // const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
-      const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId,setCandidateAssessmentDetails)
+      const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
       console.log("candidateId,scheduledAssessmentId",candidateId,scheduledAssessmentId)
       console.log('Decrypted IDs:', { scheduledAssessmentId, candidateId });
   
@@ -175,7 +188,7 @@ console.log("location",location)
   }, [location]);
 
  
-  
+
 
   useEffect(() => {
     const fetchAssessment = async () => {
@@ -184,6 +197,7 @@ console.log("location",location)
       const candidateAssessmentId = params.get('candidateAssessmentId')
       const decryptedId = decrypt(candidateAssessmentId,'test')
       console.log("decrypted id",decryptedId)
+      
       
       const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
       if (scheduledAssessmentId) {
@@ -289,8 +303,6 @@ console.log("location",location)
                 navigate("/assessmenttext", {
                     replace: true,
                     state: {
-                      // getCandidateAssessmentDetails:getCandidateAssessmentDetails,
-                      // setCandidateAssessmentDetails,
                         candidateAssessmentId,
                         assessment,
                         candidate,
@@ -311,7 +323,6 @@ console.log("location",location)
                 navigate("/assessmenttext", {
                     replace: true,
                     state: {
-                      // getCandidateAssessmentDetails:getCandidateAssessmentDetails,
                         candidateAssessmentId,
                         assessment,
                         candidate,

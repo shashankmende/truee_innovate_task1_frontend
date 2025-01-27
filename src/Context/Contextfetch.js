@@ -111,10 +111,43 @@ const CustomProvider = ({ children }) => {
     getQuestions();
   }, []);
 
+  const [candidateAssessmentDetails,setCandidateAssessmentDetails]=useState("")
+  const [candidateAssessmentId,setCandidateAssessmentId]=useState(localStorage.getItem("candidateAssessmentId"))
+
+  
+  
+  const getCandidateAssessmentDetails  = async(candidateAssessmentId)=>{
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/candidate-assessment/details/${candidateAssessmentId}`)
+      console.log("response=",response)
+      if (response.data.success){
+        
+        const document = response.data.candidateAssessment
+        setCandidateAssessmentDetails(document)
+        const idsObj = {scheduledAssessmentId:document.scheduledAssessmentId,candidateId:document.candidateId}
+        
+        return idsObj
+      }
+    } catch (error) {
+      console.error("error in getting ids from candidate assessment")
+      
+    }
+  }
+
+  useEffect(()=>{
+    getCandidateAssessmentDetails(localStorage.getItem("candidateAssessmentId"))
+  },[candidateAssessmentId])
+
+  // alert(`candidate assessment id from context ${(localStorage.getItem("candidateAssessmentId"))}`)
 
   return (
     <CustomContext.Provider
       value={{
+        // candidateAssessmentId,
+        // setCandidateAssessmentId,
+        getCandidateAssessmentDetails,
+        candidateAssessmentDetails,
+        setCandidateAssessmentDetails,
         getInterviewerQuestions,
         fetchMyQuestionsData,
         myQuestionsList,
