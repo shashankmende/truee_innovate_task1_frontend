@@ -32,6 +32,7 @@ import { ReactComponent as MdMoreVert } from "../../../../icons/MdMoreVert.svg";
 
 import ScheduledAssessmentTab from "./ScheduledAssessmentTab.jsx";
 import ScheduledAssessmentViewPage from "./ScheduledAssessmentViewPage.jsx";
+import AssessmentResultTab from "./AssessmentResultTab.jsx";
 const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
   console.log('assesview page props',assessment)
   const [isEditSectionPopupOpen, setIsEditSectionPopupOpen] = useState(false);
@@ -105,6 +106,8 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
     const [candidateAssessmentData, setCandidateAssessmentData] = useState({});
     const [filteredScheduledAssessmentData, setFilteredScheduledAssessmentData] =
       useState([]);
+      // console.log("candidate details",Object.values(candidateAssessmentData).flat())
+      console.log('scheduledAssessmentData',scheduledAssessmentData)
     const [scheduledAssessmentId,setScheduledAssessmentId]=useState("")
 
       const getScheduledAssessments = async () => {
@@ -113,8 +116,8 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
           const response = await axios.get(url);
           if (response.data.success) {
             const data = response.data.scheduledAssessment;
-            setScheduledAssessmentData(data || []);
-            setFilteredScheduledAssessmentData(data || []);
+            setScheduledAssessmentData(data);
+            setFilteredScheduledAssessmentData(data );
     
             const candidateAssessmentPromises = data.map(async (item) => {
               const candidateResponse = await axios.get(
@@ -146,6 +149,11 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
           );
         }
       };  
+
+
+      useEffect(()=>{
+        getScheduledAssessments()
+      },[])
   
   
   const onClickAddSection = () => {
@@ -2508,105 +2516,11 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
                       </div>
                     </>
                   ) : (
-                    <table className="text-left w-full border-collapse border-gray-300 mb-14 mt-5">
-                      <thead className="bg-custom-bg sticky top-0 z-10 text-xs">
-                        <tr>
-                          <th scope="col" className="py-3 px-6">
-                            Candidate Name
-                          </th>
-                          <th scope="col" className="py-3 px-6">
-                            No.Of Answered Questions
-                          </th>
-                          <th scope="col" className="py-3 px-6">
-                            Duration
-                          </th>
-                          <th scope="col" className="py-3 px-6">
-                            Progress Score/Total Score
-                          </th>
-                          <th scope="col" className="py-3 px-6">
-                            Pass Score
-                          </th>
-                          <th scope="col" className="py-3 px-6">
-                            Test Date
-                          </th>
-                          <th scope="col" className="py-3 px-6">
-                            Status
-                          </th>
-                          <th scope="col" className="py-3 px-6">
-                            Action
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {assessmentResults.length > 0 ? (
-                          assessmentResults.map((result, index) => (
-                            <tr
-                              key={index}
-                              className="border-b border-gray-200 text-xs"
-                            >
-                              <td
-                                className="py-3 px-6 cursor-pointer"
-                                onClick={() => handleCandidateClick(result)}
-                              >
-                                {
-                                  getCandidateDetails(result.candidateId)
-                                    .LastName
-                                }
-                              </td>
-                              <td className="py-3 px-6">
-                                {result.answeredQuestions}/
-                                {result.totalQuestions}
-                              </td>
-                              <td className="py-3 px-6">
-                                {result.timeSpent}/30:00 min
-                              </td>
-                              <td className="py-3 px-6">
-                                {result.answeredQuestionsScore}/
-                                {result.totalScore}
-                              </td>
-                              <td className="py-3 px-6">{result.passScore}</td>
-                              <td className="py-3 px-6">
-                                {new Date(
-                                  result.createdAt
-                                ).toLocaleDateString()}
-                              </td>
-                              <td className="py-3 px-6">
-                                {result.answeredQuestionsScore >= result.passScore ? "Pass" : "Fail"}
-                              </td>
-                              <td className="py-2 px-6 relative">
-                                <button>
-                                  <FiMoreHorizontal className="text-3xl" />
-                                </button>
-                                {actionViewMore === result._id && (
-                                  <div className="absolute z-10 w-36 rounded-md shadow-lg bg-white ring-1 p-4 ring-black ring-opacity-5 right-2 popup">
-                                    <div className="space-y-1">
-                                      <p className="hover:bg-gray-200 p-1 rounded pl-3">
-                                        View
-                                      </p>
-                                      <p className="hover:bg-gray-200 p-1 rounded pl-3">
-                                        Edit
-                                      </p>
-                                      <p className="hover:bg-gray-200 p-1 rounded pl-3">
-                                        Schedule
-                                      </p>
-                                    </div>
-                                  </div>
-                                )}
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td
-                              colSpan="6"
-                              className="text-center text-gray-500 py-3"
-                            >
-                              No data found
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+                    <AssessmentResultTab
+                     candidatesList = {Object.values(candidateAssessmentData).flat()}
+                     onClickViewButtonOfScheduledAssessment={onClickViewButtonOfScheduledAssessment}
+                     filteredScheduledAssessmentData={filteredScheduledAssessmentData}
+                     />
                   )}
                 </div>
               )}
@@ -2620,11 +2534,10 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
 
 
         {showScheduledAssessmentViewPage && (
-          <ScheduledAssessmentViewPage 
-          
+          <ScheduledAssessmentViewPage           
           candidates = {candidateAssessmentData[scheduledAssessmentId]}
           assessment={ScheduledAssessmentViewPageId}
-          setShowScheduledAssessmentViewPage={setShowScheduledAssessmentViewPage}
+          showMainPage={setShowScheduledAssessmentViewPage}
           />
         )}
 

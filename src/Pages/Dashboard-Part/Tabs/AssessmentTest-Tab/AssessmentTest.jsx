@@ -17,7 +17,7 @@ const AssessmentTest = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [isChecked, setIsChecked] = useState(false);
-  // const [assessment, setAssessment] = useState(null);
+  const [assessment, setAssessment] = useState(null);
   const navigate = useNavigate();
   const [isNextPageActive, setIsNextPageActive] = useState(false);
   const [isThirdPageActive, setIsThirdPageActive] = useState(false);
@@ -28,7 +28,7 @@ const AssessmentTest = () => {
   console.log("scheduledAssessmentId",scheduledAssessmentId)
   const [candidateId,setCandidateId]=useState("")
   const [candidateAssessmentId,setCandidateAssessmentId]=useState("")
-  // const [candidateAssessmentDetails,setCandidateAssessmentDetails]=useState("")
+  const [candidateAssessmentDetails,setCandidateAssessmentDetails]=useState("")
   // const [sections, setSections] = useState([]);
   // const [questions, setQuestions] = useState([]);
 
@@ -37,12 +37,6 @@ const AssessmentTest = () => {
 
   const [reSending,SetReSending]=useState(false)
 
-  const {
-    
-    candidateAssessmentDetails,
-    setCandidateAssessmentDetails,
-    assessment, setAssessment
-  } = useCustomContext()
   
 
 
@@ -114,12 +108,6 @@ const AssessmentTest = () => {
     return originalText;
   };
   
-
-  useEffect(()=>{
-    const handlePageLoad = ()=>{
-      getCandidateAssessmentDetails(candidateAssessmentId)
-    }
-  },[candidateAssessmentId])
 
   
   useEffect(() => {
@@ -216,9 +204,9 @@ const AssessmentTest = () => {
   }, [location]);
 
 
-  if (error) {
-    return <div className="flex justify-center items-center h-screen">{error}</div>;
-  }
+  // if (error) {
+  //   return <div className="flex justify-center items-center h-screen">{error}</div>;
+  // }
 
   if (!assessment) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -228,12 +216,9 @@ const AssessmentTest = () => {
     event.preventDefault();
     if (otp.length !== 5) {
       setError("OTP must be 5 digits");
+      return 
     } 
-    // else if(otp==='1234'){
-    //   setError("");
-    //   setOtp("");
-    //   setIsNextPageActive(true);
-    // }
+
     else{
      const isValid =  await verifyOtp(candidateId,otp,scheduledAssessmentId)
      console.log("response=",isValid)
@@ -724,6 +709,8 @@ const AssessmentTest = () => {
                     placeholder="Enter OTP"
                     className="border p-2 rounded-md focus:outline-none"
                   />
+                  {/* {error && <p>{error}</p>} */}
+                  {error && <p className="text-red-500 mt-2">{error}</p>}
                 </div>
                 <button
                 type="button"
@@ -737,7 +724,7 @@ const AssessmentTest = () => {
                   Submit
                 </button>
               </div>
-              {error && <p className="text-red-500 mt-2">{error}</p>}
+              {/* {error && <p className="text-red-500 mt-2">{error}</p>} */}
             </form>
           </div>
         )}
