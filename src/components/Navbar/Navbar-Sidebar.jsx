@@ -516,7 +516,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className=" bg-white fixed top-0 left-0 right-0 z-50">
+      <div className=" bg-white fixed top-0 left-0 right-0 z-40">
         <div className="mx-auto relative">
           <div className="xl:flex lg:flex 2xl:flex justify-between items-center border-b-2 border-gray-100 xl:p-2 2xl:p-2 lg:p-2 sm:px-5 md:px-5 sm:py-3 md:py-3">
             <div>

@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { ReactComponent as MdArrowDropDown } from "../../../../icons/MdArrowDropDown.svg";
 import { validatePassScoreData } from "../../../../utils/passScoreValidation";
 
-const PassScore = ({ sections, questionsBySection, onClose, onSave }) => {
-  const [selectedScore, setSelectedScore] = useState("");
-  const [selectedPassScoreBy, setSelectedPassScoreBy] = useState("");
+const PassScore = ({ setAddedSections,addedSections,sections,setFormData,formData,passScoreType, questionsBySection, onClose, onSave }) => {
+  const [selectedScore, setSelectedScore] = useState(formData.passScoreType);
+  const [selectedPassScoreBy, setSelectedPassScoreBy] = useState(formData.passScoreBy);
   const [passScore, setPassScore] = useState("");
   const [showDropdownScore, setShowDropdownScore] = useState(false);
   const [showDropdownPassScoreBy, setShowDropdownPassScoreBy] = useState(false);
@@ -28,6 +28,10 @@ const PassScore = ({ sections, questionsBySection, onClose, onSave }) => {
 
   const handleScoreSelect = (score) => {
     setSelectedScore(score);
+    setFormData(prev=>({
+      ...prev,
+      passScoreType:score
+    }))
     setShowDropdownScore(false);
 
     // Clear the error for selectedScore
@@ -40,6 +44,11 @@ const PassScore = ({ sections, questionsBySection, onClose, onSave }) => {
   const handlePassScoreBySelect = (score) => {
     setSelectedPassScoreBy(score);
     setShowDropdownPassScoreBy(false);
+    setFormData(prev=>({
+      ...prev,
+      passScoreBy:score,
+      ...(score==="Each Section" && {passScore:""})
+    }))
 
     // Clear the error for selectedPassScoreBy
     setErrors((prevErrors) => {
@@ -219,8 +228,9 @@ const PassScore = ({ sections, questionsBySection, onClose, onSave }) => {
                     value={passScore}
                     onChange={(e) => {
                       const value = e.target.value;
-                      if (value >= 1 && value <= 10) {
+                      if (value >= 1 && value <= 100) {
                         setPassScore(value);
+                        setFormData(prev=>({...prev,passScore:value}))
                       }
                     }}
                     required
@@ -247,11 +257,15 @@ const PassScore = ({ sections, questionsBySection, onClose, onSave }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {sections.map((sectionName) => {
-                      const questions = questionsBySection[sectionName] || [];
+                    {/* {sections.map((sectionName) => { */}
+                    {addedSections.map((section,index) => {
+                    // {addedSections.map((sectionName) => {
+                      // const questions = questionsBySection[sectionName] || [];
+                      const {SectionName:sectionName,Questions:questions}=section
+                      // const questions = sectionName.Questions
                       const totalScore = questions.reduce((acc, question) => acc + (Number(question.Score) || 0), 0);
                       return (
-                        <tr key={sectionName}>
+                        <tr key={index}>
                           <td className="border border-gray-300 p-2">{sectionName}</td>
                           <td className="border border-gray-300 p-2">{questions.length}</td>
                           <td className="border border-gray-300 p-2">{totalScore}</td>
@@ -261,8 +275,11 @@ const PassScore = ({ sections, questionsBySection, onClose, onSave }) => {
                               value={passScores[sectionName] || ""}
                               onChange={(e) => {
                                 const value = e.target.value;
-                                if (value >= 1 && value <= 10) {
+                                if (value >= 1 && value <= 100) {
                                   handlePassScoreChange(sectionName, value);
+                                  setAddedSections(prev=>
+                                     prev.map((each)=>each.SectionName===sectionName ? {...each,passScore:+value}:each)
+                                  )
                                 }
                               }}
                               className="border-b focus:outline-none w-[60px] pr-1"

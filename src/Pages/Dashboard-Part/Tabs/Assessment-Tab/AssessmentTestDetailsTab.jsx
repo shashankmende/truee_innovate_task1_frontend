@@ -1,4 +1,6 @@
 import React from "react";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const AssessmentTestDetailsTab = ({
   includePhone,
@@ -80,16 +82,6 @@ const AssessmentTestDetailsTab = ({
             />
             Position
           </p>
-          {/* <p className="flex items-center ml-6">
-                              <input
-                                type="checkbox"
-                                className="mr-2"
-                                name="includeSkills"
-                                checked={includeSkills}
-                                onChange={handleCheckboxChange}
-                              />
-                              Skills
-                            </p> */}
         </div>
 
         <div className="mb-4 flex gap-5">
@@ -106,6 +98,14 @@ const AssessmentTestDetailsTab = ({
               placeholder="Enter instructions here..."
               style={{ whiteSpace: "pre-wrap" }}
             ></textarea>
+            {/* <ReactQuill
+            className="border focus:outline-none mb-5 p-2 w-full rounded-md text-sm pr-10"
+            value={instructions}
+            onChange={handleInstructionsChange}
+            onFocus={() => setIsEditing(true)}
+            placeholder="Enter instructions here..."
+              style={{ whiteSpace: "pre-wrap" }}
+            /> */}
             <div className="absolute bottom-1 right-1 text-right text-sm">
               {instructions.length}/2000
             </div>

@@ -43,6 +43,7 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
 
   const organizationId = Cookies.get("organizationId");
   const [activeTab, setActiveTab] = useState("Basicdetails");
+  // const [activeTab, setActiveTab] = useState("Details");
   // const [activeTab, setActiveTab] = useState("Questions");
   const [position, setPosition] = useState("");
   const [startDate, setStartDate] = useState(new Date());
@@ -104,6 +105,9 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
     NumberOfQuestions: "",
     ExpiryDate: new Date(),
     status:"Active",
+    passScoreType:"",
+    passScoreBy:"",
+    passScore:''
   });
 
   //shashank - [10/01/2025]
@@ -224,6 +228,7 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
       return;
     }
     handleSave(event,currentTab)
+    
     setActiveTab(nextTab);
   };
 
@@ -255,7 +260,10 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
           NumberOfQuestions: formData.NumberOfQuestions,
         }),
         ...(formData.ExpiryDate && { ExpiryDate: formData.ExpiryDate }),
-        ...( {status:formData.status})
+        ...( {status:formData.status}),
+        ...(formData.passScoreType && { passScoreType:formData.passScoreType }),
+        ...(formData.passScoreBy && {passScoreBy:formData.passScoreBy}),
+        ...(formData.passScoreBy === "overall" && {passScore:formData.passScore})
       };
     }
 
@@ -287,11 +295,14 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
         Sections: addedSections.filter(eachSection=>eachSection.Questions.length> 0)
         .map((sectionName) => ({
           SectionName: sectionName.SectionName,
-          Questions: sectionName.Questions.map(each=>each.qId)
+          Questions: sectionName.Questions.map(each=>each.qId),
+          passScore:sectionName.passScore
+        
         })),
 
         totalScore: totalScore,
-        passScore: overallPassScore,
+        // passScore: eachSection.passScore,
+        ...(formData.passScore && {passScore:formData.passScore})
       };
     }
     if (currentTab === "Candidates") {
@@ -322,14 +333,9 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
         }
         break;
       case "Questions":
-        // const totalQuestions = Object.values(questionsBySection).reduce(
-        //   (acc, questions) => acc + questions.length,
-        //   0
-        // );
-        // const totalQuestions = addedSections.map(eachsection=>eachsection.Questions.length)
+        
         const totalQuestions = addedSections.reduce((acc,eachsection)=>acc+eachsection.Questions.length,0)
-        // alert(`${totalQuestions}`)
-        // alert(`${questionsLimit}`)
+
         if (totalQuestions !== questionsLimit) {
           newErrors.questions = `Please add exactly ${questionsLimit} questions.`;
           setIsQuestionLimitErrorPopupOpen(true);
@@ -776,58 +782,10 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
     }
   };
 
-  // const handleSectionAdded = (newSection) => {
-  //   const isSectionExists = selectedIcons.some(
-  //     (section) =>
-  //       section.SectionName === newSection.SectionName &&
-  //       section.Position === position
-  //   );
-  //   if (isSectionExists) {
-  //     alert(
-  //       `Section "${newSection.SectionName}" already exists for position "${position}".`
-  //     );
-  //     return;
-  //   }
-  //   setMatchingSection((prevSections) => [
-  //     ...prevSections,
-  //     newSection.SectionName,
-  //   ]);
-  //   setQuestionsBySection((prevQuestions) => ({
-  //     ...prevQuestions,
-  //     [newSection.SectionName]: prevQuestions[newSection.SectionName] || [],
-  //   }));
-  // };
-
+  
   const [selectedSkills, setSelectedSkills] = useState([]);
 
-  // const handleSectionAdded = (data) => {
-  //   const { SectionName, Skills } = data;
-
-  //   // Add the customized section name to the matching sections
-  //   setMatchingSection((prevSections) => {
-  //     const uniqueSections = [...new Set([...prevSections, SectionName])]; // Add the new section name
-  //     return uniqueSections;
-  //   });
-
-  //   const newSections = Skills.map(skill => skill);
-
-  //   setMatchingSection((prevSections) => {
-  //     const uniqueSections = [...new Set([...prevSections, ...newSections])];
-  //     return uniqueSections;
-  //   });
-
-  //   setQuestionsBySection((prevQuestions) => {
-  //     const updatedQuestions = { ...prevQuestions };
-  //     newSections.forEach((sectionName) => {
-  //       if (!updatedQuestions[sectionName]) {
-  //         updatedQuestions[sectionName] = [];
-  //       }
-  //     });
-  //     return updatedQuestions;
-  //   });
-
-  //   setSelectedSkills([]);
-  // };
+  
 
   const [addedSections, setAddedSections] = useState([]);
   
@@ -1050,14 +1008,12 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   // ashraf
 
   const calculateCheckedCount = () => {
-    return Object.values(questionsBySection).reduce((total, questions) => {
-      return total + (questions ? questions.length : 0);
-    }, 0);
-    // return addedSections.reduce((acc,section)=>{
-    //   section.Questions.forEach(question=>{
-    //     return acc+question.length
-    //   })
-    // })
+
+    const count =  addedSections.reduce((acc,section)=>{
+      return acc+section.Questions.length
+    },0)
+ 
+    return count
   };
 
   useEffect(() => {
@@ -1067,17 +1023,6 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
 
   const [isLimitReachedPopupOpen, setIsLimitReachedPopupOpen] = useState(false);
 
-  // const toggleSidebarAddQuestion = (sectionName) => {
-  //   if (checkedCount >= questionsLimit) {
-  //     setIsLimitReachedPopupOpen(true);
-  //     return;
-  //   }
-  //   // setSelectedQuestion(null);
-  //   // setCurrentSectionName(sectionName);
-  //   // setIsAddQuestionModalOpen(true);
-  //   setCurrentSectionName(sectionName);
-  //   setIsAddQuestionModalOpen(true);
-  // };
 
   const closeLimitReachedPopup = () => {
     setIsLimitReachedPopupOpen(false);
@@ -1129,12 +1074,16 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   • You can review your answers before submitting.
   • Ensure you are in a quiet environment to avoid distractions.`;
 
+  
+
   const [instructions, setInstructions] = useState(defaultInstructions);
   const [instructionError, setInstructionError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
   const handleInstructionsChange = (e) => {
+    
     const value = e.target.value;
+    
     setInstructions(value);
     setIsEditing(true);
 
@@ -1201,7 +1150,7 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   const handleDeleteClick = (type,item,secName) => {
     console.log("item to delete",{...item,secName})
     setDeleteType(type);
-    setItemToDelete({...item,secName});
+    setItemToDelete({...item,SectionName:secName});
     setIsDeleteConfirmationOpen(true);
     setActionViewMore(null);
     setActionViewMoreSection(null);
@@ -1228,65 +1177,6 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   };
   
 
-  // const confirmDelete = async () => {
-  //   try {
-  //     if (deleteType === "section") {
-  //       // Handle section deletion
-  //       setAddedSections((prev) =>
-  //         prev.filter((each) =>
-  //           each.Questions.every((q) => q.qId !== itemToDelete.qId)
-  //         )
-  //       );
-  //     } else if (deleteType === "question") {
-  //       // Delete the question from the backend
-        // await axios.delete(
-        //   `${process.env.REACT_APP_API_URL}/assessment-question/${itemToDelete.qId}`
-        // );
-  
-  //       // Update frontend state and reorder
-  //       const updatedSections = addedSections.map((section) => {
-  //         // Remove the specific question from the section based on qId
-          
-  //         // const filteredQuestions = section.Questions.filter(
-  //         //   (q) => q.qId !== itemToDelete.qId
-  //         // );
-  //         if (section.SectionName===itemToDelete.secName){
-  //           return section.Questions.filter(q=>q.qId!==itemToDelete.qId)
-  //         }
-  //         return section
-  
-  //         // console.log("Filtered questions after deleting:", filteredQuestions);
-  
-  //         // // Recalculate orders within this section
-  //         // const reorderedQuestions = filteredQuestions.map((q, index) => ({
-  //         //   ...q,
-  //         //   order: index + 1,
-  //         // }));
-  
-  //         // // Send updated orders to the backend
-  //         // updateQuestionOrdersInBackend(reorderedQuestions);
-  
-  //         // return { ...section, Questions: reorderedQuestions };
-  //       });
-  //       console.log("updated seciton after deleting",updatedSections)
-  
-  //       setAddedSections(updatedSections);
-  //     }
-  
-  //     // Close confirmation modal
-  //     setIsDeleteConfirmationOpen(false);
-  //     setItemToDelete(null);
-  //   } catch (error) {
-  //     console.error("Error deleting item:", error);
-  //     // Optionally, show a user-friendly error message
-  //     alert("An error occurred while deleting the item. Please try again.");
-  //   }
-  // };
-
-
-  
-
-
   function deleteQuestion(sectionIndex, questionIndex) {
     setAddedSections((prevSections) => {
       const updatedSections = [...prevSections];
@@ -1305,18 +1195,21 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   const confirmDelete = async () => {
     try {
       if (deleteType === "section") {
-        // Handle section deletion
-        setAddedSections((prev) =>
-          prev.filter((each) =>
-            each.Questions.every((q) => q.qId !== itemToDelete.qId)
-          )
-        );
+        setAddedSections((prev) => {
+          const filteredList = prev.filter(section => section.SectionName !== itemToDelete.SectionName);
+          console.log("filtered list", filteredList);
+          return filteredList; 
+        });
+
       } else if (deleteType === "question") {
+        
         await axios.delete(
           `${process.env.REACT_APP_API_URL}/assessment-question/${itemToDelete.qId}`
         );
-        const sectionIndex = addedSections.findIndex(section=>section.SectionName===itemToDelete.secName)
-        const questionIndex = addedSections.findIndex(section=>section.Questions.some(question=>question._id===itemToDelete._id))
+        const sectionIndex = addedSections.findIndex(section=>section.SectionName===itemToDelete.SectionName)
+        
+        const questionIndex = addedSections.findIndex(section=>section.Questions.some(question=>question.qId===itemToDelete.qId))
+        
         deleteQuestion(sectionIndex,questionIndex)
       }
       setIsDeleteConfirmationOpen(false);
@@ -1437,81 +1330,6 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
   };
 
 
-  //changes made by shashank - [08/01/2025]
-
-//   const updateQuestionsInAddedSectionFromQuestionBank = async(secName, question,questionFrom) => {
-
-
-//    const questionExistResponse = await axios.get(`${process.env.REACT_APP_API_URL}/assessment-question/${tabsSubmitStatus.responseId}`)
-// // let response;
-//    if (questionFrom==="addquestion"){
-  
-//     console.log("addquestionsection",question)
-//     const reqBody = {
-//       ...question,
-//       assessmentId:tabsSubmitStatus.responseId,
-//       order:questionExistResponse.data.order,
-//       customizations:"customization"
-//     }
-//     const response = await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
-//     setAddedSections((prev) =>
-//       prev.map((each) =>
-//         each.SectionName === secName
-//           ? { ...each, Questions: [...each.Questions, {order:questionExistResponse.data.order || 0,questionText:question.snapshot.questionText,questionType:question.snapshot.questionType,score:question.snapshot.score,qId:response.data.question._id,order:questionExistResponse.data.order}] }
-//           : each
-//       )
-//     );
-//    }
-//    else{
-//     const reqBody ={
-//       assessmentId:tabsSubmitStatus.responseId,
-//       questionId:question._id,
-//       source: question.isCustom? "custom":"system",
-//       snapshot:{
-//         questionText:question.questionText,
-//         options:question.options,
-//         correctAnswer:question.correctAnswer,
-//         questionType:question.questionType,
-//         score:Number(question.score)
-//       },
-//       order:questionExistResponse.data.order,
-//       customizations:"customization"
-
-//     }
-//     //shashank - [13/01/2025]
-//     //before pushing the question to assessement question ,check if it already exists,if exists increment the order number from latest
-//     //question, if not found=>start from one and increment in each request further.
-//     const response =  await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
-//     setAddedSections((prev) =>
-//       prev.map((each) =>
-//         each.SectionName === secName
-//           ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id,order:questionExistResponse.data.order}] }
-//           : each
-//       )
-//     );
-//   }
-//   // response =  await axios.post(`${process.env.REACT_APP_API_URL}/assessment-questions`,reqBody)
-//   //   setAddedSections((prev) =>
-//   //     prev.map((each) =>
-//   //       each.SectionName === secName
-//   //         ? { ...each, Questions: [...each.Questions, {...question,qId:response.data.question._id,order:questionExistResponse.data.order}] }
-//   //         : each
-//   //     )
-//   //   );
-    
-//   };
-
-const recalculateOrder = (sections) => {
-  let currentOrder = 1; 
-  return sections.map((section) => ({
-    ...section,
-    Questions: section.Questions?.map((question) => ({
-      ...question,
-      order: currentOrder++, 
-    })),
-  }));
-};
-
 
 function synchronizeOrder(addedSections) {
   let currentOrder = 1; // Start the order from 1
@@ -1587,80 +1405,6 @@ const updateQuestionsInAddedSectionFromQuestionBank = async(secName,question)=>{
         console.error("Error pushing updated question to backend:", error);
   }
 }
-
-// const updateQuestionsInAddedSectionFromQuestionBank = async (secName, question) => {
-//   console.log("Updating question in section:", secName, question);
-
-//   // Step 1: Add the new question with a temporary order of 0
-//   const updatedSections = addedSections.map((section) =>
-//     section.SectionName === secName
-//       ? {
-//           ...section,
-//           Questions: [...section.Questions, { ...question, order: 0 }],
-//         }
-//       : section
-//   );
-
-//   // Step 2: Recalculate the order for all sections
-//   const updatedSectionsWithOrder = recalculateOrder(updatedSections);
-//   console.log("updated sections with order",updatedSectionsWithOrder)
-
-//   // Step 3: Find the exact updated question with the new order 
-//   const updatedQuestion = updatedSectionsWithOrder
-//     .find((section) => section.SectionName === secName) // Locate the correct section
-//     .Questions.find((q) => q._id === question._id); // Locate the question in that section
-
-//   console.log("Updated question after recalculating order:", updatedQuestion);
-
-//   // Step 4: Prepare the request body for the backend
-  // const reqBody = {
-  //   assessmentId: tabsSubmitStatus.responseId,
-  //   questionId: updatedQuestion._id,
-  //   source: updatedQuestion.isCustom ? "custom" : "system",
-  //   snapshot: {
-  //     questionText: updatedQuestion.questionText,
-  //     options: updatedQuestion.options,
-  //     correctAnswer: updatedQuestion.correctAnswer,
-  //     questionType: updatedQuestion.questionType,
-  //     score: Number(updatedQuestion.score),
-  //   },
-  //   order: updatedQuestion.order,
-  //   customizations: "customization",
-  // };
-
-// if (updatedQuestion.questionType ==="Short Text" || updatedQuestion.questionType==="Long Text"){
-  
-//   reqBody.snapshot.autoAssessment= question.autoAssessment
-// }
-
-//   try {
-//     // Step 5: Send the updated question to the backend
-    // const response = await axios.post(
-    //   `${process.env.REACT_APP_API_URL}/assessment-questions`,
-    //   reqBody
-    // );
-
-//     // Step 6: Update the section with the response from the backend
-    // const finalSectionsUpdate = updatedSectionsWithOrder.map((section) =>
-    //   section.SectionName === secName
-    //     ? {
-    //         ...section,
-    //         Questions: section.Questions.map((each) =>
-    //           each._id === updatedQuestion._id
-    //             ? { ...updatedQuestion, qId: response.data.question._id }
-    //             : each
-    //         ),
-    //       }
-    //     : section
-    // );
-
-//     // Step 7: Update the state with the final sections
-    // setAddedSections(finalSectionsUpdate);
-//     console.log("Successfully updated sections:", finalSectionsUpdate);
-//   } catch (error) {
-//     console.error("Error pushing updated question to backend:", error);
-//   }
-// };
 
 
 console.log('added sections',addedSections)
@@ -1952,6 +1696,11 @@ console.log('added sections',addedSections)
                     <div className="fixed inset-y-0 right-0 z-50 w-1/2 bg-white shadow-lg transition-transform duration-5000 transform">
                       <Sidebar
                         sections={matchingSection}
+                        passScoreType = {formData.passScoreType}
+                        formData = {formData}
+                        setFormData={setFormData}
+                        addedSections={addedSections}
+                        setAddedSections={setAddedSections}
                         questionsBySection={questionsBySection}
                         onClose={() => setSidebarOpen(false)}
                         onSave={handlePassScoreSave}

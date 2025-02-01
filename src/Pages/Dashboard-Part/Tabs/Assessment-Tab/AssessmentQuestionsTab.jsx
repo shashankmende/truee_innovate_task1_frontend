@@ -183,7 +183,7 @@ const AssessmentQuestionsTab = ({
                             <p
                               className="hover:bg-gray-200 p-1 rounded pl-3 cursor-pointer"
                               //shashank - [11/01/2025]
-                              onClick={()=>handleDeleteClick("section",sectionName)}
+                              onClick={()=>handleDeleteClick("section",sectionName,sectionName.SectionName)}
                             >
                               Delete
                             </p>

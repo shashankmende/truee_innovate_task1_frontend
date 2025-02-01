@@ -39,6 +39,7 @@ const AssessmentQuestion = () => {
     
     const [totalScore,setTotalScore]=useState(0)
     const [sectionWiseTotalScore,setSetSectionWiseTotalScore]=useState([])
+    const [assessmentTotalScore,setAssessmentTotalScore]= useState(0)
 
 
     useEffect(()=>{
@@ -698,63 +699,93 @@ const AssessmentQuestion = () => {
     }, [timeSpent, navigate]);
 
 
-    const handleMCQInputChange = async(optionIndex, questionIndex) => {
-        
+    const handleMCQInputChange = async (optionIndex, questionIndex) => {
         setSelectedOptions(prevSelectedOptions => {
             const newSelectedOptions = [...prevSelectedOptions];
             newSelectedOptions[selectedSection][questionIndex] = optionIndex;
             return newSelectedOptions;
         });
+    
         setAnswerLater(prevAnswerLater => {
             const newAnswerLater = [...prevAnswerLater];
             newAnswerLater[selectedSection][questionIndex] = false;
             return newAnswerLater;
         });
+    
         setQuestionErrors(prevErrors => {
             const newErrors = [...prevErrors];
             newErrors[questionIndex] = false;
             return newErrors;
         });
-
-        const questionId = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex]._id
+    
+        const questionId = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex]._id;
+        
         try {
-            const userSelectedOption = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex].snapshot.options[optionIndex]
-            // const userSelectedOption = selectedOptions[selectedSection][questionIndex]
-            const {correctAnswer,score} = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex].snapshot
-            const {SectionName} = assessment.assessmentId.Sections[selectedSection]
-            
-            const isCorrect  = userSelectedOption === correctAnswer
-            const calculatedScore = isCorrect ? sectionWiseTotalScore[selectedSection]+score : sectionWiseTotalScore[selectedSection]
-            const newScores = [...sectionWiseTotalScore]
-             newScores[selectedSection]= calculatedScore
-             setSetSectionWiseTotalScore(newScores)
-            setTotalScore(calculatedScore)
-            console.log("correct answer",correctAnswer,"-----"," user selected option",userSelectedOption,"*******","isCorrect", isCorrect)
+            const userSelectedOption = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex].snapshot.options[optionIndex];
+            const { correctAnswer, score } = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex].snapshot;
+            const { SectionName } = assessment.assessmentId.Sections[selectedSection];
+    
+            const isCorrect = userSelectedOption === correctAnswer;
+    
+            // Updating Section-Wise Total Score using Functional Form
+            setSetSectionWiseTotalScore(prevScores => {
+                const newScores = [...prevScores];
+                const previousScore = newScores[selectedSection] || 0;
+                newScores[selectedSection] = previousScore - (isCorrect ? 0 : score) + (isCorrect ? score : 0);
+                return newScores;
+            });
+    
+            // Updating Total Assessment Score using Functional Form
+            setTotalScore(prevTotalScore => {
+                return sectionWiseTotalScore.reduce((total, sectionScore) => total + sectionScore, 0);
+            });
+    
+            console.log("correct answer:", correctAnswer, " | user selected option:", userSelectedOption, " | isCorrect:", isCorrect);
+    
             const Answers = {
                 questionId,
                 answer: userSelectedOption,
                 isCorrect,
-                score: isCorrect ? score:0,
-                isAnswerLater: answerLater[selectedSection][questionIndex]
-            }
-            const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);
-                // const totalScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce((total, question) => total + question.snapshot.score, 0);              
-                // const totalScore = calculateAnsweredQuestions()
-            const reqBody = {
-                SectionName,
-                Answers,
-                totalScore: calculatedScore,
-                passScore,
-                sectionResult: calculatedScore >= passScore? "pass":"fail"
-            }
-            console.log("reqBody",reqBody)
-            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}/sections/${selectedSection}/questions/${questionId}`,reqBody)
+                score: isCorrect ? score : 0,
+                isAnswerLater: false
+            };
+    
+            const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce(
+                (total, question) => total + question.snapshot.score, 0
+            );
+    
+            // Using a callback inside setSetSectionWiseTotalScore to ensure latest state
+            setSetSectionWiseTotalScore(prevScores => {
+                const updatedSectionTotalScore = prevScores[selectedSection];
+    
+                // Compute new assessmentTotalScore inside the callback to ensure correct values
+                const newAssessmentTotalScore = prevScores.reduce((total, sectionScore) => total + sectionScore, 0);
+    
+                const reqBody = {
+                    SectionName,
+                    Answers,
+                    sectionTotalScore: updatedSectionTotalScore,
+                    assessmentTotalScore: newAssessmentTotalScore,
+                    passScore,
+                    sectionResult: updatedSectionTotalScore >= passScore ? "pass" : "fail"
+                };
+    
+                console.log("reqBody", reqBody);
+    
+                // Make API request after state updates are applied
+                axios.patch(
+                    `${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}/sections/${selectedSection}/questions/${questionId}`,
+                    reqBody
+                );
+    
+                return prevScores; // Return unchanged prevScores as setSetSectionWiseTotalScore needs a return value
+            });
+    
         } catch (error) {
             console.error('Error updating answer:', error);
-
         }
     };
-
+    
 
     const handlePrevSectionClick = async() => {
         if (selectedSection > 0) {
@@ -897,84 +928,85 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
         }
 
 
-const handleInputChange = async (value, questionIndex, event) => {
-    event?.stopPropagation(); // Prevent event bubbling
-
-    // Update state for selected options
-    setSelectedOptions((prevSelectedOptions) => {
-        const newSelectedOptions = [...prevSelectedOptions];
-        newSelectedOptions[selectedSection][questionIndex] = value;
-        return newSelectedOptions;
-    });
-
-    // Uncheck the "Answer at a later time" checkbox
-    setAnswerLater((prevAnswerLater) => {
-        const newAnswerLater = [...prevAnswerLater];
-        newAnswerLater[selectedSection][questionIndex] = false;
-        return newAnswerLater;
-    });
-
-    // Clear the error for the current question
-    setQuestionErrors((prevErrors) => {
-        const newErrors = [...prevErrors];
-        newErrors[questionIndex] = false;
-        return newErrors;
-    });
-
-    // Validate input length
-    const { CharLimits = { min: 0, max: 250 } } = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex];
-    const { min, max } = CharLimits;
-
-    setValidationErrors((prevErrors) => {
-        const newErrors = [...prevErrors];
-        newErrors[questionIndex] = value.length < min || value.length > max;
-        return newErrors;
-    });
-
-    // Prepare data for API request
-    const section = assessment.assessmentId.Sections[selectedSection];
-    // const { SectionName } = assessment.assessmentId.Sections[selectedSection];
-    const { SectionName } = section;
-    const question = section.Questions[questionIndex];
-    const { _id: questionId } = question;
-
-    // const questionId = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex]._id;
-    const userAnswer = value;
-    const { correctAnswer, score } = question.snapshot;
-    const isCorrect = userAnswer === correctAnswer;
-
-    const Answers = {
-        questionId,
-        answer: userAnswer,
-        isCorrect,
-        score: isCorrect ? score : 0,
-        isAnswerLater: answerLater[selectedSection][questionIndex],
-    };
-
-    const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
-
-
-    const calculatedScore = isCorrect
-        ? sectionWiseTotalScore[selectedSection] + score
-        : sectionWiseTotalScore[selectedSection];
-
-    const newScores = [...sectionWiseTotalScore];
-    newScores[selectedSection] = calculatedScore;
-    setSetSectionWiseTotalScore(newScores);
-    setTotalScore(calculatedScore);
-
-    const reqBody = {
-        SectionName,
-        Answers,
-        totalScore: calculatedScore,
-        passScore,
-        sectionResult: calculatedScore >= passScore ? "pass" : "fail",
-    };
-
-    // Use debounced API request
-    debouncedUpdate(reqBody, questionId);
-};
-
+        const handleInputChange = async (value, questionIndex, event) => {
+            event?.stopPropagation(); // Prevent event bubbling
+        
+            // Update state for selected options
+            setSelectedOptions((prevSelectedOptions) => {
+                const newSelectedOptions = [...prevSelectedOptions];
+                newSelectedOptions[selectedSection][questionIndex] = value;
+                return newSelectedOptions;
+            });
+        
+            // Uncheck the "Answer at a later time" checkbox
+            setAnswerLater((prevAnswerLater) => {
+                const newAnswerLater = [...prevAnswerLater];
+                newAnswerLater[selectedSection][questionIndex] = false;
+                return newAnswerLater;
+            });
+        
+            // Clear the error for the current question
+            setQuestionErrors((prevErrors) => {
+                const newErrors = [...prevErrors];
+                newErrors[questionIndex] = false;
+                return newErrors;
+            });
+        
+            // Validate input length
+            const { CharLimits = { min: 0, max: 250 } } = assessment.assessmentId.Sections[selectedSection].Questions[questionIndex];
+            const { min, max } = CharLimits;
+        
+            setValidationErrors((prevErrors) => {
+                const newErrors = [...prevErrors];
+                newErrors[questionIndex] = value.length < min || value.length > max;
+                return newErrors;
+            });
+        
+            // Retrieve question details
+            const section = assessment.assessmentId.Sections[selectedSection];
+            const { SectionName } = section;
+            const question = section.Questions[questionIndex];
+            const { _id: questionId, snapshot } = question;
+        
+            const userAnswer = value;
+            const { correctAnswer, score } = snapshot;
+            const isCorrect = userAnswer === correctAnswer;
+        
+            const Answers = {
+                questionId,
+                answer: userAnswer,
+                isCorrect,
+                score: isCorrect ? score : 0,
+                isAnswerLater: false, // Answer later is always false now
+            };
+        
+            const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
+        
+            // ✅ Use functional updates to ensure state consistency
+            setSetSectionWiseTotalScore((prevScores) => {
+                const newScores = [...prevScores];
+                newScores[selectedSection] = (prevScores[selectedSection] || 0) + (isCorrect ? score : 0);
+        
+                // ✅ Update total score after ensuring section score is updated
+                setTotalScore((prevTotal) => {
+                    return newScores.reduce((total, sectionScore) => total + sectionScore, 0);
+                });
+        
+                return newScores;
+            });
+        
+            const reqBody = {
+                SectionName,
+                Answers,
+                totalScore: sectionWiseTotalScore[selectedSection], // Previous value, but will update via state
+                passScore,
+                sectionResult: sectionWiseTotalScore[selectedSection] >= passScore ? "pass" : "fail",
+            };
+        
+            // Use debounced API request
+            debouncedUpdate(reqBody, questionId);
+        };
+        
 const debouncedUpdate = debounce(async (reqBody, questionId) => {
     try {
         await axios.patch(
@@ -1280,9 +1312,9 @@ const debouncedUpdate = debounce(async (reqBody, questionId) => {
                                                             {selectedOptions[sectionIndex][questionIndex] || "Answer at a later time"}
                                                         </p>
                                                     )}
-                                                    {/* <p className="ml-4 text-green-500">Score: {questionScore}</p> Display the score */}
                                                 </div>
                                             </div>
+
                                         </div>
                                     );
                                 })}

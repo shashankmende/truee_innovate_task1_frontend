@@ -33,7 +33,7 @@ import { ReactComponent as MdMoreVert } from "../../../../icons/MdMoreVert.svg";
 import ScheduledAssessmentTab from "./ScheduledAssessmentTab.jsx";
 import ScheduledAssessmentViewPage from "./ScheduledAssessmentViewPage.jsx";
 import AssessmentResultTab from "./AssessmentResultTab.jsx";
-const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
+const AssessmentPopup = ({isOpen,onOutsideClick, assessment,linkExpiryDays, onCloseprofile }) => {
   console.log('assesview page props',assessment)
   const [isEditSectionPopupOpen, setIsEditSectionPopupOpen] = useState(false);
   const [sectionToEdit, setSectionToEdit] = useState(null);
@@ -1525,10 +1525,12 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
     return candidate || { LastName: "Name not found", Email: "Email not found" }; // Fallback to default messages if not found
   };
 
+  const [showSharePopup,setShowSharePopup]= useState(false)
+
   return (
     <>
-      <div>
-        {(showMainContent && !showScheduledAssessmentViewPage) && (
+      <div className="">
+        {(showMainContent && !showScheduledAssessmentViewPage ) && (
           <div className="container mx-auto bg-white">
             <div className="mx-10">
               <div className="flex items-center">
@@ -1960,6 +1962,11 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
               {
                 activeTab==="scheduledAssessment"&& (
                 <ScheduledAssessmentTab
+                isOpen={isOpen}
+                onOutsideClick={onOutsideClick}
+                linkExpiryDays={linkExpiryDays}
+                showSharePopup={showSharePopup}
+                setShowSharePopup = {setShowSharePopup}
                 getScheduledAssessments={getScheduledAssessments}
                 scheduledAssessmentData={scheduledAssessmentData}
                 setScheduledAssessmentData={setScheduledAssessmentData}
@@ -2556,6 +2563,14 @@ const AssessmentPopup = ({ assessment,linkExpiryDays, onCloseprofile }) => {
           // formReload={formReload}
           />
         )}
+
+
+      {/* {showSharePopup && (<div className="fixed z-50   top-0 right-0 left-0 h-full bg-[#8080805c]">
+        <div>
+        share popup
+        </div>
+      </div>)} */}
+
 
         {showNewCandidateContent && (
           <EditAssesmentForm onClose={handleClose} candidate1={assessment} />

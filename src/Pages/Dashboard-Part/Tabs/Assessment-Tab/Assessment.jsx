@@ -638,9 +638,9 @@ const Assessment = () => {
                                 <th scope="col" className="py-3 px-6">
                                   Duration
                                 </th>
-                                <th scope="col" className="py-3 px-6">
+                                {/* <th scope="col" className="py-3 px-6">
                                   Expiry Date
-                                </th>
+                                </th> */}
                                 <th scope="col" className="py-3 px-6">
                                   Action
                                 </th>
@@ -717,7 +717,7 @@ const Assessment = () => {
                                     <td className="py-2 px-6">
                                       {assessment.Duration}
                                     </td>
-                                    <td className="py-2 px-6">
+                                    {/* <td className="py-2 px-6">
                                       {new Date(
                                         assessment.ExpiryDate
                                       ).toLocaleDateString("en-GB", {
@@ -725,7 +725,7 @@ const Assessment = () => {
                                         month: "2-digit",
                                         year: "numeric",
                                       })}{" "}
-                                    </td>
+                                    </td> */}
                                     <td className="py-2 px-6">
                                       <div>
                                         <button
@@ -987,6 +987,8 @@ const Assessment = () => {
       {showAssessmentDetails && (
         <AssessmentProfileDetails
         // assessmentId={}
+        isOpen={isMenuOpen}
+        onOutsideClick={handleOutsideClick}
         linkExpiryDays= {linkExpiryDays}
           assessment={showAssessmentDetails}
           onCloseprofile={handleCloseProfile}

@@ -28,17 +28,6 @@ const ShareAssessment = ({
   console.log(assessmentId, "assessmentId");
   const { sharingPermissionscontext } = usePermissions();
   const sharingPermissions = useMemo(() => sharingPermissionscontext.candidate || {}, [sharingPermissionscontext]);
-  // const [formData, setFormData] = useState({
-  //   AssessmentTitle: "",
-  //   AssessmentType: "",
-  //   Skill_Technology: "",
-  //   Position: "",
-  //   Duration: "",
-  //   TotalScore: "",
-  //   PassScore: "",
-  //   DifficultyLevel: "",
-  //   NumberOfQuestions: "",
-  // });
 
   const linkInputRef = useRef(null);
 
@@ -301,42 +290,7 @@ const ShareAssessment = ({
               </div>
 
               <div className="mt-20 mx-8">
-                {/* Share the link */}
-
-                {/* <div className="flex gap-5 mb-5 relative">
-                  <div>
-                    <label
-                      htmlFor="difficulty"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-black w-36"
-                    >
-                      Share the link
-                      <span className="text-red-500">*</span>
-                    </label>
-                  </div>
-
-                  <div className="relative flex-grow">
-                    <div className="relative">
-                      <input
-                        className="border-b focus:outline-none mb-5 min-w-[383px]"
-                        type="text"
-                        id="share"
-                        value={shareLink}
-                        readOnly
-                        ref={linkInputRef}
-                      />
-                      <IoIosCopy
-                        className="absolute top-0 text-gray-500 text-lg mt-1 cursor-pointer ml-36"
-                        onClick={handleCopyClick}
-                      />
-                    </div>
-                    {copyStatus && (
-                      <span className="absolute right-0 top-full px-2 py-1 text-xs text-white bg-gray-600 border border-gray-600 rounded-md shadow-lg z-10">
-                        Copied
-                      </span>
-                    )}
-                  </div>
-
-                </div> */}
+                {/* Share the link */}        
 
                 {/* add candidate */}
                 <div className="flex gap-5 mb-5 relative" ref={candidateRef}>
