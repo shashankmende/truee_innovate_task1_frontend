@@ -51,8 +51,10 @@ const AssessmentQuestion = () => {
     const [totalScore,setTotalScore]=useState(0)
     const [sectionWiseTotalScore,setSetSectionWiseTotalScore]=useState([])
     const [assessmentTotalScore,setAssessmentTotalScore]= useState(0)
+    
 
 
+  
 
  
 
@@ -67,7 +69,7 @@ const AssessmentQuestion = () => {
                 // const [isNewAssessment,setIsNewAssessment]= useState(newCandidateAssessmentDetails.sections? false:true)
                 setIsNewAssessment( response.data.candidateAssessment.sections ? false:true)
 
-                toast.success("progress loaded")
+                // toast.success("progress loaded")
             }
 
         }
@@ -107,6 +109,8 @@ const AssessmentQuestion = () => {
             if (assessmentData) {
                 console.log("Fetched assessment data:", assessmentData);
                 setAssessment(assessmentData);
+              
+
     
                 // Initialize options, answers, and scores for a new session
                 setSelectedOptions(
@@ -417,7 +421,8 @@ const AssessmentQuestion = () => {
             const sectionsData = assessment.assessmentId.Sections.map((section, sectionIndex) => {                
                 const answeredQuestions = selectedOptions[sectionIndex].filter(option => option !== "").length;
                 const totalQuestions = section.Questions.length;
-                const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
+                // const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
+                const passScore =  assessment.assessmentId.passScoreBy ==="Overall" ? assessment.assessmentId.passScore : section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
                 // const totalScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);  
                 // let totalScore =0            
                     
@@ -466,18 +471,7 @@ const AssessmentQuestion = () => {
                     'Content-Type': 'application/json',
                 },
                 
-                // body: JSON.stringify({
-                //     assessmentId: Assessment._id,
-                //     answeredQuestionsScore: answeredQuestionsScore,
-                //     totalScore: Assessment.totalScore,
-                //     passScore: Assessment.passScore,
-                //     candidateId: candidateId,
-                //     answeredQuestions: calculateAnsweredQuestions(),
-                //     totalQuestions: totalQuestions,
-                //     timeSpent: formattedTimeSpent,
-                //     questions: questionsData,
-                //     sections: sectionsData
-                // }),
+    
                 body:JSON.stringify(reqBody)
             });
 
@@ -661,7 +655,8 @@ const AssessmentQuestion = () => {
             setSetSectionWiseTotalScore(prevScores => {
                 const newScores = [...prevScores];
                 const previousScore = newScores[selectedSection] || 0;
-                newScores[selectedSection] = previousScore - (isCorrect ? 0 : score) + (isCorrect ? score : 0);
+                // newScores[selectedSection] = previousScore - (isCorrect ? 0 : score) + (isCorrect ? score : 0);
+                newScores[selectedSection] = Math.max(0, previousScore + (isCorrect ? score : -score));
                 return newScores;
             });
     
@@ -680,9 +675,10 @@ const AssessmentQuestion = () => {
                 isAnswerLater: false
             };
     
-            const passScore = assessment.assessmentId.Sections[selectedSection].Questions.reduce(
+            const passScore = assessment.assessmentId.passScoreBy ==="Overall"  ? assessment.assessmentId.passScore :   assessment.assessmentId.Sections[selectedSection].Questions.reduce(
                 (total, question) => total + question.snapshot.score, 0
             );
+            // alert(`pass Score ${passScore}`)
     
             // Using a callback inside setSetSectionWiseTotalScore to ensure latest state
             setSetSectionWiseTotalScore(prevScores => {
@@ -710,6 +706,21 @@ const AssessmentQuestion = () => {
     
                 return prevScores; // Return unchanged prevScores as setSetSectionWiseTotalScore needs a return value
             });
+            // setSetSectionWiseTotalScore(()=>{
+            //     return assessment.assessmentId.Sections.map((section,sectionIndex)=>{
+            //         let sectionScore=0;
+            //         section.Questions.forEach((question,questionIndex)=>{
+            //             const userAnswerIndex = selectedOptions[sectionIndex]?.[questionIndex]
+            //             const userAnswerText = typeof userAnswerIndex === "number" ? question.snapshot.options[userAnswerIndex]:userAnswerIndex
+            //             const correctAnswerText = question.snapshot.correctAnswer;
+            //             const isCorrect = userAnswerText === correctAnswerText 
+            //             if (isCorrect){
+            //                 sectionScore+= question.snapshot.score 
+            //             }
+            //         })
+            //         return sectionScore
+            //     })
+            // })
     
         } catch (error) {
             console.error('Error updating answer:', error);
@@ -910,7 +921,8 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                 isAnswerLater: false, 
             };
         
-            const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
+            const passScore = assessment.assessmentId.passScoreBy==="Overall" ? assessment.assessmentId.passScore  :  section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
+            // const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
         
             
             setSetSectionWiseTotalScore((prevScores) => {

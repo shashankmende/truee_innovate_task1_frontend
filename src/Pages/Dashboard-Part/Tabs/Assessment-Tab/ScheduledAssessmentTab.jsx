@@ -638,7 +638,7 @@ const ScheduledAssessmentTab = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [showMainContent, setShowMainContent] = useState(true);
   const dropdownRef = useRef(null);
-  const itemsPerPage = 8;
+  const itemsPerPage = 6;
   const totalPages = Math.ceil(scheduledAssessmentData.length / itemsPerPage);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -764,7 +764,7 @@ const ScheduledAssessmentTab = ({
         createdBy: Cookies.get("userId"),
       };
       const scheduleAssessmentResponse = await axios.post(
-        `${process.env.REACT_APP_API_URL}/schedule-assessment`,
+        `${process.env.REACT_APP_API_URL}/schedule-assessment/schedule`,
         reqBody
       );
       const selectedCandidateIds = selectedCandidates.map(
@@ -1457,7 +1457,7 @@ const ScheduledAssessmentTab = ({
               </div>
             </div>
             <div
-              className="flex gap-5 mb-5 relative px-8 py-16"
+              className="grid grid-cols-[20%_70%] justify-between mb-5 relative px-8 py-16"
               ref={candidateRef}
             >
               <div>
@@ -1468,9 +1468,9 @@ const ScheduledAssessmentTab = ({
                   Select Candidates <span className="text-red-500">*</span>
                 </label>
               </div>
-              <div className="relative flex-grow">
+              <div className="relative flex-grow ">
                 <div
-                  className={`border-b focus:border-black focus:outline-none mb-5 w-96 h-auto flex items-start flex-wrap ${
+                  className={`border-b focus:border-black focus:outline-none mb-5 w-full h-auto flex items-start flex-wrap ${
                     errors.Candidate ? "border-red-500" : "border-gray-300"
                   }`}
                 >
@@ -1490,6 +1490,7 @@ const ScheduledAssessmentTab = ({
                   ))}
                   <input
                     type="text"
+                    id="Candidate"
                     className="border-none focus:outline-none flex-grow min-w-[100px]"
                     value={candidateInput}
                     onChange={handleCandidateInputChange}
@@ -1526,7 +1527,7 @@ const ScheduledAssessmentTab = ({
                 {showCandidatesDropDown && (
                   <div
                     ref={dropdownRef}
-                    className="absolute z-30 -mt-5 w-96 rounded-md bg-white shadow-lg"
+                    className="absolute z-30 -mt-5 w-full rounded-md bg-white shadow-lg"
                   >
                     <p className="p-1 font-medium">Recent Candidates</p>
                     <ul className="">
