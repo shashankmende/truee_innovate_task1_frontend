@@ -33,7 +33,7 @@ import { ReactComponent as MdMoreVert } from "../../../../icons/MdMoreVert.svg";
 import ScheduledAssessmentTab from "./ScheduledAssessmentTab.jsx";
 import ScheduledAssessmentViewPage from "./ScheduledAssessmentViewPage.jsx";
 import AssessmentResultTab from "./AssessmentResultTab.jsx";
-const AssessmentPopup = ({isOpen,onOutsideClick, assessment,linkExpiryDays, onCloseprofile }) => {
+const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,linkExpiryDays, onCloseprofile }) => {
   console.log('assesview page props',assessment)
   const [isEditSectionPopupOpen, setIsEditSectionPopupOpen] = useState(false);
   const [sectionToEdit, setSectionToEdit] = useState(null);
@@ -1962,6 +1962,7 @@ const AssessmentPopup = ({isOpen,onOutsideClick, assessment,linkExpiryDays, onCl
               {
                 activeTab==="scheduledAssessment"&& (
                 <ScheduledAssessmentTab
+                fetchAssessmentData={fetchAssessmentData}
                 isOpen={isOpen}
                 onOutsideClick={onOutsideClick}
                 linkExpiryDays={linkExpiryDays}

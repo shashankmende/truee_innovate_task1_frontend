@@ -214,7 +214,7 @@ const ShareAssessment = ({
             status:"pending",
             expiryAt:new Date(new Date().setDate(new Date().getDate()+linkExpiryDays)),
             isActive:true,
-            assessmentLink:"http://truleeinnovative.com/asssessment/eedgewwf22342343"
+            assessmentLink:""
     
           }))
           console.log("candidate assessment list",CandidateAssessmentsList)

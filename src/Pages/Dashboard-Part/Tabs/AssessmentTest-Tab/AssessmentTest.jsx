@@ -55,19 +55,19 @@ const AssessmentTest = () => {
         return false;
       }
     } catch (error) {
-      // Improved error handling
+      
       if (error.response) {
-        // Server responded with a status other than 200
+        
         
         toast.error(`Error: ${error.response.data.message}`)
         return false;
       } else if (error.request) {
-        // Request was made but no response received
+        
         console.error('No response received:', error.request);
         
         toast.error('Network error: Unable to reach the server. Please try again.')
       } else {
-        // Something else happened
+        
         console.error('Error:', error.message);
         
         toast.error('An unexpected error occurred. Please try again.')
@@ -214,6 +214,8 @@ const AssessmentTest = () => {
 
   const handleSubmit = async(event) => {
     event.preventDefault();
+    const assessmentStatus = candidateAssessmentDetails.status
+
     if (otp.length !== 5) {
       setError("OTP must be 5 digits");
       return 
@@ -224,6 +226,18 @@ const AssessmentTest = () => {
      console.log("response=",isValid)
 
      if (isValid){
+      if (assessmentStatus==="in_progress"){
+        navigate("/assessmenttext", {
+          replace: true,
+          state: {
+              candidateAssessmentId,
+              assessment,
+              candidate,
+              candidateId: candidate._id,
+              candidateAssessmentDetails,
+          },
+      });
+      }
      setError("");
      setOtp("");
      setIsNextPageActive(true);
@@ -232,6 +246,7 @@ const AssessmentTest = () => {
       setError("Invalid OTP");
      }
     }
+
 
   };
 
@@ -264,7 +279,7 @@ const AssessmentTest = () => {
     const assessmentExpiryTime = new Date(assessment.expiryAt);
     const candidateExpiryTime = new Date(candidateAssessmentDetails.expiryAt);
 
-    // Check if the assessment is expired
+    
     if (currentTime > candidateExpiryTime || currentTime > assessmentExpiryTime) {
         toast.error("Your assessment has expired.");
         return;
@@ -566,12 +581,12 @@ const AssessmentTest = () => {
         ) : isThirdPageActive ? (
           <div>
             <div className="mx-16 p-6 rounded-md border">
-              <p className="text-xl font-semibold mb-2">Terms & Conditions</p>
+              <p className="text-xl font-semibold mb-2">Instructions</p>
 
               <div>
                 <ul className="list-disc list-inside my-5">
-                  {assessment?.Instructions?.split('•').map((instruction, index) => (
-                    instruction.trim() && <li key={index}>{instruction.trim()}</li>
+                  {assessment?.assessmentId.Instructions?.split('•').map((instruction, index) => (
+                    instruction.trim() && <li className="list-disc" key={index}>{instruction.trim()}</li>
                   ))}
                 </ul>
               </div>
@@ -585,6 +600,7 @@ const AssessmentTest = () => {
               )}
 
               <div className="text-sm mt-5">
+              <p className="text-xl font-semibold mb-2">Terms & Conditions</p>
                 <p>By participating in this assessment, you agree to comply with these terms and conditions.</p>
               </div>
 

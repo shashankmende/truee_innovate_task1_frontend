@@ -9,8 +9,8 @@ import debounce from 'lodash.debounce';
 
 
 const AssessmentQuestion = () => {
-    const [assessment, setAssessment] = useState(null);
-    
+    const [assessment, setAssessment] = useState(null);        
+
     const [showMainContent, setShowMainContent] = useState(true);
     const [showPreview, setShowPreview] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -30,10 +30,21 @@ const AssessmentQuestion = () => {
     const candidateAssessmentId = location.state?.candidateAssessmentId
     // const {candidateAssessmentDetails,getCandidateAssessmentDetails}=useCustomContext()
     let candidateAssessmentDetails = location.state?.candidateAssessmentDetails
+
     
     const [newCandidateAssessmentDetails,setNewCandidateAssessmentDetails]= useState(candidateAssessmentDetails)
-    const [remainingTime,setRemainingTime]=useState( newCandidateAssessmentDetails.remainingTime ||   30*60)//1800 seconds
-    let totalTimeAllowed = newCandidateAssessmentDetails.remainingTime || 30 * 60;
+    // const [isNewAssessment,setIsNewAssessment]= useState(newCandidateAssessmentDetails.sections? false:true)
+    const [isNewAssessment,setIsNewAssessment]= useState(true)
+    console.log("isNew Assessment",isNewAssessment)
+    const assessmentDuration = Number(assessment?.assessmentId?.Duration.split(" ")[0])*60
+    console.log("assessment duration",assessmentDuration)
+
+    // const [remainingTime,setRemainingTime]=useState( !isNewAssessment ? newCandidateAssessmentDetails.remainingTime :   assessmentDuration)//1800 seconds
+    const [remainingTime,setRemainingTime]=useState(assessmentDuration)//1800 seconds
+    console.log("remaining time",remainingTime)
+    // let totalTimeAllowed = newCandidateAssessmentDetails.remainingTime || 30*60;
+    // const totalTimeAllowed = isNewAssessment ? assessmentDuration : remainingTime
+    let totalTimeAllowed = assessmentDuration
     const [selectedSection, setSelectedSection] = useState(  0);
     const remainingTimeRef = useRef(remainingTime); // Ref to store the current value of remainingTime
     
@@ -42,6 +53,9 @@ const AssessmentQuestion = () => {
     const [assessmentTotalScore,setAssessmentTotalScore]= useState(0)
 
 
+
+ 
+
     useEffect(()=>{
         const handlePageLoad = async()=>{
             // alert("page is loaded")
@@ -49,9 +63,11 @@ const AssessmentQuestion = () => {
             if (response.data.success){
                 setNewCandidateAssessmentDetails(response.data.candidateAssessment)
                 setSelectedSection(response.data.candidateAssessment.lastSelectedSection || 0);
-                setRemainingTime(response.data.candidateAssessment.remainingTime || 30 * 60);
+                setRemainingTime( assessmentDuration || response.data.candidateAssessment.remainingTime );
+                // const [isNewAssessment,setIsNewAssessment]= useState(newCandidateAssessmentDetails.sections? false:true)
+                setIsNewAssessment( response.data.candidateAssessment.sections ? false:true)
 
-                // toast.success("progress loaded")
+                toast.success("progress loaded")
             }
 
         }
@@ -169,93 +185,7 @@ const AssessmentQuestion = () => {
     }, [location.state, navigate, newCandidateAssessmentDetails]);
     
 
-    
-//     useEffect(() => {
-//         const assessmentData = location.state?.assessment;
-//         // const existingSections = candidateAssessmentDetails?.sections 
-//         const existingSections = newCandidateAssessmentDetails?.sections 
-//         const newSelectedOptions = assessmentData.assessmentId.Sections.map(section =>
-//             Array(section.Questions.length).fill("")
-//         )
-//         console.log("existing sections**********",existingSections)
-//         if (existingSections?.length === 0){
-            
-//         if (assessmentData) {
-//             console.log('Fetched assessment data:', assessmentData);
-//             setAssessment(assessmentData);
-//             setSelectedOptions(
-//                 newSelectedOptions
-//             );
-//             setAnswerLater(
-//                 assessmentData.assessmentId.Sections.map(section =>
-//                     Array(section.Questions.length).fill(false)
-//                 )
-//             );
-//             setSetSectionWiseTotalScore(
-//                 Array(assessmentData.assessmentId.Sections.length).fill(0)
-//             )
-//         } else {
-//             console.error('No assessment data found in state');
-//             navigate("/error");
-//         }
-//     }
-//     else{
-//         toast.success("Your session resumed..")
 
-//         setAssessment(assessmentData)
-//         const assessmentSections = assessmentData.assessmentId.Sections
-
-
-    
-//         const restoredOptions = assessmentSections.map((section,sectionIndex)=>{
-//             const isSectionExist = existingSections[sectionIndex]
-//             console.log("section index",sectionIndex,"********",isSectionExist)
-//             if (isSectionExist){
-//                 return isSectionExist.Answers.map((answer,questionIndex)=>{
-//                     const question = assessmentData.assessmentId.Sections[sectionIndex]?.Questions.find(q=>q._id===answer.questionId)
-                    
-//                     return question?.snapshot.questionType==="MCQ"?
-//                     question?.snapshot.options.indexOf(answer.answer)
-//                     : answer.answer
-
-//                 })
-//             }
-//             else{
-//                 return Array(section.Questions.length).fill("")
-//             }
-//          }
-            
-//         )
-
-    
-
-//         setSelectedOptions(restoredOptions);
-
-
-// const restoredAnswerLater = assessmentSections.map((section, sectionIndex) => {
-//     const isSectionExist = existingSections[sectionIndex];
-//     if (isSectionExist) {
-//         return isSectionExist.Answers.map((answer) => answer.isAnswerLater || false);
-//     } else {
-//         return Array(section.Questions.length).fill(false);
-//     }
-// });
-
-//         console.log("restoredAnswerLater",restoredAnswerLater)
-//         setAnswerLater(restoredAnswerLater);
-
-//         const restoredScores = existingSections.map((section) => section.totalScore || 0);
-//         setSetSectionWiseTotalScore(restoredScores);
-
-//     }
-//     }, [location.state, navigate,newCandidateAssessmentDetails]);
-    
-    // }, [location.state, navigate]);
-
-    
-
-    // Keep the ref updated with the latest state value
-    
     
     useEffect(() => {
         remainingTimeRef.current = remainingTime;
@@ -266,7 +196,7 @@ const AssessmentQuestion = () => {
         const timer = setInterval(()=>{
             setRemainingTime(prevTime=>{
                 if (prevTime <=1 ){
-                    clearInterval(timer)
+                    // clearInterval(timer)
                     handleTimeout()
                     return 0
                 }
@@ -279,22 +209,22 @@ const AssessmentQuestion = () => {
     },[])
 
     const handleTimeout = async () => {
-        try {
-            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`, {
-                status: "completed",
-                endedAt: new Date(),
-            });
-            navigate("/timeout");
-        } catch (error) {
-            console.error("Error handling timeout:", error);
-        }
+        // try {
+        //     await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`, {
+        //         status: "completed",
+        //         endedAt: new Date(),
+        //     });
+        //     navigate("/timeout");
+        // } catch (error) {
+        //     console.error("Error handling timeout:", error);
+        // }
     };
 
     //auto-save
     useEffect(()=>{
         const timerId = setInterval(() => {
             autoSaveProgress();
-        }, 30000); // Every 30 seconds
+        }, 15000); // Every 30 seconds
     
         return () => clearInterval(timerId);
     },[remainingTimeRef, selectedSection, candidateAssessmentId])
@@ -464,7 +394,7 @@ const AssessmentQuestion = () => {
 
                     const marks = isCorrect ? score : 0;
 
-                    // Log the question data for debugging
+                    
                     console.log({
                         questionId: question._id,
                         correctAnswer,
@@ -689,11 +619,11 @@ const AssessmentQuestion = () => {
         const timeOutEvent = async()=>{
             // const totalTimeAllowed = 30 * 60;
             
-        if (timeSpent >= totalTimeAllowed) {
-            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed",endedAt:new Date()})
-            handleSubmit();
-            navigate('/timeout');
-        }
+        // if (timeSpent >= totalTimeAllowed) {
+        //     await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed",endedAt:new Date()})
+        //     handleSubmit();
+        //     navigate('/timeout');
+        // }
         }
         timeOutEvent()
     }, [timeSpent, navigate]);
@@ -977,17 +907,17 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                 answer: userAnswer,
                 isCorrect,
                 score: isCorrect ? score : 0,
-                isAnswerLater: false, // Answer later is always false now
+                isAnswerLater: false, 
             };
         
             const passScore = section.Questions.reduce((total, question) => total + question.snapshot.score, 0);
         
-            // ✅ Use functional updates to ensure state consistency
+            
             setSetSectionWiseTotalScore((prevScores) => {
                 const newScores = [...prevScores];
                 newScores[selectedSection] = (prevScores[selectedSection] || 0) + (isCorrect ? score : 0);
         
-                // ✅ Update total score after ensuring section score is updated
+                
                 setTotalScore((prevTotal) => {
                     return newScores.reduce((total, sectionScore) => total + sectionScore, 0);
                 });
@@ -998,12 +928,12 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
             const reqBody = {
                 SectionName,
                 Answers,
-                totalScore: sectionWiseTotalScore[selectedSection], // Previous value, but will update via state
+                totalScore: sectionWiseTotalScore[selectedSection],
                 passScore,
                 sectionResult: sectionWiseTotalScore[selectedSection] >= passScore ? "pass" : "fail",
             };
         
-            // Use debounced API request
+            
             debouncedUpdate(reqBody, questionId);
         };
         
@@ -1259,6 +1189,7 @@ const debouncedUpdate = debounce(async (reqBody, questionId) => {
                             </button>
                         )}
                     </div>
+                    
                 </div>
             </div>
         );
@@ -1280,9 +1211,9 @@ const debouncedUpdate = debounce(async (reqBody, questionId) => {
                 <div className="border p-3 rounded-md">
                     <p className="font-semibold text-lg mb-2">Answered Questions Score: {answeredQuestionsScore}</p>
                 </div>
-                <div className="border p-3 rounded-md">
+                <div className="border p-3 rounded-md mt-5">
                     {assessment.assessmentId.Sections.map((section, sectionIndex) => (
-                        <div key={sectionIndex}>
+                        <div key={sectionIndex} >
                             <h3 className="font-semibold text-lg mb-2">{section.SectionName}</h3>
                             <div className="grid grid-cols-2 gap-4 mb-2">
                                 {section.Questions.map((question, questionIndex) => {
@@ -1298,11 +1229,12 @@ const debouncedUpdate = debounce(async (reqBody, questionId) => {
                                                 <div className="ml-2">
                                                     {answerLater[sectionIndex][questionIndex] ? (
                                                         <p className="ml-4 text-red-500">Answer at a later time.</p>
-                                                    ) : question.QuestionType === "MCQ" ? (
+                                                    ) : question.snapshot.questionType === "MCQ" ? (
                                                         selectedOptions[sectionIndex][questionIndex] !== null &&
                                                             selectedOptions[sectionIndex][questionIndex] !== undefined ? (
                                                             <p className="ml-4 text-custom-blue">
-                                                                {`${String.fromCharCode(97 + selectedOptions[sectionIndex][questionIndex])}) ${question.Options[selectedOptions[sectionIndex][questionIndex]]}`}
+                                                                {/* {`${String.fromCharCode(97 + selectedOptions[sectionIndex][questionIndex])}) ${question.snapshot.options[selectedOptions[sectionIndex][questionIndex]]}`} */}
+                                                                {` ${question.snapshot.options[selectedOptions[sectionIndex][questionIndex]]}`}
                                                             </p>
                                                         ) : (
                                                             <p className="ml-4 text-red-500">Answer at a later time.</p>

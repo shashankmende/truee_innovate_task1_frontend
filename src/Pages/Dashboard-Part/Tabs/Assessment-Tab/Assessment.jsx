@@ -633,7 +633,7 @@ const Assessment = () => {
                                   Total Score
                                 </th>
                                 <th scope="col" className="py-3 px-6">
-                                  Pass Score
+                                  Pass Score (Number / %)
                                 </th>
                                 <th scope="col" className="py-3 px-6">
                                   Duration
@@ -712,7 +712,7 @@ const Assessment = () => {
                                       {assessment.totalScore}
                                     </td>
                                     <td className="py-2 px-6">
-                                      {assessment.passScore}
+                                      {assessment.passScore} {assessment.passScoreType ==="Percentage" ?"%":"Number"}
                                     </td>
                                     <td className="py-2 px-6">
                                       {assessment.Duration}
@@ -987,6 +987,7 @@ const Assessment = () => {
       {showAssessmentDetails && (
         <AssessmentProfileDetails
         // assessmentId={}
+        fetchAssessmentData={fetchAssessmentData}
         isOpen={isMenuOpen}
         onOutsideClick={handleOutsideClick}
         linkExpiryDays= {linkExpiryDays}
@@ -998,6 +999,7 @@ const Assessment = () => {
       {sidebarOpen && (
         <>
           <Sidebar
+          fetchAssessmentData={fetchAssessmentData}
           showLinkExpiryDay={showLinkExpiryDay}
           setShowLinkExpiryDays={setShowLinkExpiryDays}
           linkExpiryDays={linkExpiryDays}

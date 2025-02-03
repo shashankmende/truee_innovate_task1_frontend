@@ -34,7 +34,7 @@ import AssessmentQuestionsTab from "./AssessmentQuestionsTab.jsx";
 import Candidate from '../Candidate-Tab/Candidate.jsx'
 import toast from "react-hot-toast";
 
-const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,setShowLinkExpiryDays,showLinkExpiryDay}) => {
+const NewAssessment = ({fetchAssessmentData, onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,setShowLinkExpiryDays,showLinkExpiryDay}) => {
   const { sharingPermissionscontext } = usePermissions();
   const positionPermissions = useMemo(
     () => sharingPermissionscontext.position || {},
@@ -458,6 +458,7 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
           status:"pending",
           expiryAt:new Date(new Date().setDate(new Date().getDate()+linkExpiryDays)),
           isActive:true,
+          assessmentLink:""
           // assessmentLink:"http://truleeinnovative.com/asssessment/eedgewwf22342343"
   
         }))
@@ -471,7 +472,9 @@ const NewAssessment = ({ onClose, onDataAdded,setLinkExpiryDays ,linkExpiryDays,
           }
         setIsLoading(false)
         setSelectedCandidates([])
+        fetchAssessmentData()
         onClose()
+
       }
       
       toast.success(`Assessment Scheduled`)
