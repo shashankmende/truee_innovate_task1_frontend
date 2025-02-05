@@ -213,15 +213,15 @@ const AssessmentQuestion = () => {
     },[])
 
     const handleTimeout = async () => {
-        // try {
-        //     await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`, {
-        //         status: "completed",
-        //         endedAt: new Date(),
-        //     });
-        //     navigate("/timeout");
-        // } catch (error) {
-        //     console.error("Error handling timeout:", error);
-        // }
+        try {
+            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/update/${candidateAssessmentId}`, {
+                status: "completed",
+                endedAt: new Date(),
+            });
+            navigate("/timeout");
+        } catch (error) {
+            console.error("Error handling timeout:", error);
+        }
     };
 
     //auto-save
@@ -464,7 +464,7 @@ const AssessmentQuestion = () => {
             }
             console.log("req body=",reqBody)
             // const response = await fetch(`${process.env.REACT_APP_API_URL}/assessmenttest`, {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/candidate-assessment/update/${candidateAssessmentId}`, {
                 // method: 'POST',
                 method: 'PATCH',
                 headers: {
@@ -484,7 +484,7 @@ const AssessmentQuestion = () => {
                 
                 // navigate('/assessmentsubmit', { state: { assessmentName: Assessment.AssessmentTitle } });
                 navigate('/assessmentsubmit', {replace:true, state: { assessmentName: Assessment.AssessmentTitle } });
-                await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed", endedAt:new Date(),completionTime:`${hours}M ${minutes}S`})
+                await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/update/${candidateAssessmentId}`,{isActive:false,status:"completed", endedAt:new Date(),completionTime:`${hours}M ${minutes}S`})
             } else {
                 console.error('Failed to submit score');
             }
@@ -613,11 +613,11 @@ const AssessmentQuestion = () => {
         const timeOutEvent = async()=>{
             // const totalTimeAllowed = 30 * 60;
             
-        // if (timeSpent >= totalTimeAllowed) {
-        //     await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{isActive:false,status:"completed",endedAt:new Date()})
-        //     handleSubmit();
-        //     navigate('/timeout');
-        // }
+        if (timeSpent >= totalTimeAllowed) {
+            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/update/${candidateAssessmentId}`,{isActive:false,status:"completed",endedAt:new Date()})
+            handleSubmit();
+            navigate('/timeout');
+        }
         }
         timeOutEvent()
     }, [timeSpent, navigate]);
@@ -732,7 +732,7 @@ const AssessmentQuestion = () => {
         if (selectedSection > 0) {
             setSelectedSection(selectedSection - 1);
             setCurrentQuestionIndex(0);
-            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{lastSelectedSection:selectedSection-1})
+            await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/update/${candidateAssessmentId}`,{lastSelectedSection:selectedSection-1})
         }
     };
 
@@ -857,7 +857,7 @@ const passScore = assessment.assessmentId.Sections[selectedSection].Questions.re
                 setCurrentQuestionIndex(0);
                 // Clear errors when moving to the next section
                 setQuestionErrors([]);
-                await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,{lastSelectedSection:selectedSection+1})
+                await axios.patch(`${process.env.REACT_APP_API_URL}/candidate-assessment/update/${candidateAssessmentId}`,{lastSelectedSection:selectedSection+1})
             } else {
                 handleFinishClick();
                 setAssessmentCompleted(true); // Mark assessment as completed

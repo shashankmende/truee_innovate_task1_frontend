@@ -17,6 +17,7 @@ import Feedback from '../FeedbackPage/Feedback';
 import { useCustomContext } from '../../../../../Context/Contextfetch';
 import { useEffect, useState } from 'react';
 import QuestionBank from '../../QuestionBank-Tab/QuestionBank';
+import VideoCall from './VideoCall';
  
 // eslint-disable-next-line react/prop-types
 const IconButton = ({ icon, label, color = "text-gray-700" }) => (
@@ -30,13 +31,19 @@ const InterviewPage = () => {
   const {popupVisibility,setPopupVisibility,feedbackCloseFlag,setFeedbackCloseFlag,page,setPage}=useCustomContext()
   const [questionBankPopupVisibility,setQuestionBankPopupVisibility]=useState(false)
 
-
+    const [isVideoOn,setIsVideoOn]= useState(true)
+    
 
   useEffect(()=>{
     setPage("Popup")
     setFeedbackCloseFlag(true)
 
   },[])
+
+
+  const functionToToggleVideo =()=>{}
+
+
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Header Icons*/}
@@ -78,7 +85,10 @@ const InterviewPage = () => {
  
         {/* Right section - Controls */}
         <div className="flex items-center space-x-6">
+          <span onClick = {()=>setIsVideoOn(prev=>!prev)}>
+
           <IconButton icon={mdiVideo} label="Camera" />
+          </span>
           <IconButton icon={mdiMicrophone} label="Mic" />
           <IconButton icon={mdiArrowUpBox} label="share" />
           <IconButton icon={mdiPhoneHangup} label="Leave" color="text-red-500" />
@@ -95,11 +105,17 @@ const InterviewPage = () => {
      
       {/*user video */}
       <div className="absolute bottom-4 right-4 w-48 h-48 rounded-lg overflow-hidden shadow-lg">
+      
+      {isVideoOn ? 
+      
+      <VideoCall isVideoOn={isVideoOn} setIsVideoOn={setIsVideoOn} />
+      :
       <img
         src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop"
         alt="User video"
         className="w-full h-full object-cover"
       />
+      }
     </div>
     </div>
   );

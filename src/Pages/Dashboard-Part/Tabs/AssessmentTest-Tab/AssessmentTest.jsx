@@ -41,7 +41,7 @@ const AssessmentTest = () => {
 
 
   const verifyOtp = async (candidateId, otp, scheduledAssessmentId) => {
-    const url = `${process.env.REACT_APP_API_URL}/verify-otp`;
+    const url = `${process.env.REACT_APP_API_URL}/candidate-assessment/verify-otp`;
     try {
       const response = await axios.post(url, { candidateId, otp, scheduledAssessmentId });
   
@@ -136,7 +136,7 @@ const AssessmentTest = () => {
       
       try {
         // Fetch assessment details
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessments-list/${scheduledAssessmentId}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessment/list/${scheduledAssessmentId}`);
         setAssessment(response.data.scheduledAssessment);
         console.log('Assessment Data:', response.data);
   
@@ -191,7 +191,7 @@ const AssessmentTest = () => {
       const {candidateId,scheduledAssessmentId} = await getCandidateAssessmentDetails(decryptedId)
       if (scheduledAssessmentId) {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessments-list/${scheduledAssessmentId}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule-assessment/list/${scheduledAssessmentId}`);
           setAssessment(response.data.scheduledAssessment);
           console.log(response.data, "response.data");
         } catch (error) {
@@ -298,7 +298,7 @@ const AssessmentTest = () => {
                 // Start a fresh assessment
                 // toast.success("Starting a new assessment...");
                 await axios.patch(
-                    `${process.env.REACT_APP_API_URL}/candidate-assessment/${candidateAssessmentId}`,
+                    `${process.env.REACT_APP_API_URL}/candidate-assessment/update/${candidateAssessmentId}`,
                     { status: "in_progress", startedAt: currentTime }
                 );
                 navigate("/assessmenttext", {
@@ -351,7 +351,7 @@ const AssessmentTest = () => {
     console.log("Resend OTP clicked");
     try {
       SetReSending(true)
-    const response =  await axios.post(`${process.env.REACT_APP_API_URL}/resend-link`,{
+    const response =  await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment/resend-otp`,{
         candidateId,
         scheduledAssessmentId
       })

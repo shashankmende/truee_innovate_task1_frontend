@@ -607,7 +607,7 @@ const ScheduledAssessmentTab = ({
     setAssessmentActionViewMore("");
     try {
       const response = await axios.patch(
-        `${process.env.REACT_APP_API_URL}/schedule-assessment/${id}`,
+        `${process.env.REACT_APP_API_URL}/schedule-assessment/update/${id}`,
         { status: "cancelled" }
       );
 
@@ -622,7 +622,7 @@ const ScheduledAssessmentTab = ({
 
     try {
       const response = await axios.patch(
-        `${process.env.REACT_APP_API_URL}/candidate-assessment/${id}`,
+        `${process.env.REACT_APP_API_URL}/candidate-assessment/update/${id}`,
         { status: "cancelled" }
       );
 
@@ -670,7 +670,7 @@ const ScheduledAssessmentTab = ({
     async (id) => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/candidate-assessment/${id}`
+          `${process.env.REACT_APP_API_URL}/candidate-assessment/scheduled-assessment/${id}`
         );
         if (response.data.success) {
           setCandidateAssessmentData(response.data.candidateAssessments || []);
@@ -790,12 +790,12 @@ const ScheduledAssessmentTab = ({
         );
         console.log("candidate assessment list", CandidateAssessmentsList);
         const CandidateAssessmentResponse = await axios.post(
-          `${process.env.REACT_APP_API_URL}/candidate-assessment`,
+          `${process.env.REACT_APP_API_URL}/candidate-assessment/create`,
           CandidateAssessmentsList
         );
         if (CandidateAssessmentResponse.data.success) {
           const response = await axios.post(
-            `${process.env.REACT_APP_API_URL}/send-assessment-link`,
+            `${process.env.REACT_APP_API_URL}/candidate-assessment/send-assessment-link`,
             {
               scheduledAssessmentId:
                 scheduleAssessmentResponse.data.assessment._id,
@@ -851,7 +851,7 @@ const ScheduledAssessmentTab = ({
     try {
       setIsCandidateSharing(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/candidate-link/${said}/${caid}`
+        `${process.env.REACT_APP_API_URL}/candidate-assessment/candidate-link/${said}/${caid}`
       );
 
       if (response.data.success) {

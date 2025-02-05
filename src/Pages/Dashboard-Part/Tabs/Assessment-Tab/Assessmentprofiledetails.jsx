@@ -109,20 +109,23 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
       // console.log("candidate details",Object.values(candidateAssessmentData).flat())
       console.log('scheduledAssessmentData',scheduledAssessmentData)
     const [scheduledAssessmentId,setScheduledAssessmentId]=useState("")
+    const [candidatesData, setCandidatesData] = useState([]);
 
       const getScheduledAssessments = async () => {
         try {
-          const url = `${process.env.REACT_APP_API_URL}/schedule-assessment/${assessment._id}`;
+          const url = `${process.env.REACT_APP_API_URL}/schedule-assessment/assessment/${assessment._id}`;
           const response = await axios.get(url);
           if (response.data.success) {
             const data = response.data.scheduledAssessment;
             setScheduledAssessmentData(data);
             setFilteredScheduledAssessmentData(data );
+            console.log("scheduled assessments",data)
     
             const candidateAssessmentPromises = data.map(async (item) => {
               const candidateResponse = await axios.get(
-                `${process.env.REACT_APP_API_URL}/candidate-assessment/${item._id}`
+                `${process.env.REACT_APP_API_URL}/candidate-assessment/scheduled-assessment/${item._id}`
               );
+              
               return {
                 id: item._id,
                 assessments: candidateResponse.data.candidateAssessments,
@@ -131,6 +134,17 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
             const candidateAssessments = await Promise.all(
               candidateAssessmentPromises
             );
+            console.log("candidate assessmetns",candidateAssessments)
+
+            const candidatesList = []
+            for (let candidateAssessmentItem of candidateAssessments){
+              
+              candidatesList.push(...candidateAssessmentItem.assessments )
+            }
+
+            // console.log("candidates list",candidatesList)
+            setCandidatesData(candidatesList)
+
             const newObj = candidateAssessments.reduce(
               (acc, { id, assessments }) => {
                 acc[id] = assessments;
@@ -161,6 +175,8 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
     setNewSectionName(""); 
     setNewSectionNameError(""); 
   };
+
+  console.log("candidates data*************",candidatesData)
   
   const onChangeNewSectionName = (e) => {
     const value = e.target.value.trim(); 
@@ -377,15 +393,17 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
     };
   }, [sidebarOpen, handleOutsideClick]);
 
-  const [candidatesData, setCandidatesData] = useState([]);
+  // const [candidatesData, setCandidatesData] = useState([]);
 
   useEffect(() => {
     const fetchCandidatesData = async () => {
       try {
-        const candidatePromises = assessment.CandidateIds.map((candidateId) =>
+        const candidatePromises = assessment.assessmentId.CandidateIds.map((candidateId) =>
+        // const candidatePromises = assessment.CandidateIds.map((candidateId) =>
           axios.get(`${process.env.REACT_APP_API_URL}/candidate/${candidateId}`)
         );
         const candidatesResponses = await Promise.all(candidatePromises);
+        
         const candidates = candidatesResponses.map((response) => response.data);
         setCandidatesData(candidates);
       } catch (error) {
@@ -393,7 +411,8 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
       }
     };
     fetchCandidatesData();
-  }, [assessment.CandidateIds]);
+  }, []);
+  // }, [assessment.CandidateIds]);
 
   const assessmentTypes = [
     "MCQ",
@@ -1400,7 +1419,7 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/send-assessment-link`,
+        `${process.env.REACT_APP_API_URL}/candidate-assessment/send-assessment-link`,
         {
           candidateEmails,
           assessmentId: assessment._id,
@@ -1527,6 +1546,7 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
 
   const [showSharePopup,setShowSharePopup]= useState(false)
 
+  const newLocal = "flex flex-end";
   return (
     <>
       <div className="">
@@ -1988,7 +2008,8 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
                       {candidatesData.length > 0 ? (
                         <>
                           <div className="flex justify-between">
-                            <p className="font-semibold text-lg">
+                          {/* <div classN{newLocal}end"> */}
+                            <p className="font-semibold text-lg visibility-hidden">
                               Selected Candidates:
                             </p>
                             {showLinkCopiedToast && (
@@ -2005,7 +2026,7 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
                             <div>
                               <button
                                 onClick={() => handleResend()}
-                                className={`ml-4 px-3 py-1 rounded-md ${isMainResendEnabled
+                                className={`ml-4 px-3 py-1 my-4 rounded-md ${isMainResendEnabled
                                   ? "bg-custom-blue text-white hover:bg-blue-700"
                                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                   }`}
@@ -2018,7 +2039,8 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
 
                           <div className="grid grid-cols-3 gap-6">
                             {candidatesData.map((candidate) => {
-                              const link = `http://localhost:3000/assessmenttest?assessmentId=${assessment._id}&candidateId=${candidate._id}`;
+                              // const link = `http://localhost:3000/assessmenttest?assessmentId=${assessment._id}&candidateId=${candidate._id}`;
+                              const link = candidate.assessmentLink;
 
                               return (
                                 <div
@@ -2030,7 +2052,8 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
                                     <span className="text-gray-700 text-sm font-medium">
                                       Exp.Date:{" "}
                                       {
-                                        new Date(formData.ExpiryDate)
+                                        // new Date(formData.ExpiryDate)
+                                        new Date(candidate.expiryAt)
                                           .toISOString()
                                           .split("T")[0]
                                       }
@@ -2040,7 +2063,7 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
                                         Sent
                                       </span>
                                       <button
-                                        className={`py-1 px-3 text-xs rounded ${selectedCandidates[candidate._id]
+                                        className={`py-1 px-3 w-24 text-xs rounded ${selectedCandidates[candidate._id]
                                           ? "bg-teal-600 text-white"
                                           : "text-custom-blue border"
                                           }`}
@@ -2085,20 +2108,20 @@ const AssessmentPopup = ({fetchAssessmentData,isOpen,onOutsideClick, assessment,
                                     )}
 
                                     {/* Candidate information spanning 2 columns */}
-                                    <div className="col-span-2">
+                                    { candidate.candidateId ? <div className="col-span-2">
                                       <h3 className="font-semibold text-xs mb-1">
-                                        {candidate.LastName}
+                                        {candidate.candidateId?.LastName}
                                       </h3>
                                       <p className="text-xs text-gray-600 mb-1">
-                                        {candidate.Email}
+                                        {candidate.candidateId?.Email}
                                       </p>
                                       <p className="text-xs text-gray-600 mb-1">
-                                        {candidate.Phone}
+                                        {candidate.candidateId?.Phone}
                                       </p>
                                       <p className="text-xs text-gray-600 mb-1">
-                                        {candidate.Position}
+                                        {candidate.candidateId?.Position}
                                       </p>
-                                    </div>
+                                    </div>: <p className="font-semibold text-xs text-gray-600 mb-1 w-[300px]">Candidate details not available</p>}
                                   </div>
                                   <div className="grid grid-cols-4 items-center p-2 gap-2">
                                     <div className="col-span-3 flex justify-end">

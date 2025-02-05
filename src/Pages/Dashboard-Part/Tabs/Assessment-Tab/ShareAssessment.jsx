@@ -203,7 +203,7 @@ const ShareAssessment = ({
         proctoringEnabled:true,
         createdBy: Cookies.get("userId"),
       }
-      const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
+      const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment/schedule`,reqBody)
       const selectedCandidateIds = selectedCandidates.map(candidate => candidate._id);
       const selectedCandidatesEmails = selectedCandidates.map(candidate=>candidate.Email)
         
@@ -218,9 +218,9 @@ const ShareAssessment = ({
     
           }))
           console.log("candidate assessment list",CandidateAssessmentsList)
-          const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment`,CandidateAssessmentsList)
+          const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment/create`,CandidateAssessmentsList)
           if (CandidateAssessmentResponse.data.success){
-            const response = await axios.post( `${process.env.REACT_APP_API_URL}/send-assessment-link`,
+            const response = await axios.post( `${process.env.REACT_APP_API_URL}/candidate-assessment/send-assessment-link`,
               {scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,candidateEmails:selectedCandidatesEmails})
             // alert(`${response.data.message}`)
             toast.success(`${response.data.message}`)

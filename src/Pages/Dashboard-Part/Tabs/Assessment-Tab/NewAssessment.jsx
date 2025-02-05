@@ -383,7 +383,7 @@ const NewAssessment = ({fetchAssessmentData, onClose, onDataAdded,setLinkExpiryD
       let response;
     if (!tabsSubmitStatus["Basicdetails"]) {
       response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/assessment`,
+        `${process.env.REACT_APP_API_URL}/assessment/new-assessment`,
         assessmentData
       );
       // alert("Saved successfully!");
@@ -396,7 +396,7 @@ const NewAssessment = ({fetchAssessmentData, onClose, onDataAdded,setLinkExpiryD
       // alert("update method")
       console.log("sections data",assessmentData.Sections)
       response = await axios.patch(
-        `${process.env.REACT_APP_API_URL}/assessment/${tabsSubmitStatus.responseId}`,
+        `${process.env.REACT_APP_API_URL}/assessment/update/${tabsSubmitStatus.responseId}`,
         // {...assessmentData,Sections:[{SectionName:"abc",Questions:["eijdiejoie",'jijeijeij']}]}
         assessmentData
       );
@@ -449,7 +449,7 @@ const NewAssessment = ({fetchAssessmentData, onClose, onDataAdded,setLinkExpiryD
              proctoringEnabled:true,
              createdBy: Cookies.get("userId"),
            }
-      const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment`,reqBody)
+      const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment/schedule`,reqBody)
       if (scheduleAssessmentResponse.data.success){
       
         const CandidateAssessmentsList = selectedCandidates.map(candidateId=>({
@@ -463,9 +463,9 @@ const NewAssessment = ({fetchAssessmentData, onClose, onDataAdded,setLinkExpiryD
   
         }))
         console.log("candidate assessment list",CandidateAssessmentsList)
-          const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment`,CandidateAssessmentsList)
+          const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment/create`,CandidateAssessmentsList)
           if (CandidateAssessmentResponse.data.success){
-            const response = await axios.post( `${process.env.REACT_APP_API_URL}/send-assessment-link`,
+            const response = await axios.post( `${process.env.REACT_APP_API_URL}/candidate-assessment/send-assessment-link`,
               {scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,candidateEmails:candidateEmails})
             toast.success(`${response.data.message}`)
             
@@ -1168,7 +1168,7 @@ const NewAssessment = ({fetchAssessmentData, onClose, onDataAdded,setLinkExpiryD
       }));
   
       await axios.patch(
-        `${process.env.REACT_APP_API_URL}/assessment-questions`,
+        `${process.env.REACT_APP_API_URL}/assessment-questions/question`,
         payload
       );
   
@@ -1385,7 +1385,7 @@ const updateQuestionsInAddedSectionFromQuestionBank = async(secName,question)=>{
     }
 
     const response = await axios.post(
-      `${process.env.REACT_APP_API_URL}/assessment-questions`,
+      `${process.env.REACT_APP_API_URL}/assessment-questions/add`,
       reqBody
     );
 

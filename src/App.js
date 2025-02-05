@@ -15,6 +15,7 @@ import Candidate from "./Pages/Dashboard-Part/Tabs/Candidate-Tab/Candidate.jsx";
 import AssessmentTest from './Pages/Dashboard-Part/Tabs/AssessmentTest-Tab/AssessmentTest.jsx';
 import AssessmentText from './Pages/Dashboard-Part/Tabs/AssessmentTest-Tab/AssessementQuestion.jsx';
 import AssessmentSubmit from './Pages/Dashboard-Part/Tabs/AssessmentTest-Tab/AssessmentSubmit.jsx';
+import VideoCall from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/VideoCall.js";
 function App() {
   const location = useLocation();
   const shouldRenderNavbar = !['/', '/profile1', '/price', '/profile2', '/profile3', '/profile4', '/assessmenttest', '/assessmenttext', '/assessmentsubmit', '/candidatevc', '/admin', '/nofreelance', '/callback', '/jitsimeetingstart', '/organization'].includes(location.pathname);
@@ -41,6 +42,8 @@ function App() {
           <Route path="/assessmenttest" element={<AssessmentTest />} />
           <Route path="/assessmenttext" element={<AssessmentText />} />
           <Route path="/assessmentsubmit" element={<AssessmentSubmit />} />
+          <Route path="/video-call" element={<VideoCall/>} />
+
         </Routes>
       </div>
     </div>
