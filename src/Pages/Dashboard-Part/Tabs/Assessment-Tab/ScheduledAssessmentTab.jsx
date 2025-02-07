@@ -830,7 +830,7 @@ const ScheduledAssessmentTab = ({
     try {
       setIsScheduledAssessmentSharing(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/resend-link-otp/${id}`
+        `${process.env.REACT_APP_API_URL}/schedule-assessment/resend-link-otp/${id}`
       );
       if (response.data.success) {
         toast.success(`${response.data.message}`);

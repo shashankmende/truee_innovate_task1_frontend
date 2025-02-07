@@ -11,7 +11,8 @@ import {
   mdiMicrophoneOff,
   mdiArrowUpBox,
   mdiPhoneHangup,
-  mdiVideoOff
+  mdiVideoOff,
+  mdiArrowDownBox
 } from "@mdi/js";
 import { BiSolidVideoOff } from "react-icons/bi";
 
@@ -22,7 +23,11 @@ import { useEffect, useState } from "react";
 import QuestionBank from "../../QuestionBank-Tab/QuestionBank";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { connect, createLocalTracks } from "twilio-video";
+// import { connect, createLocalTracks } from "twilio-video";
+import { connect, createLocalTracks, createLocalVideoTrack } from "twilio-video";
+import toast from "react-hot-toast";
+import {showToastInfo} from '../../../../../utils/toastMessages'
+import Navbar from "../../../../../Components/Navbar/Navbar-Sidebar";
 
 // eslint-disable-next-line react/prop-types
 const IconButton = ({ icon, label, color = "text-gray-700" }) => (
@@ -84,13 +89,14 @@ const InterviewPage = () => {
 
         setRoom(connectedRoom);
 
-        localTracks.forEach((track) => {
-          console.log("Track created", track.kind, track);
-        });
+        const localVideoContainer = document.getElementById("local-video")
+        localVideoContainer.innerHTML = "";
+
+      
 
         localTracks.forEach((track) => {
           if (track.kind === "video") {
-            document.getElementById("local-video").appendChild(track.attach());
+            localVideoContainer.appendChild(track.attach());
           }
         });
 
@@ -110,7 +116,7 @@ const InterviewPage = () => {
         });
       } catch (error) {
         console.error("Failed to connect:", error);
-        alert("Error connecting to room. Please try again.");
+        // alert("Error connecting to room. Please try again.");
       }
     };
 
@@ -122,20 +128,19 @@ const InterviewPage = () => {
       room.on("participantConnected", (participant) => {
         console.log(`Participant "${participant.identity}" connected`);
         
+        if (document.getElementById(`participant-${participant.identity}`)) {return}
+
         const participantDiv = document.createElement("div")
         participantDiv.id = `participant-${participant.identity}`
+        participantDiv.classList.add("participant-video-box")
         // participantDiv.className = 
-
-        participantDiv.classList.add("participant-video-box"); // Assign CSS class
+        
 
         document.getElementById("remote-video").appendChild(participantDiv)
         // document.getElementById("remote-video").classList("participant-video-container")
         
         participant.tracks.forEach((publication) => {
           if (publication.isSubscribed) {
-            // document
-            //   .getElementById("remote-video")
-            //   .appendChild(publication.track.attach());
             participantDiv.appendChild(publication.track.attach())
           }
         });
@@ -148,17 +153,15 @@ const InterviewPage = () => {
         });
       });
   
-      room.on("participantDisconnected", (participant) => {
-        console.log(`Participant "${participant.identity}" disconnected`);
+    
+
+      room.on("participantDisconnected",(participant)=>{
+        console.log(`Participant "${participant.identity}" disconnected`)
         const participantDiv = document.getElementById(`participant-${participant.identity}`)
-        
-        // ✅ Instead of clearing the entire `remote-video`, only remove the leaving participant's tracks
-        participant.tracks.forEach((publication) => {
-          if (publication.track) {
-            publication.track.detach().forEach((element) => element.remove());
-          }
-        });
-      });
+        if (participantDiv){
+          participantDiv.remove()
+        }
+      })
   
       return () => {
         room.disconnect();
@@ -187,30 +190,7 @@ const InterviewPage = () => {
     }
   }, [room]);
 
-  // const toggleVideo = () => {
-  //   setIsVideoOn(prev=>!prev)
-  //   if (room) {
-  //     const videoTrack = room.localParticipant.videoTracks.values().next()
-  //       .value?.track;
-  //     if (videoTrack) {
-  //       if (videoTrack.isEnabled) {
-  //         videoTrack.disable();
-          
-  //       } else {
-  //         videoTrack.enable();
-  //       }
-  //     }
-  //   }
-  // };
 
-  // const toggleAudio = () => {
-  //   if (room) {
-  //     const audioTrack = [...room.localParticipant.audioTracks.values()][0]?.track;
-  //     if (audioTrack) {
-  //       audioTrack.isEnabled ? audioTrack.disable() : audioTrack.enable();
-  //     }
-  //   }
-  // };
 
   const toggleAudio =()=>{
     if(room){
@@ -239,36 +219,78 @@ const InterviewPage = () => {
       }
     }
   };
+
+  const [screenTrack, setScreenTrack] = useState(null);
+  const [isScreenSharing, setIsScreenSharing] = useState(false); // New state for highlighting
+  
+  const shareScreen = async () => {
+    if (!room) {
+      console.error("Not connected to a room");
+      return;
+    }
+  
+    try {
+      if (screenTrack) {
+        // Stop screen sharing
+        screenTrack.stop();
+        room.localParticipant.unpublishTrack(screenTrack);
+        setScreenTrack(null);
+        setIsScreenSharing(false); // Remove highlight
+        console.log("Screen sharing stopped");
+        return;
+      }
+  
+      // Start screen sharing
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const newScreenTrack = await createLocalVideoTrack(stream.getTracks()[0]);
+  
+      room.localParticipant.publishTrack(newScreenTrack);
+      setScreenTrack(newScreenTrack);
+      setIsScreenSharing(true); // Add highlight
+  
+      newScreenTrack.on("stopped", () => {
+        room.localParticipant.unpublishTrack(newScreenTrack);
+        setScreenTrack(null);
+        setIsScreenSharing(false);
+        // toast.
+        showToastInfo("Screen Sharing stopped")
+      });
+  
+      console.log("Screen sharing started");
+    } catch (error) {
+      console.error("Error sharing screen:", error);
+    }
+  };
   
   
-
-  // const leaveRoom = () => {
-  //   if (room) {
-  //     room.localParticipant.tracks.forEach((publication) => {
-  //       if (publication.track) {
-  //         publication.track.stop(); // Stop video/audio tracks
-  //         publication.track.detach(); // Detach from DOM
-  //       }
-  //     });
-
-  //     room.disconnect(); // Disconnect from Twilio Room
-  //     setRoom(null); // Clear state
-  //     console.log("Disconnected and stopped media tracks");
-  //     navigate("/");
-
-  //     // Close the page if allowed
-  //     if (window.opener) {
-  //       window.close();
-  //     }
-  //   }
-  // };
+  const videoContainerStyle = {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: "15px",
+    padding: "10px",
+  };
+  
+  const participantVideoBox = {
+    width: "250px",
+    height: "180px",
+    border: "2px solid #ccc",
+    borderRadius: "10px",
+    overflow: "hidden",
+    boxShadow: "2px 2px 10px rgba(0, 0, 0, 0.1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "black",
+  };
+  
 
   const leaveRoom = () => {
     if (room) {
       room.localParticipant.tracks.forEach((publication) => {
         if (publication.track) {
-          publication.track.stop(); // ✅ Stop the track
-          publication.track.detach().forEach((element) => element.remove()); // ✅ Remove from DOM
+          publication.track.stop(); 
+          publication.track.detach().forEach((element) => element.remove()); 
         }
       });
   
@@ -281,7 +303,9 @@ const InterviewPage = () => {
   
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className={`${isScreenSharing && "fixed z-[9999] border-4 border-[red] border-b-[green] top-0 right-0 left-0 bottom-10"}`}>
+      
+    <div className={`h-screen flex flex-col overflow-hidden ${isScreenSharing && 'border-4 border-b-[red] border-x-[red] border-t-0 fixed top-14 right-0 left-0 bottom-0'}`}>
       {/* Header Icons*/}
       <div className="bg-white border-b flex items-center justify-between px-4 py-2">
         {/* Left section - Timer */}
@@ -367,7 +391,12 @@ const InterviewPage = () => {
                { isMicOn ? <IconButton icon={mdiMicrophone} label="Mic"/> : <IconButton icon={mdiMicrophoneOff} label={"Mic Off"}/> }
             </span>
 
-            <IconButton icon={mdiArrowUpBox} label="share" />
+            <span onClick={shareScreen}>
+  <IconButton icon={isScreenSharing ? mdiVideoOff : mdiArrowUpBox} label={isScreenSharing ? "Stop Share" : "Share Screen"} />
+</span>
+
+
+            {/* <IconButton icon={mdiArrowUpBox} label="share" /> */}
             <span onClick={leaveRoom}>
               <IconButton
                 icon={mdiPhoneHangup}
@@ -379,6 +408,8 @@ const InterviewPage = () => {
         </div>
       </div>
 
+      {/* <div className={`h-screen ${isScreenSharing ? "border-4 border-red-500 shadow-lg" : ""}`}></div> */}
+
       {/*main content video*/}
       <div className="flex-1 bg-[#F3F3F3] relative flex items-center justify-center">
         <div className="w-24 h-24 rounded-full bg-[#F4E5FF] flex items-center justify-center">
@@ -387,23 +418,27 @@ const InterviewPage = () => {
       </div>
 
       {/*user video */}
-      <div className="absolute bottom-4 right-4 w-48 h-48 rounded-lg overflow-hidden shadow-lg">
+      {/* <div className="absolute bottom-4 right-4 w-48 h-48 rounded-lg overflow-hidden shadow-lg"> */}
+      <div className="absolute  bottom-4 right-4 w-48 p-2 h-1/2 rounded-lg overflow-hidden shadow-lg">
 
-        <div className="flex-1 bg-[#F3F3F3] relative flex items-center justify-center">
+        <div className="flex-1 bg-[#F3F3F3] relative h-full flex flex-col items-center justify-center border border-[red]">
 
           <div
             id="local-video"
-            className="rounded-full bg-[#F4E5FF] flex items-center justify-center"
+            className="rounded-full h-full bg-[#F4E5FF] flex flex-col "
+            // className="rounded-full h-full bg-[#F4E5FF] flex flex-col items-center justify-center"
           ></div>
 
           {/* Remote Video */}
           <div
             id="remote-video"
-            className="absolute bottom-4 right-4 rounded-lg overflow-hidden shadow-lg"
+            style={videoContainerStyle}
+            className="absolute bottom-4 right-4 h-full rounded-lg overflow-hidden shadow-lg"
           ></div>
-          {/* <div id="remote-video" className="absolute bottom-4 right-4 w-48 h-48 rounded-lg overflow-hidden shadow-lg"></div> */}
         </div>
       </div>
+    </div>
+    
     </div>
   );
 };

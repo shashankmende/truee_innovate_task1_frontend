@@ -652,16 +652,19 @@ input:-webkit-autofill:focus {
 
 
 /* Style the main remote video container */
-#remote-video {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 15px;
-	padding: 10px;
-	border: 3px solid red;
-	width: 500px;
-	aspect-ratio: 1;
-  }
+// #remote-video {
+// 	display: flex;
+// 	flex-direction: column;
+// 	overflow: auto;
+// 	flex-wrap: wrap;
+// 	justify-content: center;
+// 	gap: 15px;
+// 	padding: 10px;
+// 	border: 3px solid red;
+// 	width: 500px;
+// 	height: 100vh;
+// 	aspect-ratio: 1;
+//   }
   
   /* Style each participant's video box */
   .participant-video-box {
@@ -677,4 +680,10 @@ input:-webkit-autofill:focus {
 	background-color: black;
 	
   }
+
+  .screen-sharing-active {
+	border: 5px solid red; /* Red border around the entire screen */
+	box-shadow: 0px 0px 20px 5px red;
+  }
+  
   
