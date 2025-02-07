@@ -47,6 +47,7 @@
     "reactjs-popup": "^2.0.6",
     "scss": "^0.2.4",
     "twilio-video": "^2.29.0",
+    "uuid": "^11.0.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

@@ -16,6 +16,7 @@ import AssessmentTest from './Pages/Dashboard-Part/Tabs/AssessmentTest-Tab/Asses
 import AssessmentText from './Pages/Dashboard-Part/Tabs/AssessmentTest-Tab/AssessementQuestion.jsx';
 import AssessmentSubmit from './Pages/Dashboard-Part/Tabs/AssessmentTest-Tab/AssessmentSubmit.jsx';
 import VideoCall from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/VideoCall.js";
+import Schedulelater from "./Pages/Dashboard-Part/Tabs/Interviews/Schedulelater.jsx";
 function App() {
   const location = useLocation();
   const shouldRenderNavbar = !['/', '/profile1', '/price', '/profile2', '/profile3', '/profile4', '/assessmenttest', '/assessmenttext', '/assessmentsubmit', '/candidatevc', '/admin', '/nofreelance', '/callback', '/jitsimeetingstart', '/organization'].includes(location.pathname);
@@ -27,7 +28,7 @@ function App() {
         <Routes>
           <Route path="/interview-feedback" element={<FeedbackHome/>}/>
           <Route path="/interview-feedback-preview" element={<Preview/>}/>
-          <Route path="/interview-page" element={<InterviewPage/>}/>
+          <Route path="/interview-page/:id" element={<InterviewPage/>}/>
           <Route path="/interview-feedback-new" element={<Feedback/>}/>
           <Route path="/suggested-questions" element={<SuggestedQuestionsComponent/>}/>
           <Route path="/admin" element={<Admin />} />
@@ -42,8 +43,10 @@ function App() {
           <Route path="/assessmenttest" element={<AssessmentTest />} />
           <Route path="/assessmenttext" element={<AssessmentText />} />
           <Route path="/assessmentsubmit" element={<AssessmentSubmit />} />
-          <Route path="/video-call" element={<VideoCall/>} />
-
+          {/* <Route path="/video-call" element={<VideoCall/>} /> */}
+          {/* <Route path="/UpInterview/meet/:id" element={<VideoCall/>} /> */}
+          <Route path="/UpInterview/meet/:id" element={<VideoCall />} />
+          <Route path='/schedule-later' element={<Schedulelater/>}/>
         </Routes>
       </div>
     </div>
