@@ -16,6 +16,7 @@ import { ReactComponent as IoIosCopy } from '../../../../icons/IoIosCopy.svg';
 import Cookies from 'js-cookie'
 import toast from "react-hot-toast";
 import { IoMdClose } from "react-icons/io";
+// import { use } from "passport";
 
 const ShareAssessment = ({
   linkExpiryDays,
@@ -47,19 +48,6 @@ const ShareAssessment = ({
     };
   }, []);
 
-  const [copyStatus, setCopyStatus] = useState('');
-
-  const handleCopyClick = async () => {
-    if (linkInputRef.current) {
-      try {
-        await navigator.clipboard.writeText(linkInputRef.current.value);
-        setCopyStatus('Copied');
-        setTimeout(() => setCopyStatus(''), 2000);
-      } catch (err) {
-        console.error('Error copying text: ', err);
-      }
-    }
-  };
 
 
   // const userId = localStorage.getItem("userId");
@@ -183,12 +171,12 @@ const ShareAssessment = ({
 
 
   if (!isOpen) return null;
-  // const shareLink = `http://localhost:3000/assessmenttest?assessmentId=${assessmentId}`;
+
 
 
 
   //shashank-[10/01/2025]
-  const handleShareClick = async()=>{
+  const handleShareClick = async () => {
     if (selectedCandidates.length === 0) {
       setErrors({ ...errors, Candidate: "Please select at least one candidate." });
       return;
@@ -197,47 +185,60 @@ const ShareAssessment = ({
     try {
       const reqBody = {
         assessmentId,
-        organizationId:Cookies.get("organizationId"),
-        expiryAt:new Date(new Date().setDate(new Date().getDate()+linkExpiryDays)),
-        status:"scheduled",
-        proctoringEnabled:true,
+        organizationId: Cookies.get("organizationId"),
+        expiryAt: new Date(new Date().setDate(new Date().getDate() + linkExpiryDays)),
+        status: "scheduled",
+        proctoringEnabled: true,
         createdBy: Cookies.get("userId"),
       }
-      const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment/schedule`,reqBody)
+      const scheduleAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/schedule-assessment/schedule`, reqBody)
       const selectedCandidateIds = selectedCandidates.map(candidate => candidate._id);
-      const selectedCandidatesEmails = selectedCandidates.map(candidate=>candidate.Email)
-        
-        if (scheduleAssessmentResponse.data.success){
-          const CandidateAssessmentsList = selectedCandidateIds.map(candidateId=>({
-            scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,
-            candidateId,
-            status:"pending",
-            expiryAt:new Date(new Date().setDate(new Date().getDate()+linkExpiryDays)),
-            isActive:true,
-            assessmentLink:""
-    
-          }))
-          console.log("candidate assessment list",CandidateAssessmentsList)
-          const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment/create`,CandidateAssessmentsList)
-          if (CandidateAssessmentResponse.data.success){
-            const response = await axios.post( `${process.env.REACT_APP_API_URL}/candidate-assessment/send-assessment-link`,
-              {scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,candidateEmails:selectedCandidatesEmails})
-            // alert(`${response.data.message}`)
-            toast.success(`${response.data.message}`)
-          }
-          
-          setIsLoading(false)
+      // const selectedCandidatesEmails = selectedCandidates.map(candidate=>candidate.Email)
+      // const selectedCandidatesEmails = selectedCandidates.flatMap(candidate => candidate.Email); // `Emails` is now an array
+      const candidatesPayload = selectedCandidates.map(candidate => ({
+        candidateId: candidate._id, // Passing candidate ID
+        emails: candidate.Email // Assuming `Email` is an array in candidate object
+      }));
+      console.log("candidatesPayload", candidatesPayload)
 
-          onCloseshare();
+      if (scheduleAssessmentResponse.data.success) {
+        const CandidateAssessmentsList = selectedCandidateIds.map(candidateId => ({
+          scheduledAssessmentId: scheduleAssessmentResponse.data.assessment._id,
+          candidateId,
+          status: "pending",
+          expiryAt: new Date(new Date().setDate(new Date().getDate() + linkExpiryDays)),
+          isActive: true,
+          assessmentLink: ""
 
+        }))
+        console.log("candidate assessment list", CandidateAssessmentsList)
+        const CandidateAssessmentResponse = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment/create`, CandidateAssessmentsList)
+        // calling send email
+        if (CandidateAssessmentResponse.data.success) {
+
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment/emailCommon/assessmentSendEmail`, {
+            
+            candidates: {scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,  candidatesPayload}, 
+            category: "assessment",
+            userId: Cookies.get("userId"),
+            organizationId: Cookies.get("organizationId"),
+          });
+          // alert(`${response.data.message}`)
+          toast.success(`${response.data.message}`)
         }
-        
-      
+
+        setIsLoading(false)
+
+        onCloseshare();
+
+      }
+
+
       toast.success(`Assessment Scheduled`)
     } catch (error) {
-      console.error("error in sharing assessment from frontend in Share Assessment page",error)
+      console.error("error in sharing assessment from frontend in Share Assessment page", error)
     }
-    finally{
+    finally {
       setIsLoading(false)
     }
   }
@@ -270,7 +271,7 @@ const ShareAssessment = ({
           )}
           {showMainContent ? (
             <>
-                <div className="fixed top-0 w-full bg-custom-blue text-white border-b z-50">
+              <div className="fixed top-0 w-full bg-custom-blue text-white border-b z-50">
                 <div className="mx-8 my-3">
                   <p className="text-xl flex justify-between items-center">
                     <span className="font-semibold cursor-pointer">
@@ -283,14 +284,14 @@ const ShareAssessment = ({
                       onClick={onCloseshare}
                     >
                       {/* <MdOutlineCancel style={{color:'white'}} className="text-2xl text-white" /> */}
-                      <IoMdClose  className="text-2xl text-white" />
+                      <IoMdClose className="text-2xl text-white" />
                     </button>
                   </p>
                 </div>
               </div>
 
               <div className="mt-20 mx-8">
-                {/* Share the link */}        
+                {/* Share the link */}
 
                 {/* add candidate */}
                 <div className="flex gap-5 mb-5 relative" ref={candidateRef}>
@@ -309,7 +310,7 @@ const ShareAssessment = ({
                           key={index}
                           className="bg-slate-200 rounded-lg flex px-1 py-1 mr-1 mb-1 text-xs"
                         >
-                         {candidate.LastName}
+                          {candidate.LastName}
                           <button
                             onClick={() => handleCandidateRemove(candidate._id)}
                             className="ml-1 bg-slate-300 rounded px-2"
@@ -341,12 +342,12 @@ const ShareAssessment = ({
                           X
                         </button>
                       )}
-                    <div className="absolute right-10">
-                    <MdArrowDropDown
-                        onClick={handleDropdownToggle}
-                        className="absolute top-0 text-gray-500 text-lg mt-1 cursor-pointer"
-                      />
-                    </div>
+                      <div className="absolute right-10">
+                        <MdArrowDropDown
+                          onClick={handleDropdownToggle}
+                          className="absolute top-0 text-gray-500 text-lg mt-1 cursor-pointer"
+                        />
+                      </div>
                     </div>
 
                     {/* Dropdown */}
@@ -356,7 +357,7 @@ const ShareAssessment = ({
                         <ul className="">
                           {filteredCandidates.length > 0 ? (
                             filteredCandidates.slice(0, 4).map((candidate) => (
-                            // filteredCandidates.map((candidate) => (
+                              // filteredCandidates.map((candidate) => (
                               <li
                                 key={candidate._id}
                                 className="bg-white border-b cursor-pointer p-1 hover:bg-gray-100"
@@ -365,7 +366,7 @@ const ShareAssessment = ({
                                 }
                               >
                                 {candidate.LastName}
-                                
+
                               </li>
                             ))
                           ) : (

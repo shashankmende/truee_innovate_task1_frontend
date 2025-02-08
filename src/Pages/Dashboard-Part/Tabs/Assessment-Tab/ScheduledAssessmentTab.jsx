@@ -770,8 +770,8 @@ const ScheduledAssessmentTab = ({
       const selectedCandidateIds = selectedCandidates.map(
         (candidate) => candidate._id
       );
-      const selectedCandidatesEmails = selectedCandidates.map(
-        (candidate) => candidate.Email
+      const candidatesPayload = selectedCandidates.map(
+        (candidate) => ({candidateId:candidate._id,emails:candidate.Email})
       );
 
       if (scheduleAssessmentResponse.data.success) {
@@ -793,13 +793,27 @@ const ScheduledAssessmentTab = ({
           `${process.env.REACT_APP_API_URL}/candidate-assessment/create`,
           CandidateAssessmentsList
         );
+        // if (CandidateAssessmentResponse.data.success) {
+        //   const response = await axios.post(
+        //     `${process.env.REACT_APP_API_URL}/candidate-assessment/send-assessment-link`,
+        //     {
+        //       scheduledAssessmentId:
+        //         scheduleAssessmentResponse.data.assessment._id,
+        //       candidateEmails: candidatesPayload,
+        //     }
+        //   );
+        //   // alert(`${response.data.message}`)
+        //   toast.success(`${response.data.message}`);
+        // }
         if (CandidateAssessmentResponse.data.success) {
           const response = await axios.post(
-            `${process.env.REACT_APP_API_URL}/candidate-assessment/send-assessment-link`,
+            `${process.env.REACT_APP_API_URL}/candidate-assessment/emailCommon/assessmentSendEmail`,
             {
-              scheduledAssessmentId:
-                scheduleAssessmentResponse.data.assessment._id,
-              candidateEmails: selectedCandidatesEmails,
+              candidates:{scheduledAssessmentId:scheduleAssessmentResponse.data.assessment._id,candidatesPayload},                              
+              category:"assessment",              
+              userId: Cookies.get("userId"),
+              organizationId: Cookies.get("organizationId"),
+			  isResendOTP:false,
             }
           );
           // alert(`${response.data.message}`)
@@ -827,10 +841,24 @@ const ScheduledAssessmentTab = ({
   };
 
   const onClickShareScheduledAssessment = async (id) => {
+	// alert("share is clicked")
     try {
       setIsScheduledAssessmentSharing(true);
+      // const response = await axios.post(
+      //   `${process.env.REACT_APP_API_URL}/schedule-assessment/resend-link-otp/${id}`
+      // );
+	  console.log("candidate assessment data",candidateAssessmentData)
+	  const temp = candidateAssessmentData[id]
+	  console.log("temp",temp)
+	  const candidatesPayload = temp.map(item=>({candidateId: item.candidateId._id,emails:item.candidateId.Email,assessmentLink:item.assessmentLink}))
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/schedule-assessment/resend-link-otp/${id}`
+        `${process.env.REACT_APP_API_URL}/candidate-assessment/emailCommon/assessmentSendEmail`,{
+          candidates:{scheduledAssessmentId:id,candidatesPayload},
+          category:"shareScheduleAssessment",
+		  isResendOTP:false
+
+
+        }
       );
       if (response.data.success) {
         toast.success(`${response.data.message}`);
@@ -846,12 +874,23 @@ const ScheduledAssessmentTab = ({
 
   const onClickShareScheduledAssessmentIndividualCandidate = async (
     said,
-    caid
+    cid
   ) => {
     try {
       setIsCandidateSharing(true);
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/candidate-assessment/candidate-link/${said}/${caid}`
+    //   const response = await axios.post(
+    //     `${process.env.REACT_APP_API_URL}/candidate-assessment/candidate-link/${said}/${caid}`
+    //   );
+	const temp = candidateAssessmentData[said]
+	  console.log("temp",temp)
+	  const candidatesPayload = temp.filter(item=>item.candidateId._id===cid).map(item=>({candidateId: item.candidateId._id,emails:item.candidateId.Email,assessmentLink: item.assessmentLink}))
+	  console.log("payload",candidatesPayload)
+	const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/candidate-assessment/emailCommon/assessmentSendEmail`,{
+			candidates:{scheduledAssessmentId:said,candidatesPayload},
+			category:"shareScheduleAssessment",
+			isResendOTP:false
+		}
       );
 
       if (response.data.success) {

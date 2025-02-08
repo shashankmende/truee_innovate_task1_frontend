@@ -34,7 +34,7 @@ const AssessmentTest = () => {
 
   console.log("location",location)
   const [candidate, setCandidate] = useState(null);
-
+console.log("candidate data",candidate)
   const [reSending,SetReSending]=useState(false)
 
   
@@ -351,13 +351,21 @@ const AssessmentTest = () => {
     console.log("Resend OTP clicked");
     try {
       SetReSending(true)
-    const response =  await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment/resend-otp`,{
-        candidateId,
-        scheduledAssessmentId
+      const candidatesPayload = [{
+        candidateId:candidate._id,emails:candidate.Email
+      }]
+    // const response =  await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment/resend-otp`,{
+    const response =  await axios.post(`${process.env.REACT_APP_API_URL}/candidate-assessment/emailCommon/assessmentSendEmail`,{
+
+        candidates:{scheduledAssessmentId,candidatesPayload},
+        isResendOTP:true,
+        category:"shareScheduleAssessment"
+        
       })
       
       if(response.data.success){
         SetReSending(false)
+        toast.success(response.data.message)
       }
       
     } catch (error) {

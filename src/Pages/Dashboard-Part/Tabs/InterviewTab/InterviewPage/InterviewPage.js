@@ -426,7 +426,7 @@ const InterviewPage = () => {
           <div
             id="local-video"
             className="rounded-full h-full bg-[#F4E5FF] flex flex-col "
-            // className="rounded-full h-full bg-[#F4E5FF] flex flex-col items-center justify-center"
+
           ></div>
 
           {/* Remote Video */}
