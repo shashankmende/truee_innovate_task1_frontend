@@ -20,6 +20,7 @@ import VideoCall from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/Vi
 import Schedulelater from "./Pages/Dashboard-Part/Tabs/Interviews/Schedulelater.jsx";
 import Chat from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/Chat.js";
 import Login from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/login.js";
+import JoinTeam from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/joinTeam.js";
 
 
 function App() {
@@ -33,7 +34,7 @@ function App() {
         <Routes>
           <Route path="/interview-feedback" element={<FeedbackHome/>}/>
           <Route path="/interview-feedback-preview" element={<Preview/>}/>
-          <Route path="/interview-page/:id" element={<InterviewPage/>}/>
+          <Route path="/interview-page" element={<InterviewPage/>}/>
           <Route path="/interview-feedback-new" element={<Feedback/>}/>
           <Route path="/suggested-questions" element={<SuggestedQuestionsComponent/>}/>
           <Route path="/admin" element={<Admin />} />
@@ -54,6 +55,7 @@ function App() {
           <Route path='/schedule-later' element={<Schedulelater/>}/>
           <Route path="/Chat" element={<Chat/>}/>
           <Route path="/login" element={<Login/>}/>
+          <Route path="/join-team" element={<JoinTeam/>}/>
         </Routes>
       </div>
     </div>

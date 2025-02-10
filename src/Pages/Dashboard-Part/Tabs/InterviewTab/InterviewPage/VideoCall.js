@@ -1,55 +1,97 @@
-
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
-import Peer from "simple-peer";
+import Video from "twilio-video";
 
-const socket = io("http://localhost:5001");
+const VideoCall = ({ roomName, userName, token }) => {
+    const [room, setRoom] = useState(null);
+    const localVideoRef = useRef(null);
+    const remoteVideoRef = useRef(null);
 
-const VideoCall = ({ meetingId }) => {
-  const userVideo = useRef();
-  const peerVideo = useRef();
-  const [stream, setStream] = useState(null);
+    useEffect(() => {
+        if (!token || !roomName) return;
 
-  useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
-      setStream(stream);
-      userVideo.current.srcObject = stream;
-      socket.emit("join-meeting", meetingId);
-    });
+        const joinRoom = async () => {
+            try {
+                // Connect to Twilio Video Room
+                const newRoom = await Video.connect(token, {
+                    name: roomName,
+                    audio: true,
+                    video: { width: 640 },
+                });
 
-    socket.on("user-joined", (id) => {
-      const peer = new Peer({ initiator: true, trickle: false, stream });
-      peer.on("signal", (data) => socket.emit("signal", { signal: data, to: id }));
-      peer.on("stream", (peerStream) => (peerVideo.current.srcObject = peerStream));
-    });
-  }, []);
+                setRoom(newRoom);
 
-  return (
-    <div>
-      <video ref={userVideo} autoPlay muted />
-      <video ref={peerVideo} autoPlay />
-    </div>
-  );
+                // Attach Local Video
+                newRoom.localParticipant.tracks.forEach(publication => {
+                    if (publication.track) {
+                        localVideoRef.current.appendChild(publication.track.attach());
+                    }
+                });
+
+                // Handle Remote Participants
+                const handleParticipant = (participant) => {
+                    console.log(`Participant connected: ${participant.identity}`);
+
+                    participant.tracks.forEach(publication => {
+                        if (publication.isSubscribed && remoteVideoRef.current) {
+                            remoteVideoRef.current.appendChild(publication.track.attach());
+                        }
+                    });
+
+                    participant.on("trackSubscribed", (track) => {
+                        if (remoteVideoRef.current) {
+                            remoteVideoRef.current.appendChild(track.attach());
+                        }
+                    });
+
+                    participant.on("trackUnsubscribed", (track) => {
+                        track.detach().forEach(element => element.remove());
+                    });
+                };
+
+                newRoom.participants.forEach(handleParticipant);
+                newRoom.on("participantConnected", handleParticipant);
+
+                // ✅ Handle when a participant leaves
+                newRoom.on("participantDisconnected", (participant) => {
+                    console.log(`Participant disconnected: ${participant.identity}`);
+                    participant.tracks.forEach((publication) => {
+                        if (publication.track) {
+                            publication.track.detach().forEach(el => el.remove());
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error joining room:", error);
+            }
+        };
+
+        joinRoom();
+
+        return () => {
+            if (room) {
+                room.disconnect();
+                setRoom(null);
+            }
+        };
+    }, [roomName, token]);
+
+    return (
+        <div>
+            <h2>Video Call: {roomName}</h2>
+            <div>
+                <h3>My Video</h3>
+                <div ref={localVideoRef} />
+            </div>
+            <div>
+                <h3>Remote Video</h3>
+                <div ref={remoteVideoRef} />
+            </div>
+        </div>
+    );
 };
 
 export default VideoCall;
-
-
-
-
-
-
-
 
 
 
