@@ -16,7 +16,12 @@ import AssessmentTest from './Pages/Dashboard-Part/Tabs/AssessmentTest-Tab/Asses
 import AssessmentText from './Pages/Dashboard-Part/Tabs/AssessmentTest-Tab/AssessementQuestion.jsx';
 import AssessmentSubmit from './Pages/Dashboard-Part/Tabs/AssessmentTest-Tab/AssessmentSubmit.jsx';
 import VideoCall from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/VideoCall.js";
+
 import Schedulelater from "./Pages/Dashboard-Part/Tabs/Interviews/Schedulelater.jsx";
+import Chat from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/Chat.js";
+import Login from "./Pages/Dashboard-Part/Tabs/InterviewTab/InterviewPage/login.js";
+
+
 function App() {
   const location = useLocation();
   const shouldRenderNavbar = !['/', '/profile1', '/price', '/profile2', '/profile3', '/profile4', '/assessmenttest', '/assessmenttext', '/assessmentsubmit', '/candidatevc', '/admin', '/nofreelance', '/callback', '/jitsimeetingstart', '/organization'].includes(location.pathname);
@@ -47,6 +52,8 @@ function App() {
           {/* <Route path="/UpInterview/meet/:id" element={<VideoCall/>} /> */}
           <Route path="/UpInterview/meet/:id" element={<VideoCall />} />
           <Route path='/schedule-later' element={<Schedulelater/>}/>
+          <Route path="/Chat" element={<Chat/>}/>
+          <Route path="/login" element={<Login/>}/>
         </Routes>
       </div>
     </div>
