@@ -20,6 +20,9 @@ import { useEffect, useState,useRef } from 'react';
 import QuestionBank from '../../QuestionBank-Tab/QuestionBank';
 import { useLocation, useNavigate } from 'react-router-dom';
 import VideoCall from './VideoCall';
+import io from "socket.io-client";
+
+import axios from "axios";
 import Video from "twilio-video";
  
 // eslint-disable-next-line react/prop-types
@@ -29,6 +32,8 @@ const IconButton = ({ icon, label, color = "text-gray-700" }) => (
     <span className="text-xs">{label}</span>  
   </button>
 );
+
+const socket = io("http://localhost:5000", { transports: ["websocket"] }); // ✅ Create a single socket connection
  
 const InterviewPage = () => {
   const {popupVisibility,setPopupVisibility,feedbackCloseFlag,setFeedbackCloseFlag,page,setPage}=useCustomContext()
@@ -41,6 +46,16 @@ const InterviewPage = () => {
    const [room, setRoom] = useState(null);
       const localVideoRef = useRef(null);
       const remoteVideoRef = useRef(null);
+      const [isChatOpen,setIsChatOpen] = useState(false)
+      const [messages, setMessages] = useState([]);
+const [messageInput, setMessageInput] = useState("");
+const [dataTrack, setDataTrack] = useState(null);
+const [participants,setParticipants] = useState([])
+const [remoteParticipants, setRemoteParticipants] = useState([]);
+
+const [localUser, setLocalUser] = useState(null);
+
+
     
   const navigate = useNavigate()
       const [isVideoEnabled, setIsVideoEnabled] = useState(true);
@@ -62,53 +77,84 @@ const InterviewPage = () => {
 
     const joinRoom = async () => {
         try {
-            // Connect to Twilio Video Room
+            // ✅ Connect to Twilio Video Room
             const newRoom = await Video.connect(token, {
                 name: roomName,
                 audio: true,
                 video: true,
-                // video: { width: 640 },
             });
 
             setRoom(newRoom);
             console.log("Room joined:", newRoom);
+            setLocalUser(newRoom.localParticipant.identity);
 
-            // Attach Local Video
-            newRoom.localParticipant.tracks.forEach(publication => {
+            // ✅ Create and Publish a Data Track for Chat
+            const dataTrack = new Video.LocalDataTrack();
+            newRoom.localParticipant.publishTrack(dataTrack);
+            setDataTrack(dataTrack); // Store for sending messages
+
+            // ✅ Attach Local Video
+            newRoom.localParticipant.tracks.forEach((publication) => {
                 if (publication.track && localVideoRef.current) {
+                    localVideoRef.current.innerHTML = ""; // Clear existing content
                     localVideoRef.current.appendChild(publication.track.attach());
                 }
             });
 
-            // Handle Remote Participants
+            // ✅ Handle Remote Participants
             const handleParticipant = (participant) => {
                 console.log(`Participant connected: ${participant.identity}`);
 
+                // Store participant in state
+                setRemoteParticipants((prev) => [
+                    ...prev,
+                    { id: participant.sid, identity: participant.identity, videoTrack: null }
+                ]);
+
                 // Attach existing published tracks
-                participant.tracks.forEach(publication => {
-                    if (publication.track && remoteVideoRef.current) {
-                        remoteVideoRef.current.appendChild(publication.track.attach());
+                participant.tracks.forEach((publication) => {
+                    if (publication.track && publication.track.kind === "video") {
+                        setRemoteParticipants((prev) =>
+                            prev.map((p) =>
+                                p.id === participant.sid ? { ...p, videoTrack: publication.track } : p
+                            )
+                        );
                     }
                 });
 
-                // Handle new track subscriptions dynamically
+                // ✅ Handle Incoming Chat Messages
                 participant.on("trackSubscribed", (track) => {
-                    if (track && remoteVideoRef.current) {
-                        remoteVideoRef.current.appendChild(track.attach());
+                    if (track.kind === "data") {
+                        track.on("message", (message) => {
+                            console.log(`Message received from ${participant.identity}: ${message}`);
+                            setMessages((prev) => [...prev, { sender: participant.identity, text: message }]);
+                        });
+                    } else if (track.kind === "video") {
+                        setRemoteParticipants((prev) =>
+                            prev.map((p) =>
+                                p.id === participant.sid ? { ...p, videoTrack: track } : p
+                            )
+                        );
                     }
                 });
 
+                // ✅ Handle Unsubscribed Tracks (Remove from UI)
                 participant.on("trackUnsubscribed", (track) => {
-                    if (track) {
-                        track.detach().forEach(element => element.remove());
+                    if (track.kind === "video") {
+                        setRemoteParticipants((prev) =>
+                            prev.map((p) =>
+                                p.id === participant.sid ? { ...p, videoTrack: null } : p
+                            )
+                        );
                     }
                 });
 
-                // ✅ Handle Screen Sharing Properly
-                participant.tracks.forEach(publication => {
-                    if (publication.track && publication.track.kind === 'video' && publication.track.name === 'screen') {
+                // ✅ Handle Screen Sharing
+                participant.tracks.forEach((publication) => {
+                    if (publication.track && publication.track.kind === "video" && publication.track.name === "screen") {
                         console.log(`${participant.identity} is sharing their screen`);
                         if (screenVideoRef.current) {
+                            screenVideoRef.current.innerHTML = ""; // Clear old content
                             screenVideoRef.current.appendChild(publication.track.attach());
                         }
                     }
@@ -118,6 +164,7 @@ const InterviewPage = () => {
                     if (track.kind === "video" && track.name === "screen") {
                         console.log(`${participant.identity} started sharing their screen`);
                         if (screenVideoRef.current) {
+                            screenVideoRef.current.innerHTML = "";
                             screenVideoRef.current.appendChild(track.attach());
                         }
                     }
@@ -133,13 +180,17 @@ const InterviewPage = () => {
 
             // Attach existing participants
             newRoom.participants.forEach(handleParticipant);
-            
+
             // Listen for future participants
             newRoom.on("participantConnected", handleParticipant);
 
-            // Handle participant disconnection
+            // ✅ Handle participant disconnection
             newRoom.on("participantDisconnected", (participant) => {
                 console.log(`Participant disconnected: ${participant.identity}`);
+
+                // Remove participant from state
+                setRemoteParticipants((prev) => prev.filter((p) => p.id !== participant.sid));
+
                 participant.tracks.forEach((publication) => {
                     if (publication.track) {
                         publication.track.detach().forEach(el => el.remove());
@@ -158,9 +209,11 @@ const InterviewPage = () => {
         if (room) {
             room.disconnect();
             setRoom(null);
+            setRemoteParticipants([]); // Clear participants on disconnect
         }
     };
 }, [roomName, token]);
+
 
       const toggleVideo = () => {
         if (!room) return;
@@ -251,6 +304,70 @@ const stopScreenShare = () => {
   setIsScreenSharing(false);
 };
 
+
+
+// const sendMessage = async () => {
+//     if (!messageInput.trim()) return;
+
+//     const newMessage = { teamId: roomName, sender: JSON.parse(localStorage.getItem("user")).id, text: messageInput };
+
+//     try {
+//         const response = await axios.post("http://localhost:5000/message/send", newMessage);
+//         if (response.status === 201) {
+//             setMessages([...messages, response.data.data]); // Update UI with saved message
+//             setMessageInput(""); // Clear input
+//         }
+//     } catch (error) {
+//         console.error("Error sending message:", error);
+//     }
+// };
+
+// useEffect(() => {
+//   const fetchMessages = async () => {
+//       try {
+//           const response = await axios.get(`${process.env.REACT_APP_API_URL}/message/messages/${roomName}`);
+//           setMessages(response.data); // Update chat UI
+//       } catch (error) {
+//           console.error("Error fetching messages:", error);
+//       }
+//   };
+
+//   fetchMessages();
+// }, [isChatOpen]);
+
+useEffect(() => {
+  // ✅ Fetch chat history on mount
+  const fetchMessages = async () => {
+      try {
+          const response = await axios.get("http://localhost:5000/message/messages/your-team-id");
+          setMessages(response.data);
+      } catch (error) {
+          console.error("Error fetching messages:", error);
+      }
+  };
+  fetchMessages();
+
+  // ✅ Listen for real-time messages
+  socket.on("receiveMessage", (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+  });
+
+  return () => {
+      socket.off("receiveMessage"); // ✅ Cleanup to prevent duplicate listeners
+  };
+}, []);
+
+// ✅ Send Message via WebSocket
+const sendMessage = () => {
+  if (messageInput.trim()) {
+      const newMessage = { teamId: "your-team-id", sender: "your-user-id", text: messageInput };
+
+      socket.emit("send", newMessage); // ✅ Emit message to server
+
+      setMessages((prevMessages) => [...prevMessages, { ...newMessage, sender: "You" }]);
+      setMessageInput(""); // Clear input
+  }
+};
       
 
 
@@ -287,7 +404,10 @@ const stopScreenShare = () => {
           </Popup>
           <IconButton icon={mdiNoteTextOutline} label="Notes" />
           <IconButton icon={mdiCodeTags} label="Code Editor" />
+          <span onClick={()=>setIsChatOpen(!isChatOpen)}>
+
           <IconButton icon={mdiMessageOutline} label="Chat" />
+          </span>
           <IconButton icon={mdiAccountOutline} label="People" />
         </div>
  
@@ -327,58 +447,113 @@ const stopScreenShare = () => {
     </div>
      
       
-      {/* <div className={` ${isScreenSharing ? "grid grid-cols-[80%_20%] p-4 h-[100vh] gap-4": "flex gap-4 flex-1"} bg-[#F3F3F3] relative `}>
-    { isScreenSharing && (
-        <div id="screen-share-container" className="border-black outline-dashed rounded-md w-full h-full flex items-center justify-center">
-            <h4 className="absolute top-2 left-2 bg-gray-800 text-white px-3 py-1 rounded">Screen Sharing</h4>
-            <video ref={screenVideoRef} autoPlay playsInline className="w-full h-full object-cover border-4 rounded-lg" />
-        </div>
-    )}
-    
-    
-    <div className="flex flex-wrap gap-4 w-full p-4 ">
-    <div className="grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <div ref={remoteVideoRef} className="border border-white rounded-md w-48 aspect-square"></div>
+    <>
+  {/* ✅ Local User Video (Pinned Bottom-Right) */}
+  <div 
+    ref={localVideoRef} 
+    className={`absolute bottom-4 right-4 border w-48 aspect-square bg-black 
+      ${localUser ? "border-green-500 shadow-md" : "border-white"}
+    `}
+  >
+    <p className="bg-gray-800 text-white px-2 py-1 rounded-md text-sm">You</p>
+  </div>
+
+  {/* ✅ When Chat is Open (Chat Takes 25% Space) */}
+  {isChatOpen ? (
+    <div className="grid grid-cols-[75%_25%] gap-4 h-[100vh] p-4 bg-gray-300 border border-gray-400 rounded-md">
+      {/* Video Participants Section */}
+      <div className="flex flex-wrap  items-start gap-4 w-full h-full border border-gray-400 rounded-md">
+        {remoteParticipants.map((p) => (
+          <div key={p.id} className="border border-white rounded-md w-48 aspect-square bg-black relative">
+            <p className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded-md text-sm">{p.identity}</p>
+            <div ref={(el) => {
+              if (el && p.videoTrack) {
+                el.innerHTML = ""; // Clear previous
+                el.appendChild(p.videoTrack.attach());
+              }
+            }} className="w-full h-full flex items-center justify-center" />
+          </div>
+        ))}
+      </div>
+
+      {/* Chat Section (Takes 25% Width) */}
+      {/* <div className="w-full bg-gray-300 p-4 h-full rounded-md border border-gray-400">Chat Feature</div> */}
+      <div className="w-full bg-gray-300 p-4 h-full rounded-md border border-gray-400 flex flex-col">
+    <h2 className="text-lg font-bold mb-2 text-gray-800">Chat</h2>
+
+    {/* ✅ Chat Messages */}
+    <div className="flex-1 overflow-y-auto bg-gray-100 p-2 rounded-md">
+        {messages.map((msg, index) => (
+            <div key={index} className={`p-2 my-1 rounded-md ${msg.sender === "your-user-id" ? "bg-blue-500 text-white self-end" : "bg-gray-300 text-black self-start"}`}>
+                <strong>{msg.sender?.name}:</strong> {msg.text}
+            </div>
+        ))}
     </div>
 
-    
-    <div className="border border-white rounded-md w-48 aspect-square" ref={localVideoRef}></div>
-</div>
-
-</div> */}
-
-      
-      {/* <div className="absolute bottom-4 right-4 w-48 aspect-square  rounded-lg overflow-hidden shadow-lg">
-    
-      <div ref={localVideoRef}></div>
-    </div> */}
-    <div
-    className={`w-full h-full grid ${
-        isScreenSharing ? "grid-cols-[80%_20%]" : "grid-cols-1"
-    } gap-4 bg-gray-900 p-4`}
->
-    {/*  Screen Sharing Feed (80% width when active) */}
-    {isScreenSharing && (
-        <div id="screen-share-container" className="w-full h-full flex items-center justify-center border border-gray-500 rounded-lg">
-            <h4 className="absolute top-2 left-2 bg-gray-800 text-white px-3 py-1 rounded">Screen Sharing</h4>
-            <video ref={screenVideoRef} autoPlay playsInline className="w-full h-full object-cover rounded-lg"></video>
-        </div>
-    )}
-
-    {/*  Participant Videos (20% width when screen sharing, 50% otherwise) */}
-    <div
-        className={`grid ${
-            isScreenSharing ? "grid-cols-1 overflow-auto h-[80%]" : "grid-cols-4 md:grid-cols-3 lg:grid-cols-4 "
-            // isScreenSharing ? "grid-cols-1 overflow-auto h-[80%]" : "flex bg-[red]"
-        } gap-4`}
-    >
-        {/* Local User Video */}
-        <div ref={localVideoRef} className="border border-white rounded-md w-full aspect-square bg-black"></div>
-
-        {/* Remote Participants */}
-        <div ref={remoteVideoRef} className="border border-white rounded-md w-full aspect-square bg-black"></div>
+    {/* ✅ Input Field */}
+    <div className="mt-2 flex">
+        <input
+            type="text"
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
+            className="flex-1 p-2 rounded-l-md bg-white text-black border border-gray-400"
+            placeholder="Type a message..."
+        />
+        <button onClick={sendMessage} className="bg-blue-500 p-2 rounded-r-md text-white">
+            Send
+        </button>
     </div>
 </div>
+
+    </div>
+  ) : isScreenSharing ? (
+    // ✅ When Screen Sharing is Active (Screen Takes 75%, Participants in 25%)
+    <div className="grid grid-cols-[75%_25%] gap-4 h-[100vh] p-4 bg-gray-300 border border-gray-400 rounded-md">
+      {/* 📌 Screen Share Area (75% width) */}
+      <div className="border border-white w-full h-full flex items-center justify-center rounded-md bg-black">
+        <h4 className="absolute top-2 left-2 bg-gray-800 text-white px-3 py-1 rounded-md">Screen Sharing</h4>
+        <video ref={screenVideoRef} autoPlay playsInline className="w-full h-full object-cover rounded-md" />
+      </div>
+
+      {/*  Participants Column (25% width) */}
+      <div className="border border-white w-full h-full p-4 rounded-md overflow-auto">
+        <h2 className="text-lg font-bold mb-2 text-gray-800">Participants</h2>
+        <div className="flex flex-col gap-4">
+          {remoteParticipants.map((p) => (
+            <div key={p.id} className="border border-white rounded-md w-48 aspect-square bg-black relative">
+              <p className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded-md text-sm">{p.identity}</p>
+              <div ref={(el) => {
+                if (el && p.videoTrack) {
+                  el.innerHTML = ""; // Clear previous content
+                  el.appendChild(p.videoTrack.attach());
+                }
+              }} className="w-full h-full flex items-center justify-center" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  ) : (
+    // ✅ Default View (All Participants in a Grid)
+    <div className="flex flex-wrap  items-start gap-4 p-4 h-[100vh] bg-gray-300 border border-gray-400 rounded-md">
+      {remoteParticipants.map((p) => (
+        <div key={p.id} className="border border-white rounded-md w-48 aspect-square bg-black relative">
+          <p className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded-md text-sm">{p.identity}</p>
+          <div ref={(el) => {
+            if (el && p.videoTrack) {
+              el.innerHTML = ""; // Clear previous content
+              el.appendChild(p.videoTrack.attach());
+            }
+          }} className="w-full h-full flex items-center justify-center" />
+        </div>
+      ))}
+    </div>
+  )}
+</>
+
+
+
+
 
 
     </div>
