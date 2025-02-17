@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-// import { usePermify } from '@permify/react-role';
+import { usePermify } from '@permify/react-role';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import logo from "../../Pages/Dashboard-Part/Images/upinterviewLogo.png";
@@ -11,7 +11,7 @@ const Admin = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  // const { can } = usePermify();
+  const { can } = usePermify();
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -52,9 +52,9 @@ const Admin = () => {
           <div className="mt-5">
             <div className="flex justify-center gap-52 mb-8">
               <button className="border-2 border-gray-400 font-medium rounded-md px-10 py-2">User</button>
-              {/* {can && can('view') && ( */}
+              {can && can('view') && (
                 <button className="border-2 border-gray-400 font-medium rounded-md px-10 py-2">Admin</button>
-              {/* )} */}
+              )}
             </div>
             <div className="max-w-md mx-auto">
               <p className="text-2xl font-semibold mb-7 text-center">Welcome Back</p>

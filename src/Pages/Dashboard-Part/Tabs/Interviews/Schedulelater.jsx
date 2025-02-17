@@ -8,10 +8,9 @@ import { ReactComponent as IoIosAddCircle } from "../../../../icons/IoIosAddCirc
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import MyQuestionListMain from "../QuestionBank-Tab/MyQuestionsList.jsx";
 import SuggesstedQuestions from "../QuestionBank-Tab/SuggesstedQuestionsMain.jsx";
-// import InternalInterviews from "./Interviewers.jsx";
-// import OutsourceOption from "./OutsourceOption.jsx";
+import InternalInterviews from "./Interviewers.jsx";
+import OutsourceOption from "./OutsourceOption.jsx";
 import { useCustomContext } from "../../../../Context/Contextfetch.js";
-// import { validateInterviewData } from '../../../../utils/interviewValidation.js';
 import {v4 as uuidv4} from 'uuid'
 
 const getTodayDate = () => {
@@ -43,16 +42,29 @@ const calculateEndTime = (startTime, duration) => {
     return `${endHours}:${endMinutes.toString().padStart(2, '0')} ${period}`;
 };
 
-const Schedulelater = ({ type, onClose }) => {
+const Schedulelater = ({ type, onClose,
+    SelectedInterviewData
+}) => {
+
+    // console.log("SelectedInterviewData", SelectedInterviewData)
     const {
         candidateData
     } = useCustomContext();
+    console.log("candidateData",candidateData)
+    
     const candidateRef = useRef(null);
+
     const [showDropdown, setShowDropdown] = useState(false);
     const [showDropdownPosition, setShowDropdownPosition] = useState(false);
     const [selectedCandidate, setSelectedCandidate] = useState("");
+    // const [selectedCandidate, setSelectedCandidate] = useState("Maxwell");
     const [selectedCandidateId, setSelectedCandidateId] = useState("");
+    // const [selectedCandidateId, setSelectedCandidateId] = useState("67b1493528a91881f6b91708");
+    const [selectedPositionId, setSelectedPositionId] = useState("");
+    // const [selectedPositionId, setSelectedPositionId] = useState("67933406a5b8711f0e4ea275");
     const [selectedPosition, setSelectedPosition] = useState("");
+    // const [selectedPosition, setSelectedPosition] = useState("Salesforce");
+
     const [errors, setErrors] = useState({});
     const [showOutsourcePopup, setShowOutsourcePopup] = useState(false);
     const [unsavedChanges, setUnsavedChanges] = useState(false);
@@ -93,7 +105,14 @@ const Schedulelater = ({ type, onClose }) => {
         interviewData.rounds.map(() => ({ questions: [] }))
     );
 
+    // console.log('interviewQuestionsList', interviewQuestionsList)
+
     const [rounds, setRounds] = useState([]);
+
+    // console.log('rounds', rounds)
+
+    const [selectedInterviewerIds, setSelectedInterviewerIds] = useState([]);
+    console.log('selectedInterviewerIds', selectedInterviewerIds)
 
     const handleDateClick = (index) => {
         setCurrentRoundIndex(index);
@@ -118,11 +137,159 @@ const Schedulelater = ({ type, onClose }) => {
 
     const interviewIdRef = useRef(null);
 
+    const [matchedRound, setMatchedRound] = useState(null);
+
+    // <--------------- for edit  ----------------->
+    // useEffect(() => {
+    //     if (type === "EditInternalInterviewProfileDetails" && SelectedInterviewData) {
+    //         setSelectedCandidate(SelectedInterviewData.Candidate || "");
+    //         setSelectedCandidateId(SelectedInterviewData.CandidateId || "");
+    //         setSelectedCandidateImage(SelectedInterviewData.candidateImageUrl || "");
+
+    //         setSearchTerm(SelectedInterviewData.Candidate || "");
+    //         setSelectedPosition(SelectedInterviewData.Position || "");
+    //         setSelectedPositionId(SelectedInterviewData.PositionId || "");
+
+    //         // Set selected candidate data
+    //         setSelectedCandidateData(SelectedInterviewData.Candidate);
+
+    //         if (!SelectedInterviewData.rounds || SelectedInterviewData.rounds.length === 0) {
+    //             console.warn("Warning: SelectedInterviewData.rounds is missing or empty.");
+    //             return;
+    //         }
+
+    //         const matchedRound = SelectedInterviewData.rounds.find(
+    //             (round) => round._id === SelectedInterviewData.selectedRoundId
+    //         );
+
+    //         if (!matchedRound) {
+    //             console.warn("No matching round found for ID:", SelectedInterviewData.selectedRoundId);
+    //             return;
+    //         }
+    //         console.log("matchedRound", matchedRound);
+    //         console.log("matchedRound.questions", matchedRound.questions);
+    //         console.log("SelectedInterviewData._id", SelectedInterviewData._id)
+
+    //         setRounds([matchedRound]);
+    //         setInterviewQuestionsList([{ questions: matchedRound.questions }]);
+    //         setCurrentRoundIndex(SelectedInterviewData.currentRoundIndex ?? 0);
+    //     }
+    // }, [type, SelectedInterviewData]);
+
     useEffect(() => {
-        if (interviewData.id) {
-            interviewIdRef.current = interviewData.id;
+        if (type === "EditInternalInterviewProfileDetails" && SelectedInterviewData) {
+            setSelectedCandidate(SelectedInterviewData.Candidate || "");
+            setSelectedCandidateId(SelectedInterviewData.CandidateId || "");
+            setSelectedCandidateImage(SelectedInterviewData.candidateImageUrl || "");
+
+            setSearchTerm(SelectedInterviewData.Candidate || "");
+            setSelectedPosition(SelectedInterviewData.Position || "");
+            setSelectedPositionId(SelectedInterviewData.PositionId || "");
+
+            // Set selected candidate data
+            setSelectedCandidateData(SelectedInterviewData.Candidate);
+
+            if (!SelectedInterviewData.rounds || SelectedInterviewData.rounds.length === 0) {
+                console.warn("Warning: SelectedInterviewData.rounds is missing or empty.");
+                return;
+            }
+
+            const foundRound = SelectedInterviewData.rounds.find(
+                (round) => round._id === SelectedInterviewData.selectedRoundId
+            );
+
+            if (!foundRound) {
+                console.warn("No matching round found for ID:", SelectedInterviewData.selectedRoundId);
+                return;
+            }
+
+            console.log("matchedRound", foundRound);
+            console.log("matchedRound.questions", foundRound.questions);
+            console.log("SelectedInterviewData._id", SelectedInterviewData._id);
+
+            setMatchedRound(foundRound); // ✅ Store matchedRound in state
+            setRounds([foundRound]);
+            setInterviewQuestionsList([{ questions: foundRound.questions }]);
+            setCurrentRoundIndex(SelectedInterviewData.currentRoundIndex ?? 0);
         }
-    }, [interviewData.id]);
+    }, [type, SelectedInterviewData]);
+
+
+    // Separate useEffect for fetching questions
+    // useEffect(() => {
+    //     const fetchQuestions = async () => {
+    //         if (!SelectedInterviewData?._id) return;
+
+    //         try {
+    //             console.log("Fetching questions for interviewId:", SelectedInterviewData._id);
+
+    //             const response = await fetch(`${process.env.REACT_APP_API_URL}/interview-questions/${SelectedInterviewData._id}`);
+
+    //             if (!response.ok) {
+    //                 throw new Error(`HTTP error! Status: ${response.status}`);
+    //             }
+
+    //             const data = await response.json();
+    //             console.log("Fetched Questions:", data);
+
+    //             if (data.success) {
+    //                 // Filter the fetched questions to match those in matchedRound
+    //                 const filteredQuestions = matchedRound.questions.map((roundQuestion) => {
+    //                     return data.data.find((q) => q.questionId === roundQuestion.questionId) || roundQuestion;
+    //                 });
+
+    //                 console.log("Filtered Questions:", filteredQuestions);
+    //                 setInterviewQuestionsList([{ questions: filteredQuestions }]);
+    //             } else {
+    //                 console.warn("No questions found for this interview.");
+    //                 setInterviewQuestionsList([]);
+    //             }
+    //         } catch (error) {
+    //             console.error("Error fetching questions:", error);
+    //             setInterviewQuestionsList([]);
+    //         }
+    //     };
+
+    //     fetchQuestions();
+    // }, [SelectedInterviewData?._id, matchedRound]);
+
+    useEffect(() => {
+        const fetchQuestions = async () => {
+            if (!SelectedInterviewData?._id || !matchedRound) return; // ✅ Ensure matchedRound is available
+
+            try {
+                console.log("Fetching questions for interviewId:", SelectedInterviewData._id);
+
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/interview-questions/${SelectedInterviewData._id}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Fetched Questions:", data);
+
+                if (data.success) {
+                    // ✅ Now matchedRound is available in state
+                    const filteredQuestions = matchedRound.questions.map((roundQuestion) => {
+                        return data.data.find((q) => q.questionId === roundQuestion.questionId) || roundQuestion;
+                    });
+
+                    console.log("Filtered Questions:", filteredQuestions);
+                    setInterviewQuestionsList([{ questions: filteredQuestions }]);
+                } else {
+                    console.warn("No questions found for this interview.");
+                    setInterviewQuestionsList([]);
+                }
+            } catch (error) {
+                console.error("Error fetching questions:", error);
+                setInterviewQuestionsList([]);
+            }
+        };
+
+        fetchQuestions();
+    }, [SelectedInterviewData?._id, matchedRound]); // ✅ Now `matchedRound` is properly tracked
+
 
     const handleConfirm = () => {
         if (currentRoundIndex === null || currentRoundIndex >= rounds.length) {
@@ -137,176 +304,215 @@ const Schedulelater = ({ type, onClose }) => {
         setShowPopup(false);
     };
 
-    const [interviewId, setInterviewId] = useState(null);
+    const handleSave = async (goToNextStep = false) => {
+        const errors = {};
+        if (!selectedCandidate) errors.Candidate = "Candidate is required";
+        if (!selectedPosition) errors.Position = "Position is required";
+        setErrors(errors);
+        if (Object.keys(errors).length > 0) return;
 
-    // const handleSave = async (goToNextStep) => {
-    //     console.log("Rounds before validation:", rounds);
-    //     console.log("Round Status:", roundStatus);
-    //     const errors = {};
-    //     if (!selectedCandidate) errors.Candidate = "Candidate is required";
-    //     if (!selectedPosition) errors.Position = "Position is required";
-
-    //     // Commented logic for rounds validation
-    //     // const allRoundsCompleted = rounds.every((_, index) => roundStatus[index] === "Completed");
-    //     // if (!allRoundsCompleted) {
-    //     //     const roundsToValidate = rounds.filter((_, index) => roundStatus[index] !== "Completed");
-    //     //     const { roundsError } = validateInterviewData(roundsToValidate, window.location.pathname, type);
-    //     //     if (roundsError) {
-    //     //         errors.rounds = roundsError;
-    //     //     }
-    //     // }
-    //     // setErrors(errors);
-    //     // if (Object.keys(errors).length > 0) return;
-
-    //     if (goToNextStep === "outsourceselected") {
-    //         try {
-    //             const interviewData = {
-    //                 Candidate: selectedCandidate,
-    //                 CandidateId: selectedCandidateId,
-    //                 Position: selectedPosition,
-    //                 Status: "Scheduled",
-    //                 ScheduleType: type === "ScheduleLater" ? "schedulelater" : "schedulenow",
-    //                 candidateImageUrl: selectedCandidateImage,
-    //                 CreatedById: userId,
-    //                 LastModifiedById: userId,
-    //                 ownerId: userId,
-    //                 tenantId: orgId || undefined,
-    //             };
-
-    //             let response;
-    //             if (interviewIdRef.current) {
-    //                 response = await axios.patch(
-    //                     `${process.env.REACT_APP_API_URL}/interview/${interviewIdRef.current}`,
-    //                     interviewData
-    //                 );
-    //             } else {
-    //                 response = await axios.post(
-    //                     `${process.env.REACT_APP_API_URL}/interview`,
-    //                     interviewData
-    //                 );
-    //                 interviewIdRef.current = response.data._id;
-    //                 setInterviewData((prev) => ({
-    //                     ...prev,
-    //                     id: response.data._id,
-    //                 }));
-    //             }
-    //             console.log("Response from server from outsourceselected:", response.data);
-    //             setInterviewId(response.data._id);
-    //         } catch (error) {
-    //             toast.error("Failed to save interview data");
-    //         }
-    //         return;
-    //     }
-
-    //     // const roundsToSave = rounds;
-    //     // console.log("Rounds to save:", roundsToSave);
-    //     try {
-    //         console.log('main save active');
-
-    //         const interviewData = {
-    //             // Candidate: selectedCandidate,
-    //             Candidate: ["shashank"],
-    //             CandidateId: ["idje"],
-    //             Position: ['developer'],
-    //             Status: "Scheduled",
-    //             ScheduleType: type === "ScheduleLater" ? "schedulelater" : "schedulenow",
-
-    //             rounds: [
-    //                 {
-    //                     round:"Interview",
-    //                     mode:"Virtual",
-    //                     duration:"30 minutes",
-    //                     interviewType:"",
-    //                     interviewers:"My self",
-    //                     dateTime: new Date.now(),
-    //                     instructions:"instructions",
-    //                     status:"Scheduled"
-    //                 }
-    //             ],
-    //             candidateImageUrl: "see",
-    //             CreatedById: "userId",
-    //             LastModifiedById: "userId",
-    //             ownerId: "userId",
-    //             tenantId: "orgId",
-    //         };
-    //         console.log("interview data",interviewData)
-
-    //         let response;
-    //         if (interviewIdRef.current) {
-    //             response = await axios.patch(
-    //                 `${process.env.REACT_APP_API_URL}/interview/8855`,
-    //                 interviewData
-    //             );
-    //         } else {
-    //             response = await axios.post(
-    //                 `${process.env.REACT_APP_API_URL}/interview`,
-    //                 interviewData
-    //             );
-    //             interviewIdRef.current = response.data._id;
-    //             setInterviewData((prev) => ({
-    //                 ...prev,
-    //                 id: response.data._id,
-    //             }));
-    //         }
-    //         console.log("Response from server:", response.data);
-
-    //         const savedInterview = response.data;
-    //         setInterviewData({
-    //             id: savedInterview._id,
-    //             rounds: savedInterview.rounds,
-    //         });
-
-    //         if (type === "ScheduleNow") {
-    //         }
-
-    //         if (roundStatus[currentRoundIndex] === "Completed") {
-    //             if (currentRoundIndex + 1 < rounds.length) {
-    //                 setCurrentRoundIndex(prev => prev + 1);
-    //             } else {
-    //                 onClose();
-    //             }
-    //         } else {
-    //             if (goToNextStep === true) {
-    //                 setCurrentStep(2);
-    //             } else if (goToNextStep === "add new round") {
-    //                 if (currentRoundIndex + 1 < rounds.length) {
-    //                     setCurrentRoundIndex(prev => prev + 1);
-    //                 } else {
-    //                     setCurrentStep(1);
-    //                     handleAddRound();
-    //                 }
-    //                 setCurrentStep(1);
-    //             } else {
-    //                 onClose();
-    //             }
-    //         }
-    //     } catch (error) {
-    //         toast.error("Failed to save interview data");
-    //     }
-    // };
-
- 
-    const handleSave = async()=>{
-        // const meetLink = `${process.env.REACT_APP_API_URL}/UpInterview/meet/${uuidv4()}`
-        const meetLink = `http://localhost:3000/UpInterview/meet/${uuidv4()}`
         try {
-            const response =await axios.post(`${process.env.REACT_APP_API_URL}/schedule-interview`,{
-                rounds:[{
-                    round:"Interview",
-                    mode:"Online",
-                    duration:"30 minutes",
-                    interviewType:"",
-                    dateTime:new Date(),
-                    instructions:"",
-                    status:"scheduled",
-                    meetLink
+            const filledRounds = rounds.filter((round, index) => {
+                if (roundStatus[index] === "Completed") {
+                    return true;
+                }
+                return (
+                    round.dateTime &&
+                    round.interviewType
+                );
+            });
 
-                }]
-            })
+            if (filledRounds.length === 0) {
+                toast.error("Please fill at least one round before saving.");
+                return;
+            }
+
+            const roundsToUpdate = filledRounds.map((round, index) => ({
+                round: round.round,
+                mode: round.mode,
+                duration: round.duration || "30 minutes",
+                interviewType: round.interviewType,
+                // interviewers: round.interviewers.map(interviewer => ({
+                //     id: interviewer.id
+                // })),
+                interviewers: round.interviewers.map(interviewer => ({
+                    id: interviewer.id,
+                    name: interviewer.name
+                })),
+                dateTime: round.dateTime,
+                instructions: round.instructions || "",
+                Status: (selectedInterviewerIdsPerRound && selectedInterviewerIdsPerRound.length > 0) ? "Request Sent" : roundStatus[currentRoundIndex],
+                questions: interviewQuestionsList[index]?.questions || [],
+            }));
+
+            const roundsData = type === "EditInternalInterviewProfileDetails" && SelectedInterviewData
+                ? rounds
+                : roundsToUpdate;
+
+            const preparingTeamRequestBody = {
+                name:`Interview with ${selectedCandidate}-${selectedCandidateId.slice(-5,-1)} for the position of ${selectedPosition}`,
+                description:"description",
+                owner:Cookies.get("userId"),
+                createdBy:Cookies.get("userId"),                
+            }
+
+            // http://localhost:5000/createTeam
+
+            const teamResponse = await axios.post(`${process.env.REACT_APP_API_URL}/createTeam`,preparingTeamRequestBody)
+
+            const  meetLink = `${process.env.REACT_APP_API_URL}/meetId/`
+
+            const interviewData = {
+                Candidate: selectedCandidate,
+                CandidateId: selectedCandidateId,
+                Position: selectedPosition,                
+                PositionId: selectedPositionId,
+                Status: "Draft",
+                ScheduleType: type === "ScheduleLater" ? "schedulelater" : "schedulenow",
+                rounds: roundsData,
+                candidateImageUrl: selectedCandidateImage,
+                CreatedById: userId,
+                LastModifiedById: userId,
+                ownerId: userId,
+                tenantId: orgId || undefined,
+                createdOn: new Date(),
+                teamId:teamResponse.data.team._id,
+                
+            };
+
+            let response;
+            if (interviewIdRef.current) {
+                response = await axios.patch(
+                    `${process.env.REACT_APP_API_URL}/interview/${interviewIdRef.current}`,
+                    interviewData
+                );
+            } else {
+                response = await axios.post(
+                    `${process.env.REACT_APP_API_URL}/interview`,
+                    interviewData
+                );
+                interviewIdRef.current = response.data._id;
+                setInterviewData((prev) => ({
+                    ...prev,
+                    id: response.data._id,
+                }));
+            }
+
+            console.log('Sending outsource request with interviewers:', selectedInterviewerIdsPerRound[currentRoundIndex]);
+
+            if (selectedInterviewerIdsPerRound && selectedInterviewerIdsPerRound.length > 0) {
+                console.log('sending interview request also ...');
+                const outsourceRequestData = {
+                    tenantId: orgId,
+                    ownerId: userId,
+                    scheduledInterviewId: interviewIdRef.current,
+                    interviewerType: "Outsource Interviewer",
+                    interviewerIds: selectedInterviewerIdsPerRound[currentRoundIndex],
+                    dateTime: rounds[currentRoundIndex]?.dateTime,
+                    duration: rounds[currentRoundIndex]?.duration,
+                    candidateId: selectedCandidateId,
+                    positionId: selectedPositionId,
+                    status: "inprogress",
+                    roundNumber: currentRoundIndex + 1,
+                    requestMessage: "Outsource interview request",
+                    expiryDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                };
+                await axios.post(
+                    `${process.env.REACT_APP_API_URL}/interviewrequest`,
+                    outsourceRequestData
+                );
+
+                setSelectedInterviewerIds([]);
+
+                setRoundStatus((prevStatus) => {
+                    const newStatus = [...prevStatus];
+                    newStatus[currentRoundIndex] = "Request Sent";
+                    return newStatus;
+                });
+            }
+
+            if (goToNextStep === true) {
+                setCurrentStep(2);
+            } else if (goToNextStep === "add new round") {
+                if (currentRoundIndex + 1 < rounds.length) {
+                    setCurrentRoundIndex(currentRoundIndex + 1);
+                } else {
+                    setCurrentStep(1);
+                    handleAddRound();
+                }
+                setCurrentStep(1);
+            } else {
+                onClose();
+            }
+
         } catch (error) {
-            console.log("error in saving ",error)
+            console.error("Error:", error);
         }
-    }
+    };
+
+    // <--------------- for edit  ----------------->
+    useEffect(() => {
+        if (type === "EditInternalInterviewProfileDetails" && SelectedInterviewData?._id) {
+            interviewIdRef.current = SelectedInterviewData._id;
+        }
+    }, [type, SelectedInterviewData]);
+
+    // <--------------- for edit  ----------------->
+    const handleEditSave = async (goToNextStep = false) => {
+        const errors = {};
+        if (!selectedCandidate) errors.Candidate = "Candidate is required";
+        if (!selectedPosition) errors.Position = "Position is required";
+        setErrors(errors);
+        if (Object.keys(errors).length > 0) return;
+
+        if (!interviewIdRef.current) {
+            console.error("Error: interviewIdRef.current is null! Waiting for interviewData.id...");
+            return;
+        }
+
+        try {
+            const updatedRounds = SelectedInterviewData.rounds.map((round) => {
+                if (round._id === SelectedInterviewData.selectedRoundId) {
+                    return {
+                        ...round,
+                        mode: round.mode,
+                        duration: round.duration || "30 minutes",
+                        interviewType: round.interviewType,
+                        dateTime: round.dateTime,
+                        instructions: round.instructions || "",
+                        Status: (selectedInterviewerIdsPerRound && selectedInterviewerIdsPerRound.length > 0)
+                            ? "Request Sent"
+                            : round.Status,
+                        interviewers: round.interviewers.map(i => ({ id: i.id })),
+                        questions: interviewQuestionsList[currentRoundIndex]?.questions || round.questions,
+                    };
+                }
+                return round;
+            });
+
+            const interviewData = {
+                ...SelectedInterviewData,
+                rounds: updatedRounds,
+                LastModifiedById: userId,
+            };
+
+            console.log("Saving interview with data:", interviewData);
+
+            await axios.patch(
+                `${process.env.REACT_APP_API_URL}/interview/${interviewIdRef.current}`,
+                interviewData
+            );
+
+            if (goToNextStep) {
+                setCurrentStep(2); // Move to next step
+            } else {
+                onClose(); // Close the modal
+            }
+        } catch (error) {
+            console.error("Error in handleSave:", error);
+        }
+    };
+
 
     const handleAddNewCandidateClick = () => {
         setShowMainContent(false);
@@ -336,12 +542,16 @@ const Schedulelater = ({ type, onClose }) => {
 
     const handleinterviewSelect = (interview, roundIndex) => {
         if (!selectedCandidate) return;
+        const currentRound = rounds[roundIndex];
+        if (interview === "Outsource Interviewer" && !currentRound.dateTime) {
+            toast.error("Please select the Date & Time before choosing an Outsource Interviewer.");
+            return;
+        }
         setRounds((prevRounds) => {
             const updatedRounds = [...prevRounds];
             if (!updatedRounds[roundIndex]) return prevRounds;
             updatedRounds[roundIndex].interviewers = [];
             updatedRounds[roundIndex].interviewType = interview;
-
             if (interview === "My Self") {
                 if (!updatedRounds[roundIndex].interviewers.some(member => member.id === userId)) {
                     updatedRounds[roundIndex].interviewers.push({ id: userId, name: userName });
@@ -349,19 +559,15 @@ const Schedulelater = ({ type, onClose }) => {
             } else if (interview === "Internal Interviewers") {
                 setIsSidebarOpen(true);
             } else if (interview === "Outsource Interviewer") {
-                handleSave("outsourceselected");
                 setShowOutsourcePopup(true);
             }
-
             return updatedRounds;
         });
-
         setErrors((prevErrors) => {
             const newErrors = { ...prevErrors };
             delete newErrors[`Interviewer_${roundIndex}`];
             return newErrors;
         });
-
         setShowDropdownInterviewType(false);
     };
 
@@ -375,22 +581,6 @@ const Schedulelater = ({ type, onClose }) => {
             const newInterviewers = interviewers.map(interviewer => ({
                 id: interviewer._id,
                 name: interviewer.contactId.name,
-            }));
-            updatedRounds[index].interviewers = [...existingInterviewers, ...newInterviewers];
-            return updatedRounds;
-        });
-    };
-
-    const handleOutsourceInterviewerSelect = (interviewers, index) => {
-        setRounds((prevRounds) => {
-            const updatedRounds = [...prevRounds];
-            if (!updatedRounds[index]) {
-                updatedRounds[index] = { interviewers: [] };
-            }
-            const existingInterviewers = updatedRounds[index].interviewers || [];
-            const newInterviewers = interviewers.map(interviewer => ({
-                id: interviewer._id,
-                name: interviewer.name,
             }));
             updatedRounds[index].interviewers = [...existingInterviewers, ...newInterviewers];
             return updatedRounds;
@@ -428,8 +618,6 @@ const Schedulelater = ({ type, onClose }) => {
         );
     };
 
-    const isLastRound = currentRoundIndex === rounds.length - 1;
-
     const handleInterviewModeSelect = (index, mode) => {
         const newRounds = [...rounds];
         newRounds[index].mode = mode;
@@ -454,26 +642,44 @@ const Schedulelater = ({ type, onClose }) => {
         setRoundToDelete(null);
     };
 
+    // const handleAddRound = () => {
+    //     if (currentRoundIndex === null || currentRoundIndex >= rounds.length) {
+    //         return;
+    //     }
+    //     const newRound = { round: "", mode: "", instructions: "" };
+    //     const newRounds = [...rounds];
+    //     newRounds.splice(currentRoundIndex + 1, 0, newRound);
+    //     setRounds(newRounds, () => {
+    //         handleSave();
+    //     });
+    //     const newDurations = [...selectedDuration];
+    //     newDurations.splice(currentRoundIndex + 1, 0, "");
+    //     setSelectedDuration(newDurations);
+    //     setCurrentRoundIndex(currentRoundIndex + 1);
+    //     setExpandedRounds([currentRoundIndex + 1]);
+    //     setLastRoundCompleted(false);
+    // };
+
     const handleAddRound = () => {
         if (currentRoundIndex === null || currentRoundIndex >= rounds.length) {
             return;
         }
-
         const newRound = { round: "", mode: "", instructions: "" };
         const newRounds = [...rounds];
         newRounds.splice(currentRoundIndex + 1, 0, newRound);
-
-        setRounds(newRounds, () => {
-            handleSave();
+        setRounds(newRounds);
+        setSelectedDuration((prevDurations) => {
+            const newDurations = [...prevDurations];
+            newDurations.splice(currentRoundIndex + 1, 0, "");
+            return newDurations;
         });
-
-        const newDurations = [...selectedDuration];
-        newDurations.splice(currentRoundIndex + 1, 0, "");
-        setSelectedDuration(newDurations);
-
+        setSelectedInterviewerIdsPerRound((prevIds) => {
+            const newIds = [...prevIds];
+            newIds.splice(currentRoundIndex + 1, 0, []);
+            return newIds;
+        });
         setCurrentRoundIndex(currentRoundIndex + 1);
         setExpandedRounds([currentRoundIndex + 1]);
-
         setLastRoundCompleted(false);
     };
 
@@ -502,6 +708,8 @@ const Schedulelater = ({ type, onClose }) => {
 
     const [selectedCandidateData, setSelectedCandidateData] = useState(null);
 
+    // console.log('selectedCandidateData :', selectedCandidateData)
+
     const handleCandidateSelect = (candidate) => {
         setSelectedCandidate(candidate.LastName);
         setSelectedCandidateId(candidate._id);
@@ -510,48 +718,17 @@ const Schedulelater = ({ type, onClose }) => {
         setShowDropdown(false);
         setErrors((prevErrors) => ({ ...prevErrors, Candidate: "" }));
         setSelectedCandidateData(candidate);
-
         if (candidate?.PositionId?.length === 1) {
             handlePositionSelect(candidate.PositionId[0]);
         }
     };
 
-    // const handlePositionSelect = (position) => {
-    //     setSelectedPosition(position?.title || '');
-    //     const positionRounds = position?.rounds || [];
-
-    //     // Initialize round statuses
-    //     const initialStatuses = positionRounds.map(round => "Draft");
-    //     setRoundStatus(initialStatuses);
-
-    //     // Set current round to first incomplete round
-    //     const firstIncomplete = initialStatuses.findIndex(status => status !== "Completed");
-    //     setCurrentRoundIndex(firstIncomplete !== -1 ? firstIncomplete : positionRounds.length - 1);
-
-    //     if (positionRounds.length > 0) {
-    //         const formattedRounds = positionRounds.map((round) => ({
-    //             round: round.round || "",
-    //             mode: round.mode || "",
-    //             duration: round.duration || "",
-    //             instructions: "",
-    //         }));
-    //         setRounds(formattedRounds);
-    //         setCurrentRoundIndex(0);
-    //     } else {
-    //         setRounds([]);
-    //         setCurrentRoundIndex(null);
-    //     }
-    //     setShowDropdownPosition(false);
-    // };
-
     const handlePositionSelect = (position) => {
         setSelectedPosition(position?.title || '');
+        setSelectedPositionId(position._id);
         const positionRounds = position?.rounds || [];
-
-        // Initialize round statuses as Draft
         const initialStatuses = positionRounds.map(() => "Draft");
         setRoundStatus(initialStatuses);
-
         if (positionRounds.length > 0) {
             const formattedRounds = positionRounds.map((round) => ({
                 round: round.round || "",
@@ -560,8 +737,6 @@ const Schedulelater = ({ type, onClose }) => {
                 instructions: "",
             }));
             setRounds(formattedRounds);
-
-            // Start at first round by default
             setCurrentRoundIndex(0);
         } else {
             setRounds([]);
@@ -570,6 +745,7 @@ const Schedulelater = ({ type, onClose }) => {
         setErrors((prevErrors) => ({ ...prevErrors, Position: "" }));
         setShowDropdownPosition(false);
     };
+
     const handleAddNewPositionClick = () => {
     };
 
@@ -609,22 +785,17 @@ const Schedulelater = ({ type, onClose }) => {
             updatedList[currentRoundIndex].questions.push(question);
             return updatedList;
         });
-
         if (!interviewIdRef.current) {
             toast.error("Please save the interview before adding questions.");
             return;
         }
-
         const updatedRounds = [...interviewData.rounds];
-
         if (!updatedRounds[currentRoundIndex]) {
             updatedRounds[currentRoundIndex] = { questions: [] };
         }
-
         updatedRounds[currentRoundIndex].questions.push({
             questionId: question.recordId
         });
-
         try {
             setInterviewData((prev) => ({
                 ...prev,
@@ -638,7 +809,6 @@ const Schedulelater = ({ type, onClose }) => {
     const handleSuggestedTabClick = (questionType) => {
         setActiveTab("SuggesstedQuestions");
     };
-
 
     const handleFavoriteTabClick = (questionType) => {
         setActiveTab("MyQuestionsList");
@@ -667,22 +837,16 @@ const Schedulelater = ({ type, onClose }) => {
     const [lastRoundCompleted, setLastRoundCompleted] = useState(false);
 
     useEffect(() => {
-        if (roundStatus.length > 0) {
-            const currentRoundIndex = roundStatus.length - 1;
-
+        if (roundStatus.length > 0 && currentRoundIndex !== null) {
             if (roundStatus[currentRoundIndex] === "Completed") {
-                console.log("seelcted completed ...");
-
                 if (currentRoundIndex + 1 < roundStatus.length) {
-                    console.log("There is another round after this.");
-                    setLastRoundCompleted(false);
+                    setLastRoundCompleted(true);
                 } else {
-                    console.log("No more rounds after this.");
                     setLastRoundCompleted(true);
                 }
             }
         }
-    }, [roundStatus]);
+    }, [roundStatus, currentRoundIndex]);
 
     const handleStatusSelect = (status, index) => {
         setRoundStatus(prevStatus => {
@@ -690,7 +854,77 @@ const Schedulelater = ({ type, onClose }) => {
             updatedStatus[index] = status;
             return updatedStatus;
         });
+        setShowDropdownStatus({});
     };
+
+    const [selectedInterviewerIdsPerRound, setSelectedInterviewerIdsPerRound] = useState(() => rounds.map(() => []));
+
+    const handleReceivedInterviewerIds = (interviewers, roundIndex) => {
+        console.log('Received interviewers:', interviewers, 'for round:', roundIndex);
+        const updatedSelectedIds = [...selectedInterviewerIdsPerRound];
+        updatedSelectedIds[roundIndex] = interviewers.map(i => i.id);
+        setSelectedInterviewerIdsPerRound(updatedSelectedIds);
+        const updatedRounds = [...rounds];
+        updatedRounds[roundIndex].interviewers = interviewers.map(interviewer => ({
+            id: interviewer.id
+        }));
+        setRounds(updatedRounds);
+        setShowOutsourcePopup(false);
+    };
+
+    const handleAddInterviewData = (roundIndex) => {
+        const interviewType = rounds[roundIndex]?.interviewType;
+        if (interviewType === "Internal Interviewers") {
+            setIsSidebarOpen(true);
+        } else if (interviewType === "Outsource Interviewer") {
+            setShowOutsourcePopup(true);
+        } else {
+            toast.error("Please select a valid Interviewer Type before proceeding.");
+        }
+    };
+
+    const StatusPart = ({ index }) => {
+        return (
+            <div className={`flex items-center w-1/2 ${rounds[index]?.interviewType !== "Outsource Interviewer" ? "" : "ml-3"}`}>
+                <label className="block flex-shrink-0 w-32">
+                    Status <span className="text-red-500">*</span>
+                </label>
+                <div className={`relative flex-grow round-dropdown mb-3 ${rounds[index]?.interviewType !== "Outsource Interviewer" ? "mr-5" : ""}`}>
+                    <div
+                        className="flex items-center"
+                        onClick={() => toggleDropdownStatus(index)}
+                    >
+                        <div className="w-full px-3 py-2 border-b bg-white">
+                            {roundStatus[index] || "Draft"}
+                        </div>
+                        <div
+                            className="absolute right-0 top-0"
+                            onClick={() => toggleDropdownStatus(index)}
+                        >
+                            <MdArrowDropDown className="text-lg text-gray-500 mt-4" />
+                        </div>
+                    </div>
+                    {showDropdownStatus[index] && (
+                        <div className="absolute z-50 border border-gray-200 mb-5 w-full rounded-md bg-white shadow-lg">
+                            <div
+                                className="py-2 px-4 cursor-pointer hover:bg-gray-100"
+                                onClick={() => handleStatusSelect('Draft', index)}
+                            >
+                                Draft
+                            </div>
+                            <div
+                                className="py-2 px-4 cursor-pointer hover:bg-gray-100"
+                                onClick={() => handleStatusSelect('Completed', index)}
+                            >
+                                Completed
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
 
     const ExtendedPart = ({ index }) => {
         return (
@@ -705,12 +939,12 @@ const Schedulelater = ({ type, onClose }) => {
                                 type="text"
                                 value={rounds[index]?.interviewType || ""}
                                 readOnly
-                                className={`border-b flex-grow bg-white w-full focus:outline-none ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
+                                className="border-b flex-grow bg-white w-full focus:outline-none"
                                 onClick={roundStatus[index] !== "Completed" ? () => handleInterviewTypeClick(index) : null}
                                 title={!rounds[index].dateTime ? "Add the date & time before selecting Interview Type" : ""}
                             />
                             <MdArrowDropDown
-                                className={`absolute top-0 text-gray-500 text-lg right-0 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
+                                className="absolute top-0 text-gray-500 text-lg right-0"
                                 onClick={roundStatus[index] !== "Completed" ? () => handleInterviewTypeClick(index) : null}
                             />
                             {showDropdownInterviewType && roundStatus[index] !== "Completed" && (
@@ -728,69 +962,51 @@ const Schedulelater = ({ type, onClose }) => {
                             )}
                         </div>
                     </div>
-                    <div className="flex items-center w-1/2 pl-2">
-                        <label className="text-left mt-1 mr-4" style={{ width: "114px" }}>
-                            Interviewers <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative flex-grow">
-                            <div className="relative mb-3">
-                                <div
-                                    disabled
-                                    className="border-b focus:border-black focus:outline-none min-h-8 bg-white mb-5 h-auto w-full relative mt-2"
-                                >
-                                    <div className="flex flex-wrap">
-                                        {rounds[index]?.interviewers?.map((member) => (
-                                            <div key={member.id} className="bg-slate-200 rounded-lg px-2 py-1 inline-block mr-2">
-                                                {member.name}
-                                                <button
-                                                    onClick={() => removeSelectedTeamMember(member, index)}
-                                                    className="ml-1 bg-slate-300 rounded-lg px-2"
-                                                >
-                                                    X
-                                                </button>
-                                            </div>
-                                        ))}
+                    {rounds[index]?.interviewType !== "Outsource Interviewer" ? (
+                        <div className="flex items-center w-1/2 pl-2">
+                            <label className="text-left mt-1 mr-4" style={{ width: "114px" }}>
+                                Interviewers <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative flex-grow">
+                                <div className="relative mb-3">
+                                    <div
+                                        disabled
+                                        className="border-b focus:border-black focus:outline-none min-h-8 bg-white mb-5 h-auto w-full relative mt-2"
+                                    >
+                                        <div className="flex flex-wrap">
+                                            {rounds[index]?.interviewers?.map((member) => (
+                                                <div key={member.id} className="bg-slate-200 rounded-lg px-2 py-1 inline-block mr-2">
+                                                    {member.name}
+                                                    {/* <button
+                                                        onClick={() => removeSelectedTeamMember(member, index)}
+                                                        className="ml-1 bg-slate-300 rounded-lg px-2"
+                                                    >
+                                                        X
+                                                    </button> */}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        <StatusPart index={index} />
+                    )}
                 </div>
 
-                <div className="flex items-center w-1/2 pr-2 mb-12">
-                    <label className="block flex-shrink-0 w-32">
-                        Status <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative flex-grow round-dropdown mr-[10px]">
-                        <div className="flex items-center mb-4">
-                            <div className="w-full px-3 py-2 border-b bg-white" onClick={() => roundStatus[index] !== "Completed" && toggleDropdownStatus(index)}>
-                                {roundStatus[index] || "Draft"}
-                            </div>
-                            <div
-                                className="absolute right-0 top-0"
-                                onClick={roundStatus[index] !== "Completed" ? () => toggleDropdownStatus(index) : null}
-                            >
-                                <MdArrowDropDown
-                                    className={`text-lg text-gray-500 mt-4 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                />
-                            </div>
-
-                            {showDropdownStatus[index] && roundStatus[index] !== "Completed" && (
-                                <div className="absolute z-50 border border-gray-200 w-full top-9 rounded-md bg-white shadow-lg">
-                                    {["Draft", "Completed"].map((option) => (
-                                        <div
-                                            key={option}
-                                            className="py-2 px-4 hover:bg-gray-100"
-                                            onClick={() => handleStatusSelect(option, index)}
-                                        >
-                                            {option}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                {rounds[index]?.interviewType !== "Outsource Interviewer" && (
+                    <div className="mb-10">
+                        <StatusPart index={index} />
                     </div>
-                </div>
+                )}
+
+                <button
+                    className="border bg-custom-blue px-2 rounded py-1 text-white"
+                    onClick={() => handleAddInterviewData(index)}
+                >
+                    Add Internal or Outsource More Data
+                </button>
 
                 <div className="flex items-center gap-14 pr-2">
                     <label className="text-left mb-32">
@@ -800,10 +1016,9 @@ const Schedulelater = ({ type, onClose }) => {
                         <textarea
                             rows={5}
                             value={rounds[index].instructions}
-                            disabled={roundStatus[index] === "Completed"}
                             name="instructions"
                             id="instructions"
-                            className={`border p-2 focus:outline-none mb-3 w-full rounded-md ${errors.instructions ? "border-red-500" : "border-gray-300"} ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
+                            className={`border p-2 focus:outline-none mb-3 w-full rounded-md ${errors.instructions ? "border-red-500" : "border-gray-300"}`}
                             onChange={(e) => handleChangedescription(e, index)}
                         ></textarea>
                         <p className="text-gray-600 text-sm float-right -mt-4">
@@ -827,10 +1042,7 @@ const Schedulelater = ({ type, onClose }) => {
                     </div>
                 </div>
 
-                <div
-                    className="flex gap-5 mt-8 mb-8"
-                    style={{ padding: "0px 40px" }}
-                >
+                <div className="flex gap-5 mt-8 mb-8" style={{ padding: "0px 40px" }}>
                     {/* candidate */}
                     <div className="flex items-center w-full relative" ref={candidateRef}>
                         <label
@@ -863,8 +1075,7 @@ const Schedulelater = ({ type, onClose }) => {
                                         Recent Candidates
                                     </p>
                                     <ul>
-                                        {/* {candidateData */}
-                                        {[{ _id:"24ed", LastName: "shashank"},{ _id:"3e4rf", LastName:"mansoor"}]
+                                        {candidateData
                                             .filter((candidate) =>
                                                 candidate.LastName.toLowerCase().includes(searchTerm.toLowerCase())
                                             )
@@ -927,7 +1138,8 @@ const Schedulelater = ({ type, onClose }) => {
                                 <div className="absolute z-50 border border-gray-200 mb-5 w-full rounded-md bg-white shadow">
                                     <p className="p-1 font-medium border-b">Positions</p>
                                     <ul>
-                                        {selectedCandidateData?.PositionId?.map((position) => (
+                                        {/* mansoor code */}
+                                        {/* {selectedCandidateData?.PositionId?.map((position) => (
                                             <li
                                                 key={position._id}
                                                 className="bg-white cursor-pointer hover:bg-gray-100 p-2"
@@ -939,7 +1151,23 @@ const Schedulelater = ({ type, onClose }) => {
                                             >
                                                 {position.title}
                                             </li>
-                                        ))}
+                                        ))} */}
+
+
+                                        {/* shashank */}
+                                        {selectedCandidateData.PositionId &&  (
+                                            <li
+                                                key={selectedCandidateData.PositionId._id}
+                                                className="bg-white cursor-pointer hover:bg-gray-100 p-2"
+                                                onClick={() => {
+                                                    handlePositionSelect(selectedCandidateData.PositionId);
+                                                    setUnsavedChanges(true);
+                                                    setShowDropdownPosition(false);
+                                                }}
+                                            >
+                                                {selectedCandidateData.PositionId.title}
+                                            </li>
+                                        )}
                                         <li
                                             className="flex cursor-pointer shadow-md border-t p-1 rounded"
                                             onClick={handleAddNewPositionClick}
@@ -968,406 +1196,182 @@ const Schedulelater = ({ type, onClose }) => {
                     <div className="mx-5">
                         <div className="mb-5">
                             {currentRoundIndex !== null && rounds.length > 0 && (
-                                rounds.slice(0, currentRoundIndex + 1).map((round, index) => (
+                                // normal
+                                // (rounds.slice(0, currentRoundIndex + 1)).map((round, index) => (
+
+                                // edit
+                                // rounds(currentRoundIndex, currentRoundIndex + 1)).map((round, index) => (
+                                (type === 'EditInternalInterviewProfileDetails'
+                                    ? rounds
+                                    : rounds.slice(0, currentRoundIndex + 1)
+                                    // (currentRoundIndex, currentRoundIndex + 1)
+                                ).map((round, index) => (
                                     <div
                                         key={index}
-                                        className={`border mx-5 text-sm mb-10 ${(roundStatus[index] === "Completed" || index < currentRoundIndex) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`border mx-5 text-sm mb-10 
+                                        ${roundStatus[index] === "Completed" || (index < currentRoundIndex && type !== 'EditInternalInterviewProfileDetails')
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : ''}`}
                                     >
-                                        <div className="flex space-x-8 p-2 text-md justify-between items-center bg-custom-blue text-white pr-5 border-b border-gray-300 font-semibold text-xl">
-                                            <p className="pr-4 ml-2 w-1/4">Round-{index + 1}</p>
-                                            {rounds.length > 1 && (
-                                                <div
-                                                    className="flex items-center text-3xl ml-3 mr-3"
-                                                    onClick={() => {
-                                                        if (roundStatus[index] !== "Completed" && rounds.length > 1) {
-                                                            toggleRoundDetails(index);
-                                                        }
-                                                    }}
-                                                >
-                                                    {(rounds.slice(0, currentRoundIndex + 1).length > 1) && (expandedRounds.includes(index) ? <IoIosArrowUp /> : <IoIosArrowDown />)}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <div className={`${roundStatus[index] === "Completed" || (index < currentRoundIndex && type !== 'EditInternalInterviewProfileDetails') ? 'pointer-events-none' : ''}`}>
+                                            <div className="flex space-x-8 p-2 text-md justify-between items-center bg-custom-blue text-white pr-5 border-b border-gray-300 font-semibold text-xl">
+                                                <p className="pr-4 ml-2 w-1/4">Round - {(type === 'EditInternalInterviewProfileDetails' && SelectedInterviewData) ? (currentRoundIndex + 1) : (index + 1)}</p>
+                                                {rounds.length > 1 && (
+                                                    <div
+                                                        className="flex items-center text-3xl ml-3 mr-3"
+                                                        onClick={() => {
+                                                            if (roundStatus[index] !== "Completed" && rounds.length > 1) {
+                                                                toggleRoundDetails(index);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {(rounds.slice(0, currentRoundIndex + 1).length > 1) && (expandedRounds.includes(index) ? <IoIosArrowUp /> : <IoIosArrowDown />)}
+                                                    </div>
+                                                )}
+                                            </div>
 
-                                        {/* Round Details */}
-                                        <div className="p-4">
-                                            <div>
-                                                <div className="flex w-full mb-4 gap-5">
-                                                    {/* Round Title */}
-                                                    <div className="flex items-center w-1/2 pr-2">
-                                                        <label className="block flex-shrink-0 w-32">
-                                                            Round Title <span className="text-red-500">*</span>
-                                                        </label>
-                                                        {selectedRound === "Other" ? (
-                                                            <input
-                                                                type="text"
-                                                                disabled={(roundStatus[index] === "Completed" || index < currentRoundIndex)}
-                                                                className="flex-grow px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-blue-500"
-                                                                value={customRoundName}
-                                                                onChange={(e) => setCustomRoundName(e.target.value)}
-                                                                placeholder="Enter round name"
-                                                            />
-                                                        ) : (
-                                                            <div className="relative flex-grow round-dropdown">
-                                                                <div
-                                                                    className={`w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-blue-500 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                    onClick={() => roundStatus[index] !== "Completed" && index === currentRoundIndex && setShowRoundDropdown(index)}
-                                                                >
-                                                                    {rounds[index].round || <span>&nbsp;</span>}
-                                                                </div>
-                                                                <MdArrowDropDown
-                                                                    className={`absolute top-0 right-0 text-lg mt-4 text-gray-500 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                    onClick={() => roundStatus[index] !== "Completed" && setShowRoundDropdown(index)}
+                                            {/* Round Details */}
+                                            <div className="p-4">
+                                                <div>
+                                                    <div className="flex w-full mb-4 gap-5">
+                                                        {/* Round Title */}
+                                                        <div className="flex items-center w-1/2 pr-2">
+                                                            <label className="block flex-shrink-0 w-32">
+                                                                Round Title <span className="text-red-500">*</span>
+                                                            </label>
+                                                            {selectedRound === "Other" ? (
+                                                                <input
+                                                                    type="text"
+                                                                    className="flex-grow px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-blue-500"
+                                                                    value={customRoundName}
+                                                                    onChange={(e) => setCustomRoundName(e.target.value)}
+                                                                    placeholder="Enter round name"
                                                                 />
-                                                                {showRoundDropdown === index && roundStatus[index] !== "Completed" && (
+                                                            ) : (
+                                                                <div className="relative flex-grow round-dropdown">
+                                                                    <div
+                                                                        className="w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-blue-500"
+                                                                        onClick={() => roundStatus[index] !== "Completed" && index === currentRoundIndex && setShowRoundDropdown(index)}
+                                                                    >
+                                                                        {rounds[index].round || <span>&nbsp;</span>}
+                                                                    </div>
+                                                                    <MdArrowDropDown
+                                                                        className="absolute top-0 right-0 text-lg mt-4 text-gray-500"
+                                                                        onClick={() => roundStatus[index] !== "Completed" && setShowRoundDropdown(index)}
+                                                                    />
+                                                                    {showRoundDropdown === index && roundStatus[index] !== "Completed" && (
+                                                                        <div className="absolute z-50 border border-gray-200 mb-5 w-full rounded-md bg-white shadow-lg">
+                                                                            {["Assessment", "Technical", "Final", "HR Interview", "Other"].map((option) => (
+                                                                                <div
+                                                                                    key={option}
+                                                                                    className="py-2 px-4 cursor-pointer hover:bg-gray-100"
+                                                                                    onClick={() => handleRoundSelect(index, option)}
+                                                                                >
+                                                                                    {option}
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Interview Mode */}
+                                                        <div className="flex items-center w-1/2 pl-2">
+                                                            <label className="text-left" style={{ width: "131px" }}>
+                                                                Interview Mode <span className="text-red-500">*</span>
+                                                            </label>
+                                                            <div className="relative flex-grow">
+                                                                <input
+                                                                    type="text"
+                                                                    value={rounds[index].mode}
+                                                                    className="border-b p-2 flex-grow bg-white w-full focus:outline-none"
+                                                                    onClick={() => roundStatus[index] !== "Completed" && index === currentRoundIndex && toggleDropdownInterviewMode(index)}
+                                                                    readOnly
+                                                                />
+                                                                <MdArrowDropDown
+                                                                    className="absolute top-0 text-gray-500 text-lg mt-4 right-0"
+                                                                    onClick={() => roundStatus[index] !== "Completed" && toggleDropdownInterviewMode(index)}
+                                                                />
+                                                                {showDropdownInterviewMode === index && roundStatus[index] !== "Completed" && (
                                                                     <div className="absolute z-50 border border-gray-200 mb-5 w-full rounded-md bg-white shadow-lg">
-                                                                        {["Assessment", "Technical", "Final", "HR Interview", "Other"].map((option) => (
+                                                                        {interviewModeOptions.map((mode) => (
                                                                             <div
-                                                                                key={option}
+                                                                                key={mode}
                                                                                 className="py-2 px-4 cursor-pointer hover:bg-gray-100"
-                                                                                onClick={() => handleRoundSelect(index, option)}
+                                                                                onClick={() => handleInterviewModeSelect(index, mode)}
                                                                             >
-                                                                                {option}
+                                                                                {mode}
                                                                             </div>
                                                                         ))}
                                                                     </div>
                                                                 )}
                                                             </div>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Interview Mode */}
-                                                    <div className="flex items-center w-1/2 pl-2">
-                                                        <label className="text-left" style={{ width: "131px" }}>
-                                                            Interview Mode <span className="text-red-500">*</span>
-                                                        </label>
-                                                        <div className="relative flex-grow">
-                                                            <input
-                                                                type="text"
-                                                                value={rounds[index].mode}
-                                                                disabled={roundStatus[index] === "Completed"}
-                                                                className={`border-b p-2 flex-grow bg-white w-full focus:outline-none ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                onClick={() => roundStatus[index] !== "Completed" && index === currentRoundIndex && toggleDropdownInterviewMode(index)}
-                                                                readOnly
-                                                            />
-                                                            <MdArrowDropDown
-                                                                className={`absolute top-0 text-gray-500 text-lg mt-4 right-0 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                onClick={() => roundStatus[index] !== "Completed" && toggleDropdownInterviewMode(index)}
-                                                            />
-                                                            {showDropdownInterviewMode === index && roundStatus[index] !== "Completed" && (
-                                                                <div className="absolute z-50 border border-gray-200 mb-5 w-full rounded-md bg-white shadow-lg">
-                                                                    {interviewModeOptions.map((mode) => (
-                                                                        <div
-                                                                            key={mode}
-                                                                            className="py-2 px-4 cursor-pointer hover:bg-gray-100"
-                                                                            onClick={() => handleInterviewModeSelect(index, mode)}
-                                                                        >
-                                                                            {mode}
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                {/* Date & Time and Duration */}
-                                                <div className="flex w-full mb-4 gap-5">
-                                                    <div className="flex items-center w-1/2 pr-2">
-                                                        <label className="w-40 text-left pt-2">
-                                                            Date & Time <span className="text-red-500">*</span>
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            readOnly
-                                                            disabled={roundStatus[index] === "Completed"}
-                                                            value={rounds[index].dateTime || ""}
-                                                            onClick={() => roundStatus[index] !== "Completed" && handleDateClick(index)}
-                                                            className={`border-b py-2 bg-white flex-grow w-full focus:outline-none ${errors.DateTime ? "border-red-500" : "border-gray-300"} ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                            title={!rounds[index].duration ? "Add the duration before selecting date & time" : ""}
-                                                        />
-                                                    </div>
-                                                    <div className="flex items-center w-1/2 pl-2">
-                                                        <label className="text-left" style={{ width: "131px" }}>
-                                                            Duration <span className="text-red-500">*</span>
-                                                        </label>
-                                                        <div className="relative flex-grow">
+                                                    {/* Date & Time and Duration */}
+                                                    <div className="flex w-full mb-4 gap-5">
+                                                        <div className="flex items-center w-1/2 pr-2">
+                                                            <label className="w-40 text-left pt-2">
+                                                                Date & Time <span className="text-red-500">*</span>
+                                                            </label>
                                                             <input
                                                                 type="text"
-                                                                disabled={roundStatus[index] === "Completed"}
-                                                                className={`border-b p-2 flex-grow bg-white w-full focus:outline-none ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                value={rounds[index].duration || ""}
-                                                                onClick={() => roundStatus[index] !== "Completed" && toggleDropdownduration(index)}
                                                                 readOnly
+                                                                value={rounds[index].dateTime || ""}
+                                                                onClick={() => type !== 'EditInternalInterviewProfileDetails' && roundStatus[index] !== "Completed" && handleDateClick(index)}
+                                                                className={`border-b py-2 bg-white flex-grow w-full focus:outline-none 
+                                                                ${errors.DateTime ? "border-red-500" : "border-gray-300"} 
+                                                                ${type === 'EditInternalInterviewProfileDetails' ? "cursor-not-allowed" : ""}`}
+                                                                title={type === 'EditInternalInterviewProfileDetails' ? "Date & Time can't be edited" : (!rounds[index].duration ? "Add the duration before selecting date & time" : "")}
                                                             />
-                                                            <MdArrowDropDown
-                                                                className={`absolute top-0 text-gray-500 text-lg mt-4 right-0 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                onClick={() => roundStatus[index] !== "Completed" && toggleDropdownduration(index)}
-                                                            />
-                                                            {showDropdownduration === index && roundStatus[index] !== "Completed" && (
-                                                                <div className="absolute z-50 border border-gray-200 mb-5 w-full rounded-md bg-white shadow-lg">
-                                                                    {durationOptions.map((duration) => (
-                                                                        <div
-                                                                            key={duration}
-                                                                            className="py-2 px-4 cursor-pointer hover:bg-gray-100"
-                                                                            onClick={() => handleDurationSelect(index, duration)}
-                                                                        >
-                                                                            {duration}
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
+
+                                                        </div>
+                                                        <div className="flex items-center w-1/2 pl-2">
+                                                            <label className="text-left" style={{ width: "131px" }}>
+                                                                Duration <span className="text-red-500">*</span>
+                                                            </label>
+                                                            <div className="relative flex-grow">
+                                                                <input
+                                                                    type="text"
+                                                                    className="border-b p-2 flex-grow bg-white w-full focus:outline-none"
+                                                                    value={rounds[index].duration || ""}
+                                                                    onClick={() => roundStatus[index] !== "Completed" && toggleDropdownduration(index)}
+                                                                    readOnly
+                                                                />
+                                                                <MdArrowDropDown
+                                                                    className="absolute top-0 text-gray-500 text-lg mt-4 right-0"
+                                                                    onClick={() => roundStatus[index] !== "Completed" && toggleDropdownduration(index)}
+                                                                />
+                                                                {showDropdownduration === index && roundStatus[index] !== "Completed" && (
+                                                                    <div className="absolute z-50 border border-gray-200 mb-5 w-full rounded-md bg-white shadow-lg">
+                                                                        {durationOptions.map((duration) => (
+                                                                            <div
+                                                                                key={duration}
+                                                                                className="py-2 px-4 cursor-pointer hover:bg-gray-100"
+                                                                                onClick={() => handleDurationSelect(index, duration)}
+                                                                            >
+                                                                                {duration}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                {rounds.slice(0, currentRoundIndex + 1).length > 1 ? (
-                                                    expandedRounds.includes(index) && (
+                                                    {rounds.slice(0, currentRoundIndex + 1).length > 1 ? (
+                                                        expandedRounds.includes(index) && (
+                                                            <>
+                                                                <ExtendedPart index={index} />
+                                                            </>
+                                                        )
+                                                    ) : (
                                                         <>
                                                             <ExtendedPart index={index} />
-                                                            {/* <div>
-                                                                <div className="flex w-full mb-4 gap-5">
-                                                                    <div className="flex items-center w-1/2 pr-2">
-                                                                        <label className="text-left" style={{ width: "131px" }}>
-                                                                            Interview Type <span className="text-red-500">*</span>
-                                                                        </label>
-                                                                        <div className="relative flex-grow">
-                                                                            <input
-                                                                                type="text"
-                                                                                value={rounds[index]?.interviewType || ""}
-                                                                                readOnly
-                                                                                className={`border-b flex-grow bg-white w-full focus:outline-none ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                                onClick={roundStatus[index] !== "Completed" ? () => handleInterviewTypeClick(index) : null}
-                                                                                title={!rounds[index].dateTime ? "Add the date & time before selecting Interview Type" : ""}
-                                                                            />
-                                                                            <MdArrowDropDown
-                                                                                className={`absolute top-0 text-gray-500 text-lg right-0 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                                onClick={roundStatus[index] !== "Completed" ? () => handleInterviewTypeClick(index) : null}
-                                                                            />
-                                                                            {showDropdownInterviewType && roundStatus[index] !== "Completed" && (
-                                                                                <div className="absolute z-50 border border-gray-200 mb-5 top-5 w-full rounded-md bg-white shadow">
-                                                                                    {interviews.map((interview) => (
-                                                                                        <div
-                                                                                            key={interview}
-                                                                                            className="py-2 px-4 cursor-pointer hover:bg-gray-100"
-                                                                                            onClick={() => handleinterviewSelect(interview, index)}
-                                                                                        >
-                                                                                            {interview}
-                                                                                        </div>
-                                                                                    ))}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="flex items-center w-1/2 pl-2">
-                                                                        <label className="text-left mt-1 mr-4" style={{ width: "114px" }}>
-                                                                            Interviewers <span className="text-red-500">*</span>
-                                                                        </label>
-                                                                        <div className="relative flex-grow">
-                                                                            <div className="relative mb-3">
-                                                                                <div
-                                                                                    disabled
-                                                                                    className="border-b focus:border-black focus:outline-none min-h-8 bg-white mb-5 h-auto w-full relative mt-2"
-                                                                                >
-                                                                                    <div className="flex flex-wrap">
-                                                                                        {rounds[index]?.interviewers?.map((member) => (
-                                                                                            <div key={member.id} className="bg-slate-200 rounded-lg px-2 py-1 inline-block mr-2">
-                                                                                                {member.name}
-                                                                                                <button
-                                                                                                    onClick={() => removeSelectedTeamMember(member, index)}
-                                                                                                    className="ml-1 bg-slate-300 rounded-lg px-2"
-                                                                                                >
-                                                                                                    X
-                                                                                                </button>
-                                                                                            </div>
-                                                                                        ))}
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div className="flex items-center w-1/2 pr-2 mb-12">
-                                                                    <label className="block flex-shrink-0 w-32">
-                                                                        Status <span className="text-red-500">*</span>
-                                                                    </label>
-                                                                    <div className="relative flex-grow round-dropdown mr-[10px]">
-                                                                        <div className="flex items-center mb-4">
-                                                                            <div className="w-full px-3 py-2 border-b bg-white" onClick={() => roundStatus[index] !== "Completed" && toggleDropdownStatus(index)}>
-                                                                                {roundStatus[index] || "Draft"}
-                                                                            </div>
-                                                                            <div
-                                                                                className="absolute right-0 top-0"
-                                                                                onClick={roundStatus[index] !== "Completed" ? () => toggleDropdownStatus(index) : null}
-                                                                            >
-                                                                                <MdArrowDropDown
-                                                                                    className={`text-lg text-gray-500 mt-4 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                                />
-                                                                            </div>
-
-                                                                            {showDropdownStatus[index] && roundStatus[index] !== "Completed" && (
-                                                                                <div className="absolute z-50 border border-gray-200 w-full top-9 rounded-md bg-white shadow-lg">
-                                                                                    {["Draft", "Completed"].map((option) => (
-                                                                                        <div
-                                                                                            key={option}
-                                                                                            className="py-2 px-4 hover:bg-gray-100"
-                                                                                            onClick={() => handleStatusSelect(option, index)}
-                                                                                        >
-                                                                                            {option}
-                                                                                        </div>
-                                                                                    ))}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div className="flex items-center gap-14 pr-2">
-                                                                    <label className="text-left mb-32">
-                                                                        Instructions
-                                                                    </label>
-                                                                    <div className="flex-grow">
-                                                                        <textarea
-                                                                            rows={5}
-                                                                            value={rounds[index].instructions}
-                                                                            disabled={roundStatus[index] === "Completed"}
-                                                                            name="instructions"
-                                                                            id="instructions"
-                                                                            className={`border p-2 focus:outline-none mb-3 w-full rounded-md ${errors.instructions ? "border-red-500" : "border-gray-300"} ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                            onChange={(e) => handleChangedescription(e, index)}
-                                                                        ></textarea>
-                                                                        <p className="text-gray-600 text-sm float-right -mt-4">
-                                                                            {rounds[index].instructions ? rounds[index].instructions.length : 0} /1000
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            </div> */}
                                                         </>
-                                                    )
-                                                ) : (
-                                                    <>
-                                                        <ExtendedPart index={index} />
-                                                        {/* <div>
-                                                            <div className="flex w-full mb-4 gap-5">
-                                                                <div className="flex items-center w-1/2 pr-2">
-                                                                    <label className="text-left" style={{ width: "131px" }}>
-                                                                        Interview Type <span className="text-red-500">*</span>
-                                                                    </label>
-                                                                    <div className="relative flex-grow">
-                                                                        <input
-                                                                            type="text"
-                                                                            value={rounds[index]?.interviewType || ""}
-                                                                            readOnly
-                                                                            disabled={!rounds[index].dateTime || roundStatus[index] === "Completed"}
-                                                                            className={`border-b flex-grow bg-white w-full focus:outline-none ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                            onClick={roundStatus[index] !== "Completed" ? () => handleInterviewTypeClick(index) : null}
-                                                                            title={!rounds[index].dateTime ? "Add the date & time before selecting Interview Type" : ""}
-                                                                        />
-                                                                        <MdArrowDropDown
-                                                                            className={`absolute top-0 text-gray-500 text-lg right-0 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                            onClick={roundStatus[index] !== "Completed" ? () => handleInterviewTypeClick(index) : null}
-                                                                        />
-                                                                        {showDropdownInterviewType && roundStatus[index] !== "Completed" && (
-                                                                            <div className="absolute z-50 border border-gray-200 mb-5 top-5 w-full rounded-md bg-white shadow">
-                                                                                {interviews.map((interview) => (
-                                                                                    <div
-                                                                                        key={interview}
-                                                                                        className="py-2 px-4 cursor-pointer hover:bg-gray-100"
-                                                                                        onClick={() => handleinterviewSelect(interview, index)}
-                                                                                    >
-                                                                                        {interview}
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex items-center w-1/2 pl-2">
-                                                                    <label className="text-left mt-1 mr-4" style={{ width: "114px" }}>
-                                                                        Interviewers <span className="text-red-500">*</span>
-                                                                    </label>
-                                                                    <div className="relative flex-grow">
-                                                                        <div className="relative mb-3">
-                                                                            <div
-                                                                                disabled
-                                                                                className={`border-b focus:border-black focus:outline-none min-h-8 bg-white mb-5 h-auto w-full relative mt-2`}
-                                                                            >
-                                                                                <div className="flex flex-wrap">
-                                                                                    {rounds[index]?.interviewers?.map((member) => (
-                                                                                        <div key={member.id} className="bg-slate-200 rounded-lg px-2 py-1 inline-block mr-2">
-                                                                                            {member.name}
-                                                                                            <button
-                                                                                                onClick={() => removeSelectedTeamMember(member, index)}
-                                                                                                className="ml-1 bg-slate-300 rounded-lg px-2"
-                                                                                            >
-                                                                                                X
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    ))}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="flex items-center w-1/2 pr-2 mb-12">
-                                                                <label className="block flex-shrink-0 w-32">
-                                                                    Status <span className="text-red-500">*</span>
-                                                                </label>
-                                                                <div className="relative flex-grow round-dropdown mr-[10px]">
-                                                                    <div className="flex items-center mb-4">
-                                                                        <div className="w-full px-3 py-2 border-b bg-white" onClick={() => roundStatus[index] !== "Completed" && toggleDropdownStatus(index)}>
-                                                                            {roundStatus[index] || "Draft"}
-                                                                        </div>
-                                                                        <div
-                                                                            className="absolute right-0 top-0"
-                                                                            onClick={roundStatus[index] !== "Completed" ? () => toggleDropdownStatus(index) : null}
-                                                                        >
-                                                                            <MdArrowDropDown
-                                                                                className={`text-lg text-gray-500 mt-4 ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                            />
-                                                                        </div>
-
-                                                                        {showDropdownStatus[index] && roundStatus[index] !== "Completed" && (
-                                                                            <div className="absolute z-50 border border-gray-200 w-full top-9 rounded-md bg-white shadow-lg">
-                                                                                {["Draft", "Completed"].map((option) => (
-                                                                                    <div
-                                                                                        key={option}
-                                                                                        className="py-2 px-4 hover:bg-gray-100"
-                                                                                        onClick={() => handleStatusSelect(option, index)}
-                                                                                    >
-                                                                                        {option}
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="flex items-center gap-14 pr-2">
-                                                                <label className="text-left mb-32">
-                                                                    Instructions
-                                                                </label>
-                                                                <div className="flex-grow">
-                                                                    <textarea
-                                                                        rows={5}
-                                                                        value={rounds[index].instructions}
-                                                                        disabled={roundStatus[index] === "Completed"}
-                                                                        name="instructions"
-                                                                        id="instructions"
-                                                                        className={`border p-2 focus:outline-none mb-3 w-full rounded-md ${errors.instructions ? "border-red-500" : "border-gray-300"} ${!selectedCandidate || roundStatus[index] === "Completed" || index < currentRoundIndex ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
-                                                                        onChange={(e) => handleChangedescription(e, index)}
-                                                                    ></textarea>
-                                                                    <p className="text-gray-600 text-sm float-right -mt-4">
-                                                                        {rounds[index].instructions ? rounds[index].instructions.length : 0} /1000
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </div> */}
-                                                    </>
-                                                )}
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1453,8 +1457,30 @@ const Schedulelater = ({ type, onClose }) => {
                                         Add
                                     </button>
                                 </div>
+                                {/* {interviewQuestionsList[currentRoundIndex]?.questions?.map((question, qIndex) => {
+                                    const isMandatory = question?.mandatory === true;
+                                    return (
+                                        <>
+                                            <div
+                                                key={qIndex}
+                                                className={`mt-2 border rounded p-2 ${isMandatory ? "border-red-500" : "border-green-500"}`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <p>
+                                                        <strong>{qIndex + 1}. </strong> {question?.snapshot?.questionText}
+                                                    </p>
+                                                </div>
+                                                <div className="mt-2 text-gray-500 text-sm ml-[17px]">
+                                                    <p>{question?.snapshot?.correctAnswer}</p>
+                                                    <p>{Array.isArray(question?.snapshot?.tags) ? question?.snapshot?.tags.join(", ") : "No tags available"}</p>
+                                                </div>
+                                            </div>
+                                            {JSON.stringify(question)}
+                                        </>
+                                    );
+                                })} */}
                                 {interviewQuestionsList[currentRoundIndex]?.questions?.map((question, qIndex) => {
-                                    const isMandatory = question.mandatory === true;
+                                    const isMandatory = question?.mandatory === true;
                                     return (
                                         <div
                                             key={qIndex}
@@ -1462,16 +1488,17 @@ const Schedulelater = ({ type, onClose }) => {
                                         >
                                             <div className="flex items-center justify-between">
                                                 <p>
-                                                    <strong>{qIndex + 1}. </strong> {question.snapshot.questionText}
+                                                    <strong>{qIndex + 1}. </strong> {question?.snapshot?.questionText || "No Question Text"}
                                                 </p>
                                             </div>
                                             <div className="mt-2 text-gray-500 text-sm ml-[17px]">
-                                                <p>{question.snapshot.correctAnswer}</p>
-                                                <p>{Array.isArray(question.snapshot.tags) ? question.snapshot.tags.join(", ") : "No tags available"}</p>
+                                                <p>{question?.snapshot?.correctAnswer || "No Correct Answer"}</p>
+                                                <p>{Array.isArray(question?.snapshot?.tags) ? question?.snapshot?.tags.join(", ") : "No tags available"}</p>
                                             </div>
                                         </div>
                                     );
                                 })}
+
                                 {/* Question Popup */}
                                 {isInterviewQuestionPopup && (
                                     <div
@@ -1542,70 +1569,93 @@ const Schedulelater = ({ type, onClose }) => {
                         </div>
                     )}
                     <div className="footer-buttons flex justify-end">
-                        {currentStep === 1 ? (
+                        {currentStep === 1 && (
                             <button
-                                type="submit"
+                                type="button"
                                 className="footer-button mr-3 bg-white text-black hover:bg-white"
                                 onClick={handleClose}
                             >
                                 Cancel
                             </button>
-                        ) : (
-                            <button
-                                type="submit"
-                                className="footer-button mr-3 bg-white text-black hover:bg-white"
-                                onClick={() => setCurrentStep(1)}
-                            >
-                                Back
-                            </button>
                         )}
                         {currentStep === 1 ? (
                             <>
-                                <button
-                                    className="text-white font-semibold cursor-pointer footer-button"
-                                    onClick={() => handleSave(true)}
-                                >
-                                    {isLastRound && roundStatus[currentRoundIndex] === "Completed" ? "Save" : "Save & Next"}
-                                </button>
+                                {type === 'EditInternalInterviewProfileDetails' ? (
+                                    <>
+                                        <button
+                                            className="text-white font-semibold cursor-pointer footer-button"
+                                            onClick={() => handleEditSave(false)} // Save only
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            className="text-white font-semibold cursor-pointer footer-button ml-3"
+                                            onClick={() => handleEditSave(true)} // Save and move to next step
+                                        >
+                                            Save & Next
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            className="text-white font-semibold cursor-pointer footer-button"
+                                            onClick={() => handleSave(true)}
+                                        >
+                                            {roundStatus[currentRoundIndex] === "Completed" ? "Save" : "Save & Next"}
+                                        </button>
 
-                                {lastRoundCompleted && (
-                                    <button
-                                        className="text-white font-semibold cursor-pointer footer-button ml-3"
-                                        onClick={handleAddRound}
-                                    >
-                                        Save and Add New Round
-                                    </button>
+                                        {lastRoundCompleted && (
+                                            <button
+                                                className="text-white font-semibold cursor-pointer footer-button ml-3"
+                                                onClick={handleAddRound}
+                                            >
+                                                Save and Add New Round
+                                            </button>
+                                        )}
+                                    </>
                                 )}
                             </>
                         ) : (
                             <div>
-                                <button
-                                    className="text-white font-semibold cursor-pointer footer-button"
-                                    onClick={() => { handleSave(false) }}
-                                >
-                                    {type === "ScheduleLater" ? "Save" : "Schedule"}
-                                </button>
-                                <button
-                                    className="text-white font-semibold cursor-pointer footer-button ml-3"
-                                    onClick={() => handleSave('add new round')}
-                                >
-                                    Save and Add New Round
-                                </button>
+                                {type === 'EditInternalInterviewProfileDetails' ? (
+                                    <>
+                                        <button
+                                            className="text-white font-semibold cursor-pointer footer-button"
+                                            onClick={() => handleEditSave(false)}
+                                        >
+                                            Save
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            className="text-white font-semibold cursor-pointer footer-button"
+                                            onClick={() => { handleSave(false) }}
+                                        >
+                                            {type === "ScheduleLater" ? "Save" : "Schedule"}
+                                        </button>
+                                        <button
+                                            className="text-white font-semibold cursor-pointer footer-button ml-3"
+                                            onClick={() => handleSave('add new round')}
+                                        >
+                                            Save and Add New Round
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>
                 </React.Fragment>
             )}
-            {/* {showOutsourcePopup && (
+            {showOutsourcePopup && (
                 <OutsourceOption
                     onClose={() => setShowOutsourcePopup(false)}
-                    onSelectCandidates={(interviewers) => handleOutsourceInterviewerSelect(interviewers, currentRoundIndex)}
-                    currentRoundIndex={currentRoundIndex}
                     dateTime={rounds[currentRoundIndex]?.dateTime}
                     candidateData1={selectedCandidateData}
-                    interviewId={interviewId}
+                    onProceed={(interviewers) => handleReceivedInterviewerIds(interviewers, currentRoundIndex)}
+                    selectedInterviewerIds={selectedInterviewerIdsPerRound[currentRoundIndex] || []}
                 />
-            )} */}
+            )}
             {showDeletePopup && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-5 rounded-lg shadow-lg w-1/3 relative">
@@ -1652,14 +1702,14 @@ const Schedulelater = ({ type, onClose }) => {
                     </div>
                 </div>
             )}
-            {/* {isSidebarOpen && (
+            {isSidebarOpen && (
                 <InternalInterviews
                     isOpen={isSidebarOpen}
                     onClose={() => setIsSidebarOpen(false)}
                     onSelectCandidates={(interviewers) => handleInternalInterviewerSelect(interviewers, currentRoundIndex)}
                     currentRoundIndex={currentRoundIndex}
                 />
-            )} */}
+            )}
         </>
     );
 };

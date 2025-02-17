@@ -204,7 +204,7 @@ export const Organization = () => {
         ProfileId: adminProfileId
       });
 
-      navigate('/price');
+      navigate('/subscription-plans');
     } catch (error) {
       console.error('Error saving organization:', error.response?.data || error.message);
       setErrorMessage(`An error occurred while saving the organization: ${error.response?.data?.message || error.message || 'Unknown error'}`);

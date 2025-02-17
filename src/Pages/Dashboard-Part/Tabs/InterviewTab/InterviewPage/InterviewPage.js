@@ -33,7 +33,7 @@ const IconButton = ({ icon, label, color = "text-gray-700" }) => (
   </button>
 );
 
-const socket = io("http://localhost:5000", { transports: ["websocket"] }); // ✅ Create a single socket connection
+// const socket = io("http://localhost:5000", { transports: ["websocket"] }); // ✅ Create a single socket connection
  
 const InterviewPage = () => {
   const {popupVisibility,setPopupVisibility,feedbackCloseFlag,setFeedbackCloseFlag,page,setPage}=useCustomContext()
@@ -52,6 +52,9 @@ const [messageInput, setMessageInput] = useState("");
 const [dataTrack, setDataTrack] = useState(null);
 const [participants,setParticipants] = useState([])
 const [remoteParticipants, setRemoteParticipants] = useState([]);
+
+const [activeScreenTrack, setActiveScreenTrack] = useState(null); // Store the active screen share track
+const [screenSharer, setScreenSharer] = useState(null); // Store who is sharing
 
 const [localUser, setLocalUser] = useState(null);
 
@@ -161,20 +164,28 @@ const [localUser, setLocalUser] = useState(null);
                 });
 
                 participant.on("trackSubscribed", (track) => {
-                    if (track.kind === "video" && track.name === "screen") {
-                        console.log(`${participant.identity} started sharing their screen`);
-                        if (screenVideoRef.current) {
-                            screenVideoRef.current.innerHTML = "";
-                            screenVideoRef.current.appendChild(track.attach());
-                        }
+                  if (track.kind === "video" && track.name === "screen") {
+                    console.log(`${participant.identity} started screen sharing`);
+                    setActiveScreenTrack(track); // Store the track for full-width display
+                    setScreenSharer(participant.identity);
+              
+                    if (screenVideoRef.current) {
+                      screenVideoRef.current.innerHTML = ""; // Clear old content
+                      screenVideoRef.current.appendChild(track.attach());
                     }
-                });
+                  }
+                })
 
                 participant.on("trackUnsubscribed", (track) => {
-                    if (track.kind === "video" && track.name === "screen") {
-                        console.log(`${participant.identity} stopped sharing their screen`);
-                        track.detach().forEach(element => element.remove());
-                    }
+                  if (track.kind === "video" && track.name === "screen") {
+                    console.log(`${participant.identity} stopped screen sharing`);
+                    track.detach().forEach(el => el.remove());
+                    setActiveScreenTrack(track); // Store the track for full-width display
+                    setScreenSharer(participant.identity);
+                    if (screenVideoRef.current) {
+                      screenVideoRef.current.innerHTML = "";
+                  }
+                  }
                 });
             };
 
@@ -247,63 +258,77 @@ const [localUser, setLocalUser] = useState(null);
 
       const leaveMeeting = () => {
         if (room) {
-          room.disconnect();
-          setRoom(null);
+            if (screenTrackRef.current) {
+                stopScreenShare(); // Ensure screen sharing stops
+            }
+            room.disconnect();
+            setRoom(null);
+            setActiveScreenTrack(null); // Reset screen share state
+            setScreenSharer(null);
+            setRemoteParticipants([]);
         }
         navigate("/"); // Redirect to home or another page
-      };
-
-
-      const startScreenShare = async () => {
-        if (!room) return;
-    
-        try {
-            const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-            const screenTrack = new Video.LocalVideoTrack(stream.getTracks()[0]);
-    
-            // Ensure old screen share track is removed
-            if (screenTrackRef.current) {
-                room.localParticipant.unpublishTrack(screenTrackRef.current);
-                screenTrackRef.current.stop();
-            }
-    
-            // Publish new screen track
-            await room.localParticipant.publishTrack(screenTrack);
-            screenTrackRef.current = screenTrack;
-            setIsScreenSharing(true);
-    
-            // ✅ Fix: Attach track correctly
-            if (screenVideoRef.current) {
-                console.log("Attaching Screen Track to Video Element:", screenTrack);
-                screenTrack.attach(screenVideoRef.current); // ✅ Use `.attach(videoElement)`
-            } else {
-                console.warn("screenVideoRef is still null when attaching!");
-            }
-    
-            // Stop screen share when user manually stops
-            stream.getVideoTracks()[0].addEventListener("ended", stopScreenShare);
-        } catch (error) {
-            console.error("Error starting screen share:", error);
-        }
     };
     
     
 
-const stopScreenShare = () => {
-  if (!screenTrackRef.current || !room) return;
+    const startScreenShare = async () => {
+      if (!room) return;
+  
+      try {
+          const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+          const screenTrack = new Video.LocalVideoTrack(stream.getTracks()[0]);
+  
+          // Remove old screen track if any
+          if (screenTrackRef.current) {
+              room.localParticipant.unpublishTrack(screenTrackRef.current);
+              screenTrackRef.current.stop();
+          }
+  
+          // Publish new screen track
+          await room.localParticipant.publishTrack(screenTrack);
+          screenTrackRef.current = screenTrack;
+          setActiveScreenTrack(screenTrack);  // Make it full screen for all
+          setScreenSharer("You");  // Show "You" when sharing
+  
+          // Attach the screen for the sharer
+          if (screenVideoRef.current) {
+              screenVideoRef.current.innerHTML = "";
+              screenVideoRef.current.appendChild(screenTrack.attach());
+          }
+  
+          // Stop screen share when user manually stops
+          stream.getVideoTracks()[0].addEventListener("ended", stopScreenShare);
+      } catch (error) {
+          console.error("Error starting screen share:", error);
+      }
+  };
+  
+    
+    useEffect(() => {
+      return () => {
+        if (screenTrackRef.current) {
+          stopScreenShare();
+        }
+      };
+    }, []);
+    
+    
+    
 
-  room.localParticipant.unpublishTrack(screenTrackRef.current);
-  screenTrackRef.current.stop();
-
-  // Detach screen share feed
-  if (screenVideoRef.current) {
-      screenTrackRef.current.detach(screenVideoRef.current);
-  }
-
-  screenTrackRef.current = null;
-  setIsScreenSharing(false);
-};
-
+    const stopScreenShare = () => {
+      if (!screenTrackRef.current || !room) return;
+    
+      room.localParticipant.unpublishTrack(screenTrackRef.current);
+      screenTrackRef.current.stop();
+    
+      // Ensure UI cleanup
+      screenTrackRef.current.detach().forEach(el => el.remove());
+    
+      screenTrackRef.current = null;
+      setIsScreenSharing(false);
+    };
+    
 
 
 // const sendMessage = async () => {
@@ -338,35 +363,35 @@ const stopScreenShare = () => {
 useEffect(() => {
   // ✅ Fetch chat history on mount
   const fetchMessages = async () => {
-      try {
-          const response = await axios.get("http://localhost:5000/message/messages/your-team-id");
-          setMessages(response.data);
-      } catch (error) {
-          console.error("Error fetching messages:", error);
-      }
+      // try {
+      //     const response = await axios.get("http://localhost:5000/message/messages/your-team-id");
+      //     setMessages(response.data);
+      // } catch (error) {
+      //     console.error("Error fetching messages:", error);
+      // }
   };
   fetchMessages();
 
   // ✅ Listen for real-time messages
-  socket.on("receiveMessage", (newMessage) => {
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-  });
+  // socket.on("receiveMessage", (newMessage) => {
+  //     setMessages((prevMessages) => [...prevMessages, newMessage]);
+  // });
 
-  return () => {
-      socket.off("receiveMessage"); // ✅ Cleanup to prevent duplicate listeners
-  };
+  // return () => {
+  //     socket.off("receiveMessage"); // ✅ Cleanup to prevent duplicate listeners
+  // };
 }, []);
 
 // ✅ Send Message via WebSocket
 const sendMessage = () => {
-  if (messageInput.trim()) {
-      const newMessage = { teamId: "your-team-id", sender: "your-user-id", text: messageInput };
+  // if (messageInput.trim()) {
+  //     const newMessage = { teamId: "your-team-id", sender: "your-user-id", text: messageInput };
 
-      socket.emit("send", newMessage); // ✅ Emit message to server
+  //     socket.emit("send", newMessage); // ✅ Emit message to server
 
-      setMessages((prevMessages) => [...prevMessages, { ...newMessage, sender: "You" }]);
-      setMessageInput(""); // Clear input
-  }
+  //     setMessages((prevMessages) => [...prevMessages, { ...newMessage, sender: "You" }]);
+  //     setMessageInput(""); // Clear input
+  // }
 };
       
 
@@ -458,17 +483,25 @@ const sendMessage = () => {
     <p className="bg-gray-800 text-white px-2 py-1 rounded-md text-sm">You</p>
   </div>
 
-  {/* ✅ When Chat is Open (Chat Takes 25% Space) */}
-  {isChatOpen ? (
+  {/* ✅ When Screen Sharing is Active - Everyone Sees it Full-Screen */}
+  {activeScreenTrack ? (
+    <div className="w-screen h-screen bg-black flex items-center justify-center relative">
+      <video ref={screenVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
+      <div className="absolute top-4 left-4 bg-gray-900 text-white px-4 py-2 rounded-md">
+        <span>{screenSharer} is sharing their screen</span>
+      </div>
+    </div>
+  ) : isChatOpen ? (
+    // ✅ When Chat is Open (75% Video - 25% Chat)
     <div className="grid grid-cols-[75%_25%] gap-4 h-[100vh] p-4 bg-gray-300 border border-gray-400 rounded-md">
       {/* Video Participants Section */}
-      <div className="flex flex-wrap  items-start gap-4 w-full h-full border border-gray-400 rounded-md">
+      <div className="flex flex-wrap items-start gap-4 w-full h-full border border-gray-400 rounded-md">
         {remoteParticipants.map((p) => (
           <div key={p.id} className="border border-white rounded-md w-48 aspect-square bg-black relative">
             <p className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded-md text-sm">{p.identity}</p>
             <div ref={(el) => {
               if (el && p.videoTrack) {
-                el.innerHTML = ""; // Clear previous
+                el.innerHTML = ""; // Clear previous content
                 el.appendChild(p.videoTrack.attach());
               }
             }} className="w-full h-full flex items-center justify-center" />
@@ -476,66 +509,37 @@ const sendMessage = () => {
         ))}
       </div>
 
-      {/* Chat Section (Takes 25% Width) */}
-      {/* <div className="w-full bg-gray-300 p-4 h-full rounded-md border border-gray-400">Chat Feature</div> */}
+      {/* ✅ Chat Section (25% Width) */}
       <div className="w-full bg-gray-300 p-4 h-full rounded-md border border-gray-400 flex flex-col">
-    <h2 className="text-lg font-bold mb-2 text-gray-800">Chat</h2>
+        <h2 className="text-lg font-bold mb-2 text-gray-800">Chat</h2>
 
-    {/* ✅ Chat Messages */}
-    <div className="flex-1 overflow-y-auto bg-gray-100 p-2 rounded-md">
-        {messages.map((msg, index) => (
+        {/* ✅ Chat Messages */}
+        <div className="flex-1 overflow-y-auto bg-gray-100 p-2 rounded-md">
+          {messages.map((msg, index) => (
             <div key={index} className={`p-2 my-1 rounded-md ${msg.sender === "your-user-id" ? "bg-blue-500 text-white self-end" : "bg-gray-300 text-black self-start"}`}>
-                <strong>{msg.sender?.name}:</strong> {msg.text}
+              <strong>{msg.sender?.name}:</strong> {msg.text}
             </div>
-        ))}
-    </div>
+          ))}
+        </div>
 
-    {/* ✅ Input Field */}
-    <div className="mt-2 flex">
-        <input
+        {/* ✅ Input Field */}
+        <div className="mt-2 flex">
+          <input
             type="text"
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             className="flex-1 p-2 rounded-l-md bg-white text-black border border-gray-400"
             placeholder="Type a message..."
-        />
-        <button onClick={sendMessage} className="bg-blue-500 p-2 rounded-r-md text-white">
+          />
+          <button onClick={sendMessage} className="bg-blue-500 p-2 rounded-r-md text-white">
             Send
-        </button>
-    </div>
-</div>
-
-    </div>
-  ) : isScreenSharing ? (
-    // ✅ When Screen Sharing is Active (Screen Takes 75%, Participants in 25%)
-    <div className="grid grid-cols-[75%_25%] gap-4 h-[100vh] p-4 bg-gray-300 border border-gray-400 rounded-md">
-      {/* 📌 Screen Share Area (75% width) */}
-      <div className="border border-white w-full h-full flex items-center justify-center rounded-md bg-black">
-        <h4 className="absolute top-2 left-2 bg-gray-800 text-white px-3 py-1 rounded-md">Screen Sharing</h4>
-        <video ref={screenVideoRef} autoPlay playsInline className="w-full h-full object-cover rounded-md" />
-      </div>
-
-      {/*  Participants Column (25% width) */}
-      <div className="border border-white w-full h-full p-4 rounded-md overflow-auto">
-        <h2 className="text-lg font-bold mb-2 text-gray-800">Participants</h2>
-        <div className="flex flex-col gap-4">
-          {remoteParticipants.map((p) => (
-            <div key={p.id} className="border border-white rounded-md w-48 aspect-square bg-black relative">
-              <p className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded-md text-sm">{p.identity}</p>
-              <div ref={(el) => {
-                if (el && p.videoTrack) {
-                  el.innerHTML = ""; // Clear previous content
-                  el.appendChild(p.videoTrack.attach());
-                }
-              }} className="w-full h-full flex items-center justify-center" />
-            </div>
-          ))}
+          </button>
         </div>
       </div>
     </div>
   ) : (
     // ✅ Default View (All Participants in a Grid)
-    <div className="flex flex-wrap  items-start gap-4 p-4 h-[100vh] bg-gray-300 border border-gray-400 rounded-md">
+    <div className="flex flex-wrap items-start gap-4 p-4 h-[100vh] bg-gray-300 border border-gray-400 rounded-md">
       {remoteParticipants.map((p) => (
         <div key={p.id} className="border border-white rounded-md w-48 aspect-square bg-black relative">
           <p className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded-md text-sm">{p.identity}</p>
@@ -550,6 +554,7 @@ const sendMessage = () => {
     </div>
   )}
 </>
+
 
 
 

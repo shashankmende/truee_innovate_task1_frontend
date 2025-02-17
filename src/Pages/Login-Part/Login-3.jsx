@@ -9,12 +9,12 @@ const Profile3 = () => {
     const [isActive, setIsActive] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
 
-    // Handler to toggle the active state
     const toggleActiveState = (tab) => {
+        const professionName = tab === 'technical' ? 'Technical_Expert/Developer' : 'HR/Recruiter';
         setIsActive(!isActive);
-        setSelectedTab(tab);
+        setSelectedTab(professionName);
     };
-
+    
     const handleButtonClick = () => {
         if (selectedTab) {
             setShowPopup(true);
@@ -27,11 +27,11 @@ const Profile3 = () => {
 
     const handlePopupConfirm = (Freelancer) => {
         setShowPopup(false);
-        navigateToNext(Freelancer);
+        navigateToNext(Freelancer, selectedTab); // Pass full profession name
     };
-
+    
     const navigateToNext = (Freelancer) => {
-        navigate('/profile4', { state: { Freelancer } });
+        navigate('/profile4', { state: { Freelancer, profession: selectedTab } });
     };
 
 
