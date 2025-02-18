@@ -10,6 +10,7 @@ import { IoMdClose,IoIosCloseCircleOutline } from "react-icons/io";
 import { BiSolidUpArrow } from "react-icons/bi";
 import { TbArrowsMaximize } from "react-icons/tb";
 import { FiMinimize } from "react-icons/fi";
+import Cookies from 'js-cookie'
 
 import {
   SchedulerQuestionsValidation,
@@ -203,9 +204,11 @@ const Feedback = ({ page, closePopup }) => {
           note: skill.note,
         }))
     );
+
+    const tenantId = Cookies.get("organizationId");
   
     return {
-      tenantId:"tenantId-1",
+      tenantId,
       interviewId:"interview-1",
       candidateId:"candidate-1",
       interviewerId:"interviewerId-1",
@@ -245,7 +248,8 @@ const Feedback = ({ page, closePopup }) => {
       console.log('data',data)
       try {
       console.log("form data", data);
-      const url = `${process.env.REACT_APP_URL}/feedback/create`;
+      const url = `${process.env.REACT_APP_API_URL}/feedback/create`;
+      console.log("url",url)
       const response = await axios.post(url, data);
       console.log("response from frontend", response);
       if (response.data.success) {

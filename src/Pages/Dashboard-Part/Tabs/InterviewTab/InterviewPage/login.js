@@ -10,13 +10,17 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     // const [user, setUser] = useState(null);
-    const [user, setUser] = useState("host");
+    const [user, setUser] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const { id } = useParams(); // Meeting ID from URL
-    console.log("params",useParams())
+    
     const [isChecked,setIsChecked] = useState(false)
     const [candidate,setCandidate] = useState("")//user or host
+    const [otp, setOtp] = useState(""); // Store entered OTP
+    const [otpError, setOtpError] = useState("") 
+    const [resendMessage, setResendMessage] = useState("");
+    const [isResending, setIsResending] = useState(false);
 
     // Function to decrypt the user parameter safely
     // const decrypt = (encryptedText, secretKey = "meet") => {
@@ -56,6 +60,8 @@ const Login = () => {
 
     // Extract user from query params on mount
     useEffect(() => {
+        const checkUserSessionAndInitialize =async()=>{
+
         const params = new URLSearchParams(location.search);
         const encryptedUser = params.get("user");
 
@@ -66,12 +72,22 @@ const Login = () => {
                 setUser(decryptedUser)
                 // const isUserIdExist = Cookies.get("UserId");
                 const isUserIdExist = Cookies.get("userId");
+                console.log("is user exist",isUserIdExist,decryptedUser)
                 console.log("Is used id exist",isUserIdExist)
-                if (decryptedUser==="host" && isUserIdExist){
-                    // navigate('/interview-page')
+                if (decryptedUser.user==="host" && isUserIdExist){
+                    // navigate('/interview-page',{state:{}})
+                    
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/get-token`,{
+                    roomName:id,                    
+                    identity:isUserIdExist
+                })
+                navigate("/interview-page",{state:{roomName:id,token:response.data.token,user:"host"}})
                 }
             };
         }
+    }
+    checkUserSessionAndInitialize()
+
     }, [location.search]);
 
 
@@ -86,14 +102,17 @@ const Login = () => {
             //     password,
             // });
 
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/organization/login`,{
+            const loginResponse = await axios.post(`${process.env.REACT_APP_API_URL}/organization/login`,{
                 Email:email,
                 password,
             })
 
-            if (response.status===200){
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/get-token`)
-                navigate("/interview-page",{state:{roomName:id,token:response.data.token}})
+            if (loginResponse.status===200){
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/get-token`,{
+                    roomName:id,                    
+                    identity:loginResponse.data.userId
+                })
+                navigate("/interview-page",{state:{roomName:id,token:response.data.token,user:"host"}})
             }
             
 
@@ -105,7 +124,53 @@ const Login = () => {
             // setUser(response.data.user.user);
             // navigate("/interview-page",{state:{roomName:id,}})
         } catch (err) {
+            console.log("error ",err)
             setError(err.response?.data?.message || "Login failed");
+        }
+    };
+
+    const verifyOtp = async () => {
+        setOtpError("");
+
+        if (!otp || !user.details.id) {
+            setOtpError("Invalid OTP or candidate ID");
+            return;
+        }
+
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/team-verify-otp`, {
+                candidateId:user.details.id,
+                teamId:id, 
+                otp
+            });
+
+            if (response.status === 200) {
+                alert("OTP verified successfully!");
+                navigate("/interview-page", { state: { roomName: id,token:user.details.id,user:"public" } });
+            }
+        } catch (err) {
+            setOtpError(err.response?.data?.message || "OTP verification failed");
+        }
+    };
+
+
+    const resendOtp = async () => {
+        setIsResending(true);
+        setResendMessage("");
+
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/team-resend-otp`, {
+                candidateId:user.details.id,
+                teamId:id
+            });
+
+            if (response.status === 200) {
+                setResendMessage("OTP has been resent to your email!");
+            }
+        } catch (err) {
+            setResendMessage("Failed to resend OTP. Try again later.");
+        } finally {
+            setIsResending(false);
         }
     };
 
@@ -183,12 +248,17 @@ const Login = () => {
                             <h2 className="text-[#227a8a] font-medium">Please enter the 5-digit OTP</h2>                                                                            
                             <div className="flex flex-col gap-8">
                                 <div className="flex gap-8">
-                                <input type="text" placeholder="Enter OTP" className="p-2 rounded-md w-[300px] outline-none border"/>   
-                                <button className="font-medium text-[gray]">Resend OTP</button>                         
+                                <input type="text" placeholder="Enter OTP" className="p-2 rounded-md w-[300px] outline-none border" onChange = {(e)=>{setOtp(e.target.value) ; setOtpError("")}}/>   
+                                {/* <button className="font-medium text-[gray]">Resend OTP</button>                          */}
+                                <button disabled={isResending} onClick={resendOtp} className="font-medium text-[gray]">
+                                {isResending ? "Resending..." : "Resend OTP"}
+                            </button>  
                                 </div>
                                 <div className="flex justify-center">
-                        <button disabled={!isChecked} onClick={()=>alert('clicked')} className={`bg-[#227a8a] px-4 py-2 rounded-md text-white ${!isChecked && 'cursor-not-allowed'}`}>verify</button>
+                        <button disabled={!isChecked} onClick={()=>verifyOtp()} className={`bg-[#227a8a] px-4 py-2 rounded-md text-white ${!isChecked && 'cursor-not-allowed'}`}>verify</button>
                         </div>
+                        {otpError && <p className="text-red-500">{otpError}</p>}
+
                            
                             </div>
                         </div>

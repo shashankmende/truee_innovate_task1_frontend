@@ -315,6 +315,7 @@ const CustomProvider = ({ children }) => {
   // position fetch
   const sharingPermissionsPosition = useMemo(() => sharingPermissionscontext.position || {}, [sharingPermissionscontext]);
   const [positions, setSkillsData] = useState([]);
+
   const fetchPositionsData = useCallback(async () => {
     setLoading(true);
     try {
@@ -333,7 +334,8 @@ const CustomProvider = ({ children }) => {
 
   useEffect(() => {
     fetchPositionsData();
-  }, [fetchPositionsData]);
+  }, []);
+  // }, [fetchPositionsData]);
 
   // Mockinterview
   const [mockinterviewData, setmockinterviewData] = useState([]);

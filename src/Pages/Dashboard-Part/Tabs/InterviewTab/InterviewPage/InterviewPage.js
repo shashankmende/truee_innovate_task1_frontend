@@ -42,6 +42,8 @@ const InterviewPage = () => {
   const location =  useLocation()
   const token = location.state.token
   const roomName = location.state.roomName
+  const user = location.state.user 
+
   console.log("Location location",location)
    const [room, setRoom] = useState(null);
       const localVideoRef = useRef(null);
@@ -57,8 +59,6 @@ const [activeScreenTrack, setActiveScreenTrack] = useState(null); // Store the a
 const [screenSharer, setScreenSharer] = useState(null); // Store who is sharing
 
 const [localUser, setLocalUser] = useState(null);
-
-
     
   const navigate = useNavigate()
       const [isVideoEnabled, setIsVideoEnabled] = useState(true);
@@ -73,6 +73,28 @@ const [localUser, setLocalUser] = useState(null);
     setFeedbackCloseFlag(true)
 
   },[])
+
+  useEffect(() => {
+    console.log("Token:", token);
+    console.log("Room Name:", roomName);
+
+    if (!token || !roomName) {
+        console.error("Missing Twilio token or room name.");
+        navigate("/error-page"); // Redirect if token is missing
+        return;
+    }
+}, [roomName, token]);
+
+useEffect(() => {
+  if (room && localVideoRef.current) {
+      localVideoRef.current.innerHTML = ""; // Clear existing video
+      room.localParticipant.tracks.forEach((publication) => {
+          if (publication.track && publication.track.kind === "video") {
+              localVideoRef.current.appendChild(publication.track.attach());
+          }
+      });
+  }
+}, [room]);
 
 
   useEffect(() => {
@@ -408,16 +430,19 @@ const sendMessage = () => {
       <div className="flex items-center space-x-6">
         <div className="flex items-center space-x-6 ">
           
-        <Popup nested closeOnDocumentClick={false} trigger={<button><IconButton icon={mdiMessageTextOutline} label="Feedback" /></button>}>
+        { user==="host" && <Popup nested closeOnDocumentClick={false} trigger={<button><IconButton icon={mdiMessageTextOutline} label="Feedback" /></button>}>
           {closePopup =>
           <div className={`w-full bg-[#8080805f] fixed top-0 right-0 bottom-0  rounded-md flex justify-end ${popupVisibility?"text-[1rem]":"text-sm"}`}>
             <div style={{width:popupVisibility ? "100%":"50%"}}   className={` bg-white   transition-all duration-500 ease-in-out transform`}>
-              <Feedback closePopup={closePopup}  page={ !feedbackCloseFlag ? "Home":"Popup"}/>
+              <Feedback 
+              // interviewId={id}
+              //  interviewerId={user.details.id} 
+                closePopup={closePopup}  page={ !feedbackCloseFlag ? "Home":"Popup"}/>
             </div>
           </div>}
-        </Popup>
+        </Popup>}
           
-          <Popup closeOnDocumentClick={false} trigger={<button><IconButton icon={mdiHelpCircleOutline} label="Questions" /></button>}>
+          { user==="host" &&  <Popup closeOnDocumentClick={false} trigger={<button><IconButton icon={mdiHelpCircleOutline} label="Questions" /></button>}>
             {closeQuestionBankPopup=>(
               <div className='fixed bg-[#8080805f] top-0 left-0 right-0 bottom-0 w-full flex justify-end'>
                 <div className={`${questionBankPopupVisibility ? "w-[100%] text-md":"w-[50%] text-sm"} bg-white  transition-all duration-500 ease-in-out transform`}>
@@ -426,7 +451,7 @@ const sendMessage = () => {
                 </div>
               </div>
             )}
-          </Popup>
+          </Popup>}
           <IconButton icon={mdiNoteTextOutline} label="Notes" />
           <IconButton icon={mdiCodeTags} label="Code Editor" />
           <span onClick={()=>setIsChatOpen(!isChatOpen)}>

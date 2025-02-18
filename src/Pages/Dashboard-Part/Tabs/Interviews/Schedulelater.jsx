@@ -11,7 +11,6 @@ import SuggesstedQuestions from "../QuestionBank-Tab/SuggesstedQuestionsMain.jsx
 import InternalInterviews from "./Interviewers.jsx";
 import OutsourceOption from "./OutsourceOption.jsx";
 import { useCustomContext } from "../../../../Context/Contextfetch.js";
-import {v4 as uuidv4} from 'uuid'
 
 const getTodayDate = () => {
     const today = new Date();
@@ -46,25 +45,20 @@ const Schedulelater = ({ type, onClose,
     SelectedInterviewData
 }) => {
 
-    // console.log("SelectedInterviewData", SelectedInterviewData)
     const {
-        candidateData
+        candidateData,
+        positions,
+        fetchInterviewData
     } = useCustomContext();
-    console.log("candidateData",candidateData)
-    
+
     const candidateRef = useRef(null);
 
     const [showDropdown, setShowDropdown] = useState(false);
     const [showDropdownPosition, setShowDropdownPosition] = useState(false);
     const [selectedCandidate, setSelectedCandidate] = useState("");
-    // const [selectedCandidate, setSelectedCandidate] = useState("Maxwell");
     const [selectedCandidateId, setSelectedCandidateId] = useState("");
-    // const [selectedCandidateId, setSelectedCandidateId] = useState("67b1493528a91881f6b91708");
     const [selectedPositionId, setSelectedPositionId] = useState("");
-    // const [selectedPositionId, setSelectedPositionId] = useState("67933406a5b8711f0e4ea275");
     const [selectedPosition, setSelectedPosition] = useState("");
-    // const [selectedPosition, setSelectedPosition] = useState("Salesforce");
-
     const [errors, setErrors] = useState({});
     const [showOutsourcePopup, setShowOutsourcePopup] = useState(false);
     const [unsavedChanges, setUnsavedChanges] = useState(false);
@@ -105,14 +99,7 @@ const Schedulelater = ({ type, onClose,
         interviewData.rounds.map(() => ({ questions: [] }))
     );
 
-    // console.log('interviewQuestionsList', interviewQuestionsList)
-
     const [rounds, setRounds] = useState([]);
-
-    // console.log('rounds', rounds)
-
-    const [selectedInterviewerIds, setSelectedInterviewerIds] = useState([]);
-    console.log('selectedInterviewerIds', selectedInterviewerIds)
 
     const handleDateClick = (index) => {
         setCurrentRoundIndex(index);
@@ -166,9 +153,6 @@ const Schedulelater = ({ type, onClose,
     //             console.warn("No matching round found for ID:", SelectedInterviewData.selectedRoundId);
     //             return;
     //         }
-    //         console.log("matchedRound", matchedRound);
-    //         console.log("matchedRound.questions", matchedRound.questions);
-    //         console.log("SelectedInterviewData._id", SelectedInterviewData._id)
 
     //         setRounds([matchedRound]);
     //         setInterviewQuestionsList([{ questions: matchedRound.questions }]);
@@ -203,11 +187,7 @@ const Schedulelater = ({ type, onClose,
                 return;
             }
 
-            console.log("matchedRound", foundRound);
-            console.log("matchedRound.questions", foundRound.questions);
-            console.log("SelectedInterviewData._id", SelectedInterviewData._id);
-
-            setMatchedRound(foundRound); // ✅ Store matchedRound in state
+            setMatchedRound(foundRound);
             setRounds([foundRound]);
             setInterviewQuestionsList([{ questions: foundRound.questions }]);
             setCurrentRoundIndex(SelectedInterviewData.currentRoundIndex ?? 0);
@@ -221,7 +201,6 @@ const Schedulelater = ({ type, onClose,
     //         if (!SelectedInterviewData?._id) return;
 
     //         try {
-    //             console.log("Fetching questions for interviewId:", SelectedInterviewData._id);
 
     //             const response = await fetch(`${process.env.REACT_APP_API_URL}/interview-questions/${SelectedInterviewData._id}`);
 
@@ -230,7 +209,6 @@ const Schedulelater = ({ type, onClose,
     //             }
 
     //             const data = await response.json();
-    //             console.log("Fetched Questions:", data);
 
     //             if (data.success) {
     //                 // Filter the fetched questions to match those in matchedRound
@@ -238,7 +216,6 @@ const Schedulelater = ({ type, onClose,
     //                     return data.data.find((q) => q.questionId === roundQuestion.questionId) || roundQuestion;
     //                 });
 
-    //                 console.log("Filtered Questions:", filteredQuestions);
     //                 setInterviewQuestionsList([{ questions: filteredQuestions }]);
     //             } else {
     //                 console.warn("No questions found for this interview.");
@@ -255,27 +232,17 @@ const Schedulelater = ({ type, onClose,
 
     useEffect(() => {
         const fetchQuestions = async () => {
-            if (!SelectedInterviewData?._id || !matchedRound) return; // ✅ Ensure matchedRound is available
-
+            if (!SelectedInterviewData?._id || !matchedRound) return;
             try {
-                console.log("Fetching questions for interviewId:", SelectedInterviewData._id);
-
                 const response = await fetch(`${process.env.REACT_APP_API_URL}/interview-questions/${SelectedInterviewData._id}`);
-
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-
                 const data = await response.json();
-                console.log("Fetched Questions:", data);
-
                 if (data.success) {
-                    // ✅ Now matchedRound is available in state
                     const filteredQuestions = matchedRound.questions.map((roundQuestion) => {
                         return data.data.find((q) => q.questionId === roundQuestion.questionId) || roundQuestion;
                     });
-
-                    console.log("Filtered Questions:", filteredQuestions);
                     setInterviewQuestionsList([{ questions: filteredQuestions }]);
                 } else {
                     console.warn("No questions found for this interview.");
@@ -286,9 +253,8 @@ const Schedulelater = ({ type, onClose,
                 setInterviewQuestionsList([]);
             }
         };
-
         fetchQuestions();
-    }, [SelectedInterviewData?._id, matchedRound]); // ✅ Now `matchedRound` is properly tracked
+    }, [SelectedInterviewData?._id, matchedRound]);
 
 
     const handleConfirm = () => {
@@ -332,9 +298,6 @@ const Schedulelater = ({ type, onClose,
                 mode: round.mode,
                 duration: round.duration || "30 minutes",
                 interviewType: round.interviewType,
-                // interviewers: round.interviewers.map(interviewer => ({
-                //     id: interviewer.id
-                // })),
                 interviewers: round.interviewers.map(interviewer => ({
                     id: interviewer.id,
                     name: interviewer.name
@@ -349,23 +312,22 @@ const Schedulelater = ({ type, onClose,
                 ? rounds
                 : roundsToUpdate;
 
-            const preparingTeamRequestBody = {
-                name:`Interview with ${selectedCandidate}-${selectedCandidateId.slice(-5,-1)} for the position of ${selectedPosition}`,
-                description:"description",
-                owner:Cookies.get("userId"),
-                createdBy:Cookies.get("userId"),                
-            }
-
-            // http://localhost:5000/createTeam
-
-            const teamResponse = await axios.post(`${process.env.REACT_APP_API_URL}/createTeam`,preparingTeamRequestBody)
-
-            const  meetLink = `${process.env.REACT_APP_API_URL}/meetId/`
+                const preparingTeamRequestBody = {
+                    name:`Interview with ${selectedCandidate}-${selectedCandidateId.slice(-5,-1)} for the position of ${selectedPosition}`,
+                    description:"description",
+                    owner:Cookies.get("userId"),
+                    createdBy:Cookies.get("userId"),                
+                }
+    
+                // http://localhost:5000/createTeam
+    
+                const teamResponse = await axios.post(`${process.env.REACT_APP_API_URL}/createTeam`,preparingTeamRequestBody)
+    
 
             const interviewData = {
                 Candidate: selectedCandidate,
                 CandidateId: selectedCandidateId,
-                Position: selectedPosition,                
+                Position: selectedPosition,
                 PositionId: selectedPositionId,
                 Status: "Draft",
                 ScheduleType: type === "ScheduleLater" ? "schedulelater" : "schedulenow",
@@ -376,8 +338,7 @@ const Schedulelater = ({ type, onClose,
                 ownerId: userId,
                 tenantId: orgId || undefined,
                 createdOn: new Date(),
-                teamId:teamResponse.data.team._id,
-                
+                teamId:teamResponse.data.team._id
             };
 
             let response;
@@ -398,16 +359,18 @@ const Schedulelater = ({ type, onClose,
                 }));
             }
 
-            console.log('Sending outsource request with interviewers:', selectedInterviewerIdsPerRound[currentRoundIndex]);
-
             if (selectedInterviewerIdsPerRound && selectedInterviewerIdsPerRound.length > 0) {
-                console.log('sending interview request also ...');
+                const interviewerObjects = selectedInterviewerIdsPerRound[currentRoundIndex].map(id => ({
+                    id: String(id),
+                    status: "inprogress"
+                }));
+            
                 const outsourceRequestData = {
                     tenantId: orgId,
                     ownerId: userId,
                     scheduledInterviewId: interviewIdRef.current,
                     interviewerType: "Outsource Interviewer",
-                    interviewerIds: selectedInterviewerIdsPerRound[currentRoundIndex],
+                    interviewerIds: interviewerObjects,
                     dateTime: rounds[currentRoundIndex]?.dateTime,
                     duration: rounds[currentRoundIndex]?.duration,
                     candidateId: selectedCandidateId,
@@ -417,19 +380,28 @@ const Schedulelater = ({ type, onClose,
                     requestMessage: "Outsource interview request",
                     expiryDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
                 };
+
                 await axios.post(
                     `${process.env.REACT_APP_API_URL}/interviewrequest`,
                     outsourceRequestData
                 );
 
-                setSelectedInterviewerIds([]);
-
+                setSelectedInterviewerIdsPerRound([]);
+            
                 setRoundStatus((prevStatus) => {
                     const newStatus = [...prevStatus];
                     newStatus[currentRoundIndex] = "Request Sent";
                     return newStatus;
                 });
             }
+            
+
+            // candidate position data creation
+            await axios.post(`${process.env.REACT_APP_API_URL}/candidateposition`, {
+                candidateId: selectedCandidateId,
+                positionId: selectedPositionId,
+                interviewId: interviewIdRef.current,
+            });
 
             if (goToNextStep === true) {
                 setCurrentStep(2);
@@ -443,6 +415,7 @@ const Schedulelater = ({ type, onClose,
                 setCurrentStep(1);
             } else {
                 onClose();
+                await fetchInterviewData();
             }
 
         } catch (error) {
@@ -496,17 +469,15 @@ const Schedulelater = ({ type, onClose,
                 LastModifiedById: userId,
             };
 
-            console.log("Saving interview with data:", interviewData);
-
             await axios.patch(
                 `${process.env.REACT_APP_API_URL}/interview/${interviewIdRef.current}`,
                 interviewData
             );
 
             if (goToNextStep) {
-                setCurrentStep(2); // Move to next step
+                setCurrentStep(2);
             } else {
-                onClose(); // Close the modal
+                onClose();
             }
         } catch (error) {
             console.error("Error in handleSave:", error);
@@ -530,15 +501,15 @@ const Schedulelater = ({ type, onClose,
         setUnsavedChanges(true);
     };
 
-    const removeSelectedTeamMember = (member, roundIndex) => {
-        setRounds((prevRounds) => {
-            const updatedRounds = [...prevRounds];
-            updatedRounds[roundIndex].interviewers = updatedRounds[roundIndex].interviewers.filter(
-                (interviewer) => interviewer.id !== member.id && interviewer._id !== member._id
-            );
-            return updatedRounds;
-        });
-    };
+    // const removeSelectedTeamMember = (member, roundIndex) => {
+    //     setRounds((prevRounds) => {
+    //         const updatedRounds = [...prevRounds];
+    //         updatedRounds[roundIndex].interviewers = updatedRounds[roundIndex].interviewers.filter(
+    //             (interviewer) => interviewer.id !== member.id && interviewer._id !== member._id
+    //         );
+    //         return updatedRounds;
+    //     });
+    // };
 
     const handleinterviewSelect = (interview, roundIndex) => {
         if (!selectedCandidate) return;
@@ -708,7 +679,6 @@ const Schedulelater = ({ type, onClose,
 
     const [selectedCandidateData, setSelectedCandidateData] = useState(null);
 
-    // console.log('selectedCandidateData :', selectedCandidateData)
 
     const handleCandidateSelect = (candidate) => {
         setSelectedCandidate(candidate.LastName);
@@ -860,7 +830,6 @@ const Schedulelater = ({ type, onClose,
     const [selectedInterviewerIdsPerRound, setSelectedInterviewerIdsPerRound] = useState(() => rounds.map(() => []));
 
     const handleReceivedInterviewerIds = (interviewers, roundIndex) => {
-        console.log('Received interviewers:', interviewers, 'for round:', roundIndex);
         const updatedSelectedIds = [...selectedInterviewerIdsPerRound];
         updatedSelectedIds[roundIndex] = interviewers.map(i => i.id);
         setSelectedInterviewerIdsPerRound(updatedSelectedIds);
@@ -1124,22 +1093,21 @@ const Schedulelater = ({ type, onClose,
                                 className={`border-b focus:outline-none w-full bg-white ${errors.Position
                                     ? "border-red-500"
                                     : "border-gray-300"
-                                    } ${!!selectedPosition ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                                    } ${!selectedCandidate ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                                 value={selectedPosition || ''}
-                                onClick={!!selectedPosition ? undefined : () => setShowDropdownPosition(!showDropdownPosition)}
+                                onClick={!selectedCandidate ? undefined : (!!selectedPosition ? undefined : () => setShowDropdownPosition(!showDropdownPosition))}
                                 disabled={!!selectedPosition}
                                 readOnly
                             />
                             <MdArrowDropDown
-                                onClick={() => setShowDropdownPosition(!showDropdownPosition)}
-                                className="absolute top-0 text-gray-500 text-lg mt-1 mr-2 cursor-pointer right-0"
+                                onClick={() => selectedCandidate && setShowDropdownPosition(!showDropdownPosition)}
+                                className={`absolute top-0 text-gray-500 text-lg mt-1 mr-2 right-0 ${!selectedCandidate ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                             />
-                            {selectedCandidateData && showDropdownPosition && (
+                            {showDropdownPosition && selectedCandidate && (
                                 <div className="absolute z-50 border border-gray-200 mb-5 w-full rounded-md bg-white shadow">
                                     <p className="p-1 font-medium border-b">Positions</p>
                                     <ul>
-                                        {/* mansoor code */}
-                                        {/* {selectedCandidateData?.PositionId?.map((position) => (
+                                        {positions.map((position) => (
                                             <li
                                                 key={position._id}
                                                 className="bg-white cursor-pointer hover:bg-gray-100 p-2"
@@ -1151,23 +1119,7 @@ const Schedulelater = ({ type, onClose,
                                             >
                                                 {position.title}
                                             </li>
-                                        ))} */}
-
-
-                                        {/* shashank */}
-                                        {selectedCandidateData.PositionId &&  (
-                                            <li
-                                                key={selectedCandidateData.PositionId._id}
-                                                className="bg-white cursor-pointer hover:bg-gray-100 p-2"
-                                                onClick={() => {
-                                                    handlePositionSelect(selectedCandidateData.PositionId);
-                                                    setUnsavedChanges(true);
-                                                    setShowDropdownPosition(false);
-                                                }}
-                                            >
-                                                {selectedCandidateData.PositionId.title}
-                                            </li>
-                                        )}
+                                        ))}
                                         <li
                                             className="flex cursor-pointer shadow-md border-t p-1 rounded"
                                             onClick={handleAddNewPositionClick}
@@ -1185,6 +1137,7 @@ const Schedulelater = ({ type, onClose,
                             )}
                         </div>
                     </div>
+
                 </div>
 
                 <div>
@@ -1321,13 +1274,13 @@ const Schedulelater = ({ type, onClose,
                                                                 readOnly
                                                                 value={rounds[index].dateTime || ""}
                                                                 onClick={() => type !== 'EditInternalInterviewProfileDetails' && roundStatus[index] !== "Completed" && handleDateClick(index)}
-                                                                className={`border-b py-2 bg-white flex-grow w-full focus:outline-none 
+                                                                className={`border-b py-2 bg-white flex-grow w-full cursor-pointer focus:outline-none 
                                                                 ${errors.DateTime ? "border-red-500" : "border-gray-300"} 
-                                                                ${type === 'EditInternalInterviewProfileDetails' ? "cursor-not-allowed" : ""}`}
+                                                                ${type === 'EditInternalInterviewProfileDetails' ? "cursor-not-allowed" : "cursor-pointer"}`}
                                                                 title={type === 'EditInternalInterviewProfileDetails' ? "Date & Time can't be edited" : (!rounds[index].duration ? "Add the duration before selecting date & time" : "")}
                                                             />
-
                                                         </div>
+
                                                         <div className="flex items-center w-1/2 pl-2">
                                                             <label className="text-left" style={{ width: "131px" }}>
                                                                 Duration <span className="text-red-500">*</span>

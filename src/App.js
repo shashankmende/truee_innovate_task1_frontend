@@ -39,8 +39,7 @@ function App() {
         <Routes>
           <Route path="/interview-feedback" element={<FeedbackHome/>}/>
           <Route path="/interview-feedback-preview" element={<Preview/>}/>
-          <Route path="/interview-page
-          " element={<InterviewPage/>}/>
+          <Route path="/interview-page" element={<InterviewPage/>}/>
           <Route path="/interview-feedback-new" element={<Feedback/>}/>
           <Route path="/suggested-questions" element={<SuggestedQuestionsComponent/>}/>
           <Route path="/admin" element={<Admin />} />
