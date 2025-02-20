@@ -10,7 +10,7 @@ const instructions = [
   "Join Promptly: Join the call on time and ensure your camera and microphone are working properly.",
 ]
 
-const CandidateMiniTab = ({skillsTabData,page,tab}) => {
+const CandidateMiniTab = ({roundDetails, interviewDetails,skillsTabData,page,tab}) => {
 
 
 
@@ -38,17 +38,30 @@ const CandidateMiniTab = ({skillsTabData,page,tab}) => {
       {children}
     </div>
   );
+
+  const formatDate = (dateTimeStr) => {
+    if (typeof dateTimeStr !== "string") return dateTimeStr;
+    const datePart = dateTimeStr.split(" ")[0]; // Extract "21-02-2025"
+    const [day, month, year] = datePart.split("-"); // Split into day, month, year
+    return `${year}-${month}-${day}`; // Convert to "YYYY-MM-DD"
+  };
+
   return (
     <div className="h-[70vh] flex flex-col gap-4 " >
         <h2 className="text-black font-bold">Candidate Details:</h2>
       <div    className={`border-b-2 border-[#8080808a] flex ${tab ? "flex-row":"flex-col"} relative`}>
         <div className={`pb-4 flex  flex-wrap gap-6 ${tab ? "flex-row":"flex-col"}`}>
-          <KeyValueRow label="Candidate Name" value="Shashank" />
-          <KeyValueRow label="Position" value="Position" />
-          <KeyValueRow label="Interviewers" value="Raju, Ravi, Uma" />
-          <KeyValueRow label="Interviewer ID" value="12345" />
-          <KeyValueRow label="Interview Date" value="Interview Date" />
-          <KeyValueRow label="Interview Type" value="Virtual" />
+          
+          <KeyValueRow label="Candidate Name" value={interviewDetails?.Candidate} />
+          
+          <KeyValueRow label="Position" value={interviewDetails?.Position} />
+          {/* <KeyValueRow label="Interviewers" value="Raju, Ravi, Uma" /> */}
+          <KeyValueRow label="Interviewers" value={roundDetails?.interviewers?.map(i=>i.name).join(", ")} />
+          {/* <KeyValueRow label="Interviewer ID" value="12345" /> */}
+          <KeyValueRow label="Interviewer ID" value={interviewDetails._id} />
+          <KeyValueRow label="Interview Date" value={formatDate(roundDetails?.dateTime)} />
+          {/* <KeyValueRow label="Interview Date" value={interviewDetails.} /> */}
+          <KeyValueRow label="Interview Type" value={roundDetails?.mode}/>
         </div>
        {!tab && <div style={{ width: "500px",aspectRatio:"1" }} className='absolute right-0 top-[-150px]'>
         <DoughnutChart/>
@@ -57,7 +70,7 @@ const CandidateMiniTab = ({skillsTabData,page,tab}) => {
         <InstructionsList instructions={InstructionsList}/>
         <SectionWrapper title="Question Details:">
         <div className="questions-items-container flex gap-8">
-          <KeyValueRow label="Mandatory Questions" value="10" />
+          <KeyValueRow label="Mandatory Questions" value={roundDetails?.questions?.length} />
           <KeyValueRow label="Optional Questions" value="N/A" />
         </div>
       </SectionWrapper>

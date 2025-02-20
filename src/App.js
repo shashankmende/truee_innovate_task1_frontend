@@ -39,7 +39,8 @@ function App() {
         <Routes>
           <Route path="/interview-feedback" element={<FeedbackHome/>}/>
           <Route path="/interview-feedback-preview" element={<Preview/>}/>
-          <Route path="/interview-page" element={<InterviewPage/>}/>
+          {/* <Route path="/interview-page" element={<InterviewPage/>}/> */}
+          <Route path="/interview-page/:id/:interviewId" element={<InterviewPage/>}/>
           <Route path="/interview-feedback-new" element={<Feedback/>}/>
           <Route path="/suggested-questions" element={<SuggestedQuestionsComponent/>}/>
           <Route path="/admin" element={<Admin />} />
@@ -60,7 +61,8 @@ function App() {
           <Route path='/schedule-later' element={<Schedulelater/>}/>
           <Route path="/Chat" element={<Chat/>}/>
           {/* <Route path="/login" element={<Login/>}/> */}
-          <Route path="/meetId/:id" element={<Login/>}/>
+          {/* <Route path="/meetId/:id" element={<Login/>}/> */}
+          <Route path="/meetId/:id/:interviewId" element={<Login/>}/>
           <Route path="/join-team" element={<JoinTeam/>}/>
           <Route path="/outsourceinterviewrequest" element={<InterviewRequest />} />
         </Routes>

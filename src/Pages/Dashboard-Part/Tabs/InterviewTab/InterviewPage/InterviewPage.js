@@ -21,6 +21,7 @@ import QuestionBank from '../../QuestionBank-Tab/QuestionBank';
 import { useLocation, useNavigate } from 'react-router-dom';
 import VideoCall from './VideoCall';
 import io from "socket.io-client";
+import {useParams} from 'react-router-dom'
 
 import axios from "axios";
 import Video from "twilio-video";
@@ -40,9 +41,14 @@ const InterviewPage = () => {
   const [questionBankPopupVisibility,setQuestionBankPopupVisibility]=useState(false)
 
   const location =  useLocation()
-  const token = location.state.token
-  const roomName = location.state.roomName
-  const user = location.state.user 
+  // const token = location.state.token
+  // const roomName = location.state.roomName
+  // const user = location.state.user 
+  // const candidateId =  location.state.candidateId
+  const {token,roomName,user,candidateId,round,interviewerId}= location.state
+  const {id,interviewId} = useParams() //id:team id 
+
+  const [interviewDetails,setInterviewDetails] = useState({})
 
   console.log("Location location",location)
    const [room, setRoom] = useState(null);
@@ -113,12 +119,12 @@ useEffect(() => {
             console.log("Room joined:", newRoom);
             setLocalUser(newRoom.localParticipant.identity);
 
-            // ✅ Create and Publish a Data Track for Chat
+            //  Create and Publish a Data Track for Chat
             const dataTrack = new Video.LocalDataTrack();
             newRoom.localParticipant.publishTrack(dataTrack);
             setDataTrack(dataTrack); // Store for sending messages
 
-            // ✅ Attach Local Video
+            //  Attach Local Video
             newRoom.localParticipant.tracks.forEach((publication) => {
                 if (publication.track && localVideoRef.current) {
                     localVideoRef.current.innerHTML = ""; // Clear existing content
@@ -126,7 +132,7 @@ useEffect(() => {
                 }
             });
 
-            // ✅ Handle Remote Participants
+            //  Handle Remote Participants
             const handleParticipant = (participant) => {
                 console.log(`Participant connected: ${participant.identity}`);
 
@@ -147,7 +153,7 @@ useEffect(() => {
                     }
                 });
 
-                // ✅ Handle Incoming Chat Messages
+                //  Handle Incoming Chat Messages
                 participant.on("trackSubscribed", (track) => {
                     if (track.kind === "data") {
                         track.on("message", (message) => {
@@ -163,7 +169,7 @@ useEffect(() => {
                     }
                 });
 
-                // ✅ Handle Unsubscribed Tracks (Remove from UI)
+                //  Handle Unsubscribed Tracks (Remove from UI)
                 participant.on("trackUnsubscribed", (track) => {
                     if (track.kind === "video") {
                         setRemoteParticipants((prev) =>
@@ -174,7 +180,7 @@ useEffect(() => {
                     }
                 });
 
-                // ✅ Handle Screen Sharing
+                //  Handle Screen Sharing
                 participant.tracks.forEach((publication) => {
                     if (publication.track && publication.track.kind === "video" && publication.track.name === "screen") {
                         console.log(`${participant.identity} is sharing their screen`);
@@ -217,7 +223,7 @@ useEffect(() => {
             // Listen for future participants
             newRoom.on("participantConnected", handleParticipant);
 
-            // ✅ Handle participant disconnection
+            //  Handle participant disconnection
             newRoom.on("participantDisconnected", (participant) => {
                 console.log(`Participant disconnected: ${participant.identity}`);
 
@@ -416,7 +422,28 @@ const sendMessage = () => {
   // }
 };
       
+const [roundDetails,setRoundDetails] = useState({})
 
+useEffect(()=>{
+
+  const getInterviewDetails = async()=>{
+    try {
+      // const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/${interviewId}`)
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/67ac9c914521bfcc354d5c7a`)
+      console.log("response",response)
+      setInterviewDetails(response.data)
+      const {rounds} = response.data
+      const filteredRounds = rounds.filter(EachRound=>EachRound.round===round)
+      console.log("filtered rounds",filteredRounds)
+      setRoundDetails(filteredRounds[0])
+    } catch (error) {
+      console.log("error",error)
+    }
+    
+  }
+  getInterviewDetails()
+
+},[])
 
 
   return (
@@ -435,7 +462,14 @@ const sendMessage = () => {
           <div className={`w-full bg-[#8080805f] fixed top-0 right-0 bottom-0  rounded-md flex justify-end ${popupVisibility?"text-[1rem]":"text-sm"}`}>
             <div style={{width:popupVisibility ? "100%":"50%"}}   className={` bg-white   transition-all duration-500 ease-in-out transform`}>
               <Feedback 
-              // interviewId={id}
+              interviewDetails={interviewDetails}
+              setInterviewDetails={setInterviewDetails}
+              roundDetails={roundDetails}
+              setRoundDetails={setRoundDetails}
+              interviewerId={interviewerId}
+              round={round}
+              interviewId={interviewId}
+              candidateId = {candidateId}
               //  interviewerId={user.details.id} 
                 closePopup={closePopup}  page={ !feedbackCloseFlag ? "Home":"Popup"}/>
             </div>
@@ -447,7 +481,7 @@ const sendMessage = () => {
               <div className='fixed bg-[#8080805f] top-0 left-0 right-0 bottom-0 w-full flex justify-end'>
                 <div className={`${questionBankPopupVisibility ? "w-[100%] text-md":"w-[50%] text-sm"} bg-white  transition-all duration-500 ease-in-out transform`}>
 
-                <QuestionBank  setQuestionBankPopupVisibility={setQuestionBankPopupVisibility} questionBankPopupVisibility={questionBankPopupVisibility} section={"Popup"} closeQuestionBank={closeQuestionBankPopup}/>
+                <QuestionBank interviewDetails={interviewDetails} setQuestionBankPopupVisibility={setQuestionBankPopupVisibility} questionBankPopupVisibility={questionBankPopupVisibility} section={"Popup"} closeQuestionBank={closeQuestionBankPopup}/>
                 </div>
               </div>
             )}

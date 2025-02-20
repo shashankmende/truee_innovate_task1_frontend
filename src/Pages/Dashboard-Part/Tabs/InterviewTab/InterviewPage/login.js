@@ -13,7 +13,8 @@ const Login = () => {
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
-    const { id } = useParams(); // Meeting ID from URL
+    const { id,interviewId } = useParams(); // Meeting ID from URL
+
     
     const [isChecked,setIsChecked] = useState(false)
     const [candidate,setCandidate] = useState("")//user or host
@@ -81,7 +82,8 @@ const Login = () => {
                     roomName:id,                    
                     identity:isUserIdExist
                 })
-                navigate("/interview-page",{state:{roomName:id,token:response.data.token,user:"host"}})
+                // navigate("/interview-page",{state:{roomName:id,token:response.data.token,user:"host"}})
+                navigate(`/interview-page/${id}/${interviewId}`,{state:{roomName:id,token:response.data.token,user:"host", interviewerId:decryptedUser.details.id, candidateId:decryptedUser.details.candidateId,round:decryptedUser.details.round}})
                 }
             };
         }
@@ -112,7 +114,9 @@ const Login = () => {
                     roomName:id,                    
                     identity:loginResponse.data.userId
                 })
-                navigate("/interview-page",{state:{roomName:id,token:response.data.token,user:"host"}})
+                // navigate("/interview-page",{state:{roomName:id,token:response.data.token,user:"host"}})
+                // navigate(`/interview-page/${id}/${interviewId}`,{state:{roomName:id,token:response.data.token,user:"host"}})
+                navigate(`/interview-page/${id}/${interviewId}`,{state:{roomName:id,token:response.data.token,user:"host", interviewerId:user.details.id, candidateId:user.details.candidateId,round:user.details.round}})
             }
             
 
@@ -146,7 +150,9 @@ const Login = () => {
 
             if (response.status === 200) {
                 alert("OTP verified successfully!");
-                navigate("/interview-page", { state: { roomName: id,token:user.details.id,user:"public" } });
+                // navigate("/interview-page", { state: { roomName: id,token:user.details.id,user:"public" } });
+                navigate(`/interview-page/${id}/${interviewId}`, { state: { roomName: id,token:user.details.id,user:"public" } });
+                // navigate(`/interview-page/${id}/${interviewId}`,{state:{roomName:id,token:response.data.token,user:"host"}})
             }
         } catch (err) {
             setOtpError(err.response?.data?.message || "OTP verification failed");

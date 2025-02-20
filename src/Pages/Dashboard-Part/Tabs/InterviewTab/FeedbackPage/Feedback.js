@@ -1,4 +1,4 @@
-import React, {useLayoutEffect,  useState } from "react";
+import React, {useLayoutEffect, useEffect, useState } from "react";
 import CandidateMiniTab from "./MiniTabs/Candidate";
 import InterviewsMiniTabComponent from "./MiniTabs/Interviews";
 import SkillsTabComponent from "./MiniTabs/Skills";
@@ -42,7 +42,7 @@ const tabsList = [
   },
 ];
 
-const Feedback = ({ page, closePopup }) => {
+const Feedback = ({interviewDetails,setInterviewDetails,setRoundDetails,roundDetails,interviewerId, round,interviewId,candidateId, page, closePopup }) => {
   const [tab, setTab] = useState(1);
   const [isFormValid,setIsFormValid]=useState(false)
   const navigate = useNavigate();
@@ -52,6 +52,9 @@ const Feedback = ({ page, closePopup }) => {
     feedbackTabErrors,
     setFeedbackTabError,
   } = useCustomContext();
+
+  // const [interviewDetails,setInterviewDetails] = useState({})
+  // const [roundDetails,setRoundDetails] = useState({})
 
   const [skillsTabData, setSkillsTabData] = useState([
     {
@@ -171,6 +174,28 @@ const Feedback = ({ page, closePopup }) => {
  
   let { interviewQuestion, skills, overallImpression } = feedbackTabErrors;
 
+
+  useEffect(()=>{
+
+    const getInterviewDetails = async()=>{
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/${interviewId}`)
+        console.log("response",response)
+        setInterviewDetails(response.data)
+        const {rounds} = response.data
+        const filteredRounds = rounds.filter(EachRound=>EachRound.round===round)
+        console.log("filtered rounds",filteredRounds)
+        setRoundDetails(filteredRounds[0])
+      } catch (error) {
+        console.log("error",error)
+      }
+      
+    }
+    getInterviewDetails()
+
+  },[])
+
+
   useLayoutEffect(()=>{
     setIsFormValid(true)
   },[])
@@ -206,12 +231,13 @@ const Feedback = ({ page, closePopup }) => {
     );
 
     const tenantId = Cookies.get("organizationId");
-  
+console.log("interviewer id",interviewerId)
     return {
       tenantId,
-      interviewId:"interview-1",
-      candidateId:"candidate-1",
-      interviewerId:"interviewerId-1",
+      interviewId,
+      candidateId:candidateId,
+      interviewerId,
+      roundId:roundDetails._id,
       skills: skills,
       questionFeedback,
       generalComments:"general comments",
@@ -284,7 +310,7 @@ const Feedback = ({ page, closePopup }) => {
 
   const displayData = () => {
     switch (tab) {
-      case 1: return <CandidateMiniTab skillsTabData={skillsTabData} tab={tab} page={page}/>;
+      case 1: return <CandidateMiniTab roundDetails={roundDetails} interviewDetails ={interviewDetails} skillsTabData={skillsTabData} tab={tab} page={page}/>;
       case 2: return <InterviewsMiniTabComponent SchedulerSectionData={SchedulerSectionData} setSchedulerSectionData={setSchedulerSectionData} tab={tab} page={page}  closePopup={closePopup}/>;
       case 3: return <SkillsTabComponent setSkillsTabData={setSkillsTabData}  skillsTabData={skillsTabData} tab={tab} page={page} />;
       case 4:  return <OverallImpressions overallImpressionTabData={overallImpressionTabData} setOverallImpressionTabData={setOverallImpressionTabData}  tab={tab} page={page} />;

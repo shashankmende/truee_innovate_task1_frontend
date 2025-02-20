@@ -70,7 +70,7 @@
 // export default QuestionBank;
 
 
-import React, { useState} from "react";
+import React, { useEffect, useState} from "react";
 // import "../../../../index.css";
 // import "../styles/tabs.scss";
 import MyQuestionListMain from "./MyQuestionsList.jsx"
@@ -81,20 +81,23 @@ import { FiMinimize } from "react-icons/fi";
 import Popup from "reactjs-popup";
 import { FaCaretUp } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
+import PrevRoundQuestions from "./PrevRoundQuestions.jsx";
 
 
 // const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
   //change done by Shashank on -[08/01/2025]
-const QuestionBank = ({ assessmentId, sectionName,updateQuestionsInAddedSectionFromQuestionBank,section:sectionProp,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
+const QuestionBank = ({interviewDetails, assessmentId, sectionName,updateQuestionsInAddedSectionFromQuestionBank,section:sectionProp,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
   const [activeTab, setActiveTab] = useState("SuggesstedQuestions");
   const [interviewQuestionsList,setInterviewQuestionsList]=useState([])
 
   const location = useLocation()
+  
    const section = location.state?.section || sectionProp || ""
   //  const section = location.state?.section || sectionProp || "questionBank"
   //  const section = location?.state?.section || sectionProp || "assessment";
 
    console.log('location state from qb',location.state)
+   console.log("section",section)
   //  alert(`section: ${section}`)
 
   const handleSuggestedTabClick = (questionType) => {
@@ -104,6 +107,16 @@ const QuestionBank = ({ assessmentId, sectionName,updateQuestionsInAddedSectionF
   const handleFavoriteTabClick = (questionType) => {
     setActiveTab("MyQuestionsList");
   };
+
+const handlePrevRoundQuestions = ()=>{
+  setActiveTab("PrevRoundQuestions")
+}
+
+
+
+
+
+
   return (
       <div className={`${section==="interviewerSection" || section==="assessment" && "h-[95%] shadow-md  w-[95%] bg-white "}`}>
         <div className={`${section==="interviewerSection" || section==="assessment" ?"":" top-16 sm:top-20 md:top-24 left-0 right-0"}`}>
@@ -162,6 +175,21 @@ const QuestionBank = ({ assessmentId, sectionName,updateQuestionsInAddedSectionF
         </div>
         <div  className={` ${(section==="interviewerSection" || section==="assessment") ?"w-[95%]":" z-10 top-28 sm:top-32 md:top-36 left-0 right-0"} `}>
           <div className="flex gap-10 p-4">
+            {/* prev round questions */}
+            {section==="Popup" && <div className="relative inline-block">
+              <span className="flex items-center cursor-pointer">
+                <span
+                  className={`pb-3 ${activeTab === "PrevRoundQuestions"
+                    ? "text-black font-semibold border-b-2 border-custom-blue"
+                    : "text-gray-500"
+                    }`}
+                  onClick={() => handlePrevRoundQuestions()}
+                >
+                  Prev Round Questions
+                </span>
+              </span>
+            </div>}
+            {/* suggested questions */}
             <div className="relative inline-block">
               <span className="flex items-center cursor-pointer ">
                 <span
@@ -188,6 +216,7 @@ const QuestionBank = ({ assessmentId, sectionName,updateQuestionsInAddedSectionF
                 </span>
               </span>
             </div>
+            
           </div>
         </div>
         {activeTab === "SuggesstedQuestions" && (
@@ -202,6 +231,9 @@ const QuestionBank = ({ assessmentId, sectionName,updateQuestionsInAddedSectionF
             <MyQuestionListMain  assessmentId={assessmentId}  sectionName={sectionName} updateQuestionsInAddedSectionFromQuestionBank={updateQuestionsInAddedSectionFromQuestionBank}  interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList} questionBankPopupVisibility={questionBankPopupVisibility} section={section}/>
           </div>
         )}
+        {(activeTab ==="PrevRoundQuestions" && section==="Popup" )&& (
+          <div><PrevRoundQuestions interviewDetails={interviewDetails}/></div>
+        )}
       </div>
   );
 };

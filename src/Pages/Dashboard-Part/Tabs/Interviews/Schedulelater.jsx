@@ -292,6 +292,8 @@ const Schedulelater = ({ type, onClose,
                 toast.error("Please fill at least one round before saving.");
                 return;
             }
+            
+            console.log("filled rounds",filledRounds)
 
             const roundsToUpdate = filledRounds.map((round, index) => ({
                 round: round.round,
