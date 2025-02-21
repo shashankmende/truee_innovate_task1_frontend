@@ -881,7 +881,7 @@ const MyQuestionsList = ({
           }`}
         >
           <button
-            className="text-md absolute top-[-50px] right-0"
+            className="text-md absolute top-[-35px] right-0"
             onClick={toggleSidebar}
           >
             <span className="text-custom-blue font-semibold ">
@@ -894,8 +894,8 @@ const MyQuestionsList = ({
         <div
           className={` ${
             section === "interviewerSection" || section === "Popup"
-              ? ""
-              : "mt-2"
+              ? "mt-10"
+              : "mt-4"
           }`}
         >
           <div className="flex items-center justify-between">

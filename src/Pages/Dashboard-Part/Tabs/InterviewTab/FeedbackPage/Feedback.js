@@ -203,52 +203,81 @@ const Feedback = ({interviewDetails,setInterviewDetails,setRoundDetails,roundDet
   const areAllValidationsMet = () =>
     interviewQuestion && skills && overallImpression;
 
-  const PrepareFormData = () => {
-    const questionFeedback = SchedulerSectionData.map((question) => ({
-      questionId: question.id,
+//   const PrepareFormData = () => {
+//     const questionFeedback = SchedulerSectionData.map((question) => ({
+//       questionId: question.id,
 
-      candidateAnswer:{
-        answerType:question.isAnswered,
-        submittedAnswer:question.answer
-      },
-      interviewerFeedback:{
-        liked:question.isLiked,
-        dislikeReason: question.isLiked==="disliked"  ? question.whyDislike:"",
-        note:question.note
-      },
+//       candidateAnswer:{
+//         answerType:question.isAnswered,
+//         submittedAnswer:question.answer
+//       },
+//       interviewerFeedback:{
+//         liked:question.isLiked,
+//         dislikeReason: question.isLiked==="disliked"  ? question.whyDislike:"",
+//         note:question.note
+//       },
       
-    }));
+//     }));
   
-    const skills = skillsTabData.flatMap((category) =>
-      category.skillsList
-        .filter((skill) => skill.rating > 1)
-        .map((skill) => ({
-          skillType: category.category,
-          skillName: skill.name,
-          rating: skill.rating,
-          note: skill.note,
-        }))
-    );
+//     const skills = skillsTabData.flatMap((category) =>
+//       category.skillsList
+//         .filter((skill) => skill.rating > 1)
+//         .map((skill) => ({
+//           skillType: category.category,
+//           skillName: skill.name,
+//           rating: skill.rating,
+//           note: skill.note,
+//         }))
+//     );
 
-    const tenantId = Cookies.get("organizationId");
-console.log("interviewer id",interviewerId)
-    return {
-      tenantId,
-      interviewId,
-      candidateId:candidateId,
-      interviewerId,
-      roundId:roundDetails._id,
-      skills: skills,
-      questionFeedback,
-      generalComments:"general comments",
-      overallImpression: {
-        overallRating: overallImpressionTabData.rating,
-        recommendation: overallImpressionTabData.recommendation,
-        note: overallImpressionTabData.note,
-      },
-    };
-  };
-  
+    // const tenantId = Cookies.get("organizationId");
+// console.log("interviewer id",interviewerId)
+//     return {
+//       tenantId,
+//       interviewId,
+//       candidateId:candidateId,
+//       interviewerId,
+//       roundId:roundDetails._id,
+//       skills: skills,
+//       questionFeedback,
+//       generalComments:"general comments",
+//       overallImpression: {
+//         overallRating: overallImpressionTabData.rating,
+//         recommendation: overallImpressionTabData.recommendation,
+//         note: overallImpressionTabData.note,
+//       },
+//     };
+//   };
+
+const PrepareFormData =()=>{
+  const tenantId = Cookies.get("organizationId");
+  // console.log("interview roundDetails",roundDetails)
+  // const individualFeedbacks = roundDetails?.interviewers?.map(i=>{
+  //   return {
+  //     interviewerId:i.id._id,
+
+  //   }
+  // })
+  const individualFeedbacks = {
+        interviewerId,
+        strengths:["strength"], // Strengths noted by interviewer
+        weaknesses:["weakness"],
+        recommendation:"yes",
+        submittedAt:new Date()
+
+  }
+  console.log("individual feedback",individualFeedbacks)
+  return {
+    tenantId,
+    interviewId,
+    roundId:roundDetails._id,
+    candidateId:candidateId,
+    positionId:interviewDetails.PositionId,
+    feedbacks:[individualFeedbacks]
+
+  }
+}
+
   const onClickSubmit = async () => {
     const updatedOverallImpression = validateOverallImpression(
       overallImpressionTabData,
@@ -256,13 +285,15 @@ console.log("interviewer id",interviewerId)
     );
 
     const isValid = updatedOverallImpression && interviewQuestion && skills;
-    setIsFormValid(isValid)
+    // setIsFormValid(isValid)
+    setIsFormValid(true)
     setFeedbackTabError((prev) => ({
       ...prev,
       overallImpression: updatedOverallImpression,
     }));
 
-    if (!isValid) {
+    // if (!isValid) {
+    if (!true) {
       const alertMessages = [];
       if (!interviewQuestion)
         alertMessages.push("Interview Questions ");

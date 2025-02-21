@@ -192,6 +192,69 @@ const CustomProvider = ({ children }) => {
   const [suggestedQuestionsFilteredData, setSuggestedQuestionsFilteredData] = useState([]);
   const [myQuestionsList, setMyQuestionsList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [SchedulerSectionData, setSchedulerSectionData] = useState([
+      {
+        id: 1,
+        question:
+          "1.Explain the difference between an interface and an abstract class in Java.",
+        answer:
+          "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
+        mandatory: true,
+        rating: 0,
+        note: "",
+        isAnswered: "",
+        notesBool: false,
+        isLiked: "none",
+        whyDislike: "",
+        error: false,
+      },
+      {
+        id: 2,
+        question:
+          "2.Explain the difference between an interface and an abstract class in Java.",
+        answer:
+          "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
+        mandatory: true,
+        rating: 0,
+        note: "",
+        isAnswered: "",
+        notesBool: false,
+        isLiked: "none",
+        whyDislike: "",
+        error: false,
+      },
+      {
+        id: 3,
+        question:
+          "3.Explain the difference between an interface and an abstract class in Java.",
+        answer:
+          "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
+        mandatory: true,
+        rating: 0,
+        note: "",
+        isAnswered: "",
+        notesBool: false,
+        isLiked: "none",
+        error: false,
+        whyDislike: "",
+      },
+      {
+        id: 4,
+        question:
+          "4.Explain the difference between an interface and an abstract class in Java.",
+        answer:
+          "An interface in Java is a reference type that can only contain abstract methods(prior to Java 8) and static/final variables.",
+        mandatory: false,
+        rating: 0,
+        note: "",
+        isAnswered: "",
+        notesBool: false,
+        isLiked: "none",
+        error: false,
+        whyDislike: "",
+      },
+    ])
+
 
   // Fetch Interviewer Questions
   const getInterviewerQuestions = useCallback(async () => {
@@ -520,6 +583,8 @@ const CustomProvider = ({ children }) => {
   return (
     <CustomContext.Provider
       value={{
+        SchedulerSectionData,
+         setSchedulerSectionData,
         getInterviewerQuestions,
         fetchMyQuestionsData,
         myQuestionsList,

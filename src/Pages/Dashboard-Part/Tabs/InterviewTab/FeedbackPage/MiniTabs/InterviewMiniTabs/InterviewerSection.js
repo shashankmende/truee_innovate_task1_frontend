@@ -72,32 +72,8 @@ const InterviewerSectionComponent = ({closePopup}) => {
         </p>
       </div>
 
-      <Popup
-        trigger={
-          <button className="absolute text-white bottom-0 right-0 aspect-square rounded-full bg-[#227a8a] w-8 flex justify-center items-center cursor-pointer">
-            +
-          </button>
-        }
-        position={["top left", "bottom center", "right center"]}
-        offsetX={-10}
-        arrow
-        contentStyle={{
-          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
-          backgroundColor: "white",
-        }}
-        arrowStyle={{
-          color: "gray",
-        }}
-        closeOnDocumentClick={false}
-      >  
-        {closeQuestionBank=><div className="fixed  bg-[#80808060] left-0 top-0 bottom -0  h-full w-full flex flex-col items-center justify-center">
-
-        <QuestionBank closeQuestionBank={closeQuestionBank} section={"interviewerSection"} />
-        </div>}
-        
-        
-      </Popup>
-      <ul className="mt-4 flex flex-col gap-4 h-[45vh] overflow-auto pr-2">
+     <div className="relative">
+      <ul className={`mt-4 flex flex-col gap-4  overflow-auto pr-2 ${page==="Popup"?"h-[65vh]":"h-[45vh]"}`}>
         {interviewerSectionData.map((EachQuestion,index) => (
           <li
             key={EachQuestion.id}
@@ -253,6 +229,32 @@ const InterviewerSectionComponent = ({closePopup}) => {
           </li>
         ))}
       </ul>
+      <Popup
+        trigger={
+          <button className="absolute text-white text-[30px] bottom-[-25px] right-0 aspect-square rounded-full bg-[#227a8a] w-10  flex justify-center items-center cursor-pointer">
+            +
+          </button>
+        }
+        position={["top left", "bottom center", "right center"]}
+        offsetX={-10}
+        arrow
+        contentStyle={{
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+          backgroundColor: "white",
+        }}
+        arrowStyle={{
+          color: "gray",
+        }}
+        closeOnDocumentClick={false}
+      >  
+        {closeQuestionBank=><div className="fixed  bg-[#80808060] left-0 top-0 bottom -0  h-full w-full flex flex-col items-center justify-center">
+
+        <QuestionBank closeQuestionBank={closeQuestionBank} section={"interviewerSection"} />
+        </div>}
+        
+        
+      </Popup>
+    </div>
     </div>
   );
 };

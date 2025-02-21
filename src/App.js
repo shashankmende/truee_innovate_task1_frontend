@@ -34,7 +34,7 @@ function App() {
 
   return (
     <div className="App">
-      {shouldRenderNavbar && <Navbar />}
+      {shouldRenderNavbar && <Navbar/>}
       <div className={!shouldRenderNavbar ? '' : 'mt-16'}>
         <Routes>
           <Route path="/interview-feedback" element={<FeedbackHome/>}/>
@@ -43,8 +43,8 @@ function App() {
           <Route path="/interview-page/:id/:interviewId" element={<InterviewPage/>}/>
           <Route path="/interview-feedback-new" element={<Feedback/>}/>
           <Route path="/suggested-questions" element={<SuggestedQuestionsComponent/>}/>
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/questionBank" element={<QuestionBank  />} />
+          <Route path="/admin" element={<Admin/>}/>
+          <Route path="/questionBank" element={<QuestionBank/>}/>
           <Route path="/assessment" element={<Assessment />} />
           <Route path="/candidate" element={<Candidate />} />
           {/* <Route path="/" element={<Login1 />} /> */}

@@ -82,6 +82,8 @@ import Popup from "reactjs-popup";
 import { FaCaretUp } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import PrevRoundQuestions from "./PrevRoundQuestions.jsx";
+import SchedulerSection from "../InterviewTab/FeedbackPage/MiniTabs/InterviewMiniTabs/SchedulerSection.js";
+import InterviewerSectionComponent from "../InterviewTab/FeedbackPage/MiniTabs/InterviewMiniTabs/InterviewerSection.js";
 
 
 // const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
@@ -112,9 +114,14 @@ const handlePrevRoundQuestions = ()=>{
   setActiveTab("PrevRoundQuestions")
 }
 
+const handleInterviewerAddedTabClick =()=>{
+  setActiveTab('interviewerAddedQuestions')
+}
 
 
-
+const handlePreselectedTabClick =()=>{
+  setActiveTab('preSelectedQuestions')
+}
 
 
   return (
@@ -176,7 +183,7 @@ const handlePrevRoundQuestions = ()=>{
         <div  className={` ${(section==="interviewerSection" || section==="assessment") ?"w-[95%]":" z-10 top-28 sm:top-32 md:top-36 left-0 right-0"} `}>
           <div className="flex gap-10 p-4">
             {/* prev round questions */}
-            {section==="Popup" && <div className="relative inline-block">
+            {/* {section==="Popup" && <div className="relative inline-block">
               <span className="flex items-center cursor-pointer">
                 <span
                   className={`pb-3 ${activeTab === "PrevRoundQuestions"
@@ -188,7 +195,35 @@ const handlePrevRoundQuestions = ()=>{
                   Prev Round Questions
                 </span>
               </span>
-            </div>}
+            </div>} */}
+             {/* prev selected questions */}
+             <div className="relative inline-block">
+              <span className="flex items-center cursor-pointer">
+                <span
+                  className={`pb-3 ${activeTab === "preSelectedQuestions"
+                    ? "text-black font-semibold border-b-2 border-custom-blue"
+                    : "text-gray-500"
+                    }`}
+                  onClick={() => handlePreselectedTabClick()}
+                >
+                  Preselected Questions
+                </span>
+              </span>
+            </div>
+            {/* interviewer add questions */}
+            <div className="relative inline-block">
+              <span className="flex items-center cursor-pointer">
+                <span
+                  className={`pb-3 ${activeTab === "interviewerAddedQuestions"
+                    ? "text-black font-semibold border-b-2 border-custom-blue"
+                    : "text-gray-500"
+                    }`}
+                  onClick={() => handleInterviewerAddedTabClick()}
+                >
+                  Interviewer Add Questions
+                </span>
+              </span>
+            </div>
             {/* suggested questions */}
             <div className="relative inline-block">
               <span className="flex items-center cursor-pointer ">
@@ -203,6 +238,7 @@ const handlePrevRoundQuestions = ()=>{
                 </span>
               </span>
             </div>
+            {/* my questions list */}
             <div className="relative inline-block">
               <span className="flex items-center cursor-pointer">
                 <span
@@ -216,6 +252,7 @@ const handlePrevRoundQuestions = ()=>{
                 </span>
               </span>
             </div>
+           
             
           </div>
         </div>
@@ -230,9 +267,19 @@ const handlePrevRoundQuestions = ()=>{
             {/* <MyQuestionListMain  interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList} questionBankPopupVisibility={questionBankPopupVisibility} section={section}/> */}
             <MyQuestionListMain  assessmentId={assessmentId}  sectionName={sectionName} updateQuestionsInAddedSectionFromQuestionBank={updateQuestionsInAddedSectionFromQuestionBank}  interviewQuestionsList={interviewQuestionsList} setInterviewQuestionsList={setInterviewQuestionsList} questionBankPopupVisibility={questionBankPopupVisibility} section={section}/>
           </div>
-        )}
+        )}
         {(activeTab ==="PrevRoundQuestions" && section==="Popup" )&& (
           <div><PrevRoundQuestions interviewDetails={interviewDetails}/></div>
+        )}
+        {activeTab==="preSelectedQuestions" && (
+          <div className="p-4 rounded-md border border-[gray] mx-4 ">
+            <SchedulerSection/>
+          </div>
+        )}
+        {activeTab==="interviewerAddedQuestions" && (
+          <div className="p-4 rounded-md border border-[gray] mx-4 h-[80vh]">
+            <InterviewerSectionComponent/>
+          </div>
         )}
       </div>
   );

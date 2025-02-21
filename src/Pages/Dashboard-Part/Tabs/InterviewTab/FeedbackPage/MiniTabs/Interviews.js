@@ -3,6 +3,7 @@
 import React,{useState} from 'react'
 import SchedulerSectionComponent from './InterviewMiniTabs/SchedulerSection';
 import InterviewerSectionComponent from './InterviewMiniTabs/InterviewerSection';
+import { useCustomContext } from '../../../../../../Context/Contextfetch';
 
 const interviewMiniTabsList = [
     {
@@ -18,8 +19,10 @@ const interviewMiniTabsList = [
   ];
 
  
-  const InterviewsMiniTabComponent = ({setSchedulerSectionData,SchedulerSectionData,tab,page,closePopup}) => {
+  // const InterviewsMiniTabComponent = ({setSchedulerSectionData,SchedulerSectionData,tab,page,closePopup}) => {
+  const InterviewsMiniTabComponent = ({tab,page,closePopup}) => {
     const [interviewMiniTab, setInterviewMiniTab] = useState(1);
+    const {SchedulerSectionData, setSchedulerSectionData} = useCustomContext()
 
     const InterviewDisplayData = () => {
         switch (interviewMiniTab) {
