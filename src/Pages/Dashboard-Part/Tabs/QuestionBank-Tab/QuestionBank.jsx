@@ -88,7 +88,7 @@ import InterviewerSectionComponent from "../InterviewTab/FeedbackPage/MiniTabs/I
 
 // const QuestionBank = ({section,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
   //change done by Shashank on -[08/01/2025]
-const QuestionBank = ({interviewDetails, assessmentId, sectionName,updateQuestionsInAddedSectionFromQuestionBank,section:sectionProp,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
+const QuestionBank = ({roundDetails,interviewDetails, assessmentId, sectionName,updateQuestionsInAddedSectionFromQuestionBank,section:sectionProp,closeQuestionBank,questionBankPopupVisibility,setQuestionBankPopupVisibility}) => {
   const [activeTab, setActiveTab] = useState("SuggesstedQuestions");
   const [interviewQuestionsList,setInterviewQuestionsList]=useState([])
 
@@ -273,7 +273,7 @@ const handlePreselectedTabClick =()=>{
         )}
         {activeTab==="preSelectedQuestions" && (
           <div className="p-4 rounded-md border border-[gray] mx-4 ">
-            <SchedulerSection/>
+            <SchedulerSection roundDetails={roundDetails}/>
           </div>
         )}
         {activeTab==="interviewerAddedQuestions" && (

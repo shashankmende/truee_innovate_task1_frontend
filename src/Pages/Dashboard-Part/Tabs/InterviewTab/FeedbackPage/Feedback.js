@@ -342,7 +342,7 @@ const PrepareFormData =()=>{
   const displayData = () => {
     switch (tab) {
       case 1: return <CandidateMiniTab roundDetails={roundDetails} interviewDetails ={interviewDetails} skillsTabData={skillsTabData} tab={tab} page={page}/>;
-      case 2: return <InterviewsMiniTabComponent SchedulerSectionData={SchedulerSectionData} setSchedulerSectionData={setSchedulerSectionData} tab={tab} page={page}  closePopup={closePopup}/>;
+      case 2: return <InterviewsMiniTabComponent roundDetails={roundDetails} SchedulerSectionData={SchedulerSectionData} setSchedulerSectionData={setSchedulerSectionData} tab={tab} page={page}  closePopup={closePopup}/>;
       case 3: return <SkillsTabComponent setSkillsTabData={setSkillsTabData}  skillsTabData={skillsTabData} tab={tab} page={page} />;
       case 4:  return <OverallImpressions overallImpressionTabData={overallImpressionTabData} setOverallImpressionTabData={setOverallImpressionTabData}  tab={tab} page={page} />;
       default: return null;

@@ -434,18 +434,20 @@ useEffect(()=>{
       console.log("response",response)
       setInterviewDetails(response.data)
       const {rounds} = response.data
-      const filteredRounds = rounds.filter(EachRound=>EachRound.round===round)
+      // const filteredRounds = rounds.filter(EachRound=>EachRound.round===round)
+      const filteredRounds = rounds.filter(EachRound=>EachRound.round==="Technical")
       console.log("filtered rounds",filteredRounds)
       setRoundDetails(filteredRounds[0])
+      // setRoundDetails("Technical")
     } catch (error) {
       console.log("error",error)
-    }
-    
+    }    
   }
   getInterviewDetails()
 
 },[])
 
+console.log("ROund details",roundDetails)
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
@@ -482,7 +484,7 @@ useEffect(()=>{
               <div className='fixed bg-[#8080805f] top-0 left-0 right-0 bottom-0 w-full flex justify-end'>
                 <div className={`${questionBankPopupVisibility ? "w-[100%] text-md":"w-[50%] text-sm"} bg-white  transition-all duration-500 ease-in-out transform`}>
 
-                <QuestionBank interviewDetails={interviewDetails} setQuestionBankPopupVisibility={setQuestionBankPopupVisibility} questionBankPopupVisibility={questionBankPopupVisibility} section={"Popup"} closeQuestionBank={closeQuestionBankPopup}/>
+                <QuestionBank roundDetails={roundDetails} interviewDetails={interviewDetails} setQuestionBankPopupVisibility={setQuestionBankPopupVisibility} questionBankPopupVisibility={questionBankPopupVisibility} section={"Popup"} closeQuestionBank={closeQuestionBankPopup}/>
                 </div>
               </div>
             )}

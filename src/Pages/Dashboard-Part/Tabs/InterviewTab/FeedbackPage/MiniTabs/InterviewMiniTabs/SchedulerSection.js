@@ -16,8 +16,8 @@ const dislikeOptions = [
 ];
 
 // const SchedulerSectionComponent = ({setSchedulerSectionData,SchedulerSectionData, tab }) => {
-const SchedulerSectionComponent = ({ tab }) => {
-
+const SchedulerSectionComponent = ({roundDetails, tab }) => {
+  console.log("round details",roundDetails)
   const {page,SchedulerSectionData, setSchedulerSectionData}= useCustomContext()
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [dislikeQuestionId, setDislikeQuestionId] = useState("");
@@ -180,15 +180,22 @@ const SchedulerSectionComponent = ({ tab }) => {
         <p className="para-value text-gray-500">  This question was selected by the organizer during scheduling. Questions marked in <span className="font-bold text-[red]">Red</span> are mandatory and must be answered by the candidates, while questions marked in{" "}<span className="font-bold text-green-600">Green</span> are optional.</p>
       </div>
       <ul className={`${page==="Popup"?" h-[65vh]":"h-[45vh]"} overflow-auto pr-4 flex flex-col gap-4 mt-4`}>
-        {SchedulerSectionData.map((each) => (
+        {/* {SchedulerSectionData.map((each) => ( */}
+        {roundDetails.questions?.length === 0 ? <div>There are no questions added</div> :
+          roundDetails?.questions?.map((eachQuestionId) => {
+          const each = eachQuestionId.questionId
+          console.log('each question ',each)
+          return(
           <li className={`rounded-md w-full   cursor-pointer border-[1px] ${each.mandatory ? "border-[red]":" border-[green]"}`} ref={questionRef}key={each.id}>
             <div  className="px-2 pt-3 pb-3 flex items-center justify-between cursor-pointer transition-transform duration-300s ease-in-out"onClick={()=>onClickQuestionItem(each)}  >
-              <p >{each.question}</p>
+              {/* <p >{each.question}</p> */}
+              <p >{each.questionText}</p>
               <span> {selectedQuestion === each.id ? <FaAngleUp /> : <FaAngleDown />}</span>
             </div>
             {selectedQuestion === each.id && (
               <div className="p-2 pb-2" >
-                <p className="para-value text-gray-500">{each.answer}</p>
+                {/* <p className="para-value text-gray-500">{each.answer}</p> */}
+                <p className="para-value text-gray-500">{each.correctAnswer}</p>
                 <div className="w-full flex  justify-between items-start my-4 gap-8">
                   <RadioGroupInput each={each} />
 
@@ -290,7 +297,8 @@ const SchedulerSectionComponent = ({ tab }) => {
               </p>
             )}
           </li>
-        ))}
+        )})
+      }
       </ul>
     </div>
   );
