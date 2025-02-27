@@ -80,9 +80,9 @@ const SchedulerSectionComponent = ({roundDetails, tab }) => {
   };
 
   const onClickQuestionItem =(question)=>{
-    selectedQuestion === question.id
+    selectedQuestion === question._id
     ? setSelectedQuestion(null)
-    : setSelectedQuestion(question.id);
+    : setSelectedQuestion(question._id);
   }
 
   //sections
@@ -184,18 +184,18 @@ const SchedulerSectionComponent = ({roundDetails, tab }) => {
         {roundDetails.questions?.length === 0 ? <div>There are no questions added</div> :
           roundDetails?.questions?.map((eachQuestionId) => {
           const each = eachQuestionId.questionId
-          console.log('each question ',each)
+          
           return(
           <li className={`rounded-md w-full   cursor-pointer border-[1px] ${each.mandatory ? "border-[red]":" border-[green]"}`} ref={questionRef}key={each.id}>
             <div  className="px-2 pt-3 pb-3 flex items-center justify-between cursor-pointer transition-transform duration-300s ease-in-out"onClick={()=>onClickQuestionItem(each)}  >
               {/* <p >{each.question}</p> */}
-              <p >{each.questionText}</p>
-              <span> {selectedQuestion === each.id ? <FaAngleUp /> : <FaAngleDown />}</span>
+              <p >{each.snapshot.questionText}</p>
+              <span> {selectedQuestion === each._id ? <FaAngleUp /> : <FaAngleDown />}</span>
             </div>
-            {selectedQuestion === each.id && (
+            {selectedQuestion === each._id && (
               <div className="p-2 pb-2" >
                 {/* <p className="para-value text-gray-500">{each.answer}</p> */}
-                <p className="para-value text-gray-500">{each.correctAnswer}</p>
+                <p className="para-value text-gray-500">{each.snapshot.correctAnswer}</p>
                 <div className="w-full flex  justify-between items-start my-4 gap-8">
                   <RadioGroupInput each={each} />
 
@@ -203,14 +203,14 @@ const SchedulerSectionComponent = ({roundDetails, tab }) => {
                     {!each.notesBool && (
                       <button
                         className={`${page==="Home"?"py-[0.2rem] px-[0.8rem]":"p-1 "} question-add-note-button cursor-pointer font-bold  text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]`}
-                        onClick={() => onClickAddNote(each.id)}
+                        onClick={() => onClickAddNote(each._id)}
                       >
                         Add a Note
                       </button>
                     )}
                     {each.notesBool && (
                       <button
-                      onClick={()=>onClickDeleteNote(each.id)}
+                      onClick={()=>onClickDeleteNote(each._id)}
                       className={`${page==="Home"?"py-[0.2rem] px-[0.8rem]":"p-1 "} question-add-note-button cursor-pointer font-bold  text-[#227a8a] bg-transparent rounded-[0.3rem] shadow-[0_0.2px_1px_0.1px_#227a8a] border border-[#227a8a]`}>
                         Delete Note
                       </button>
@@ -247,7 +247,7 @@ const SchedulerSectionComponent = ({roundDetails, tab }) => {
           value={each.note}
           onChange={(e) =>
             onChangeInterviewQuestionNotes(
-              each.id,
+              each._id,
               e.target.value.slice(0, 250)
             )
           }
@@ -272,7 +272,7 @@ const SchedulerSectionComponent = ({roundDetails, tab }) => {
         value={each.note}
         onChange={(e) =>
           onChangeInterviewQuestionNotes(
-            each.id,
+            each._id,
             e.target.value.slice(0, 250)
           )
         }
@@ -286,7 +286,7 @@ const SchedulerSectionComponent = ({roundDetails, tab }) => {
   ) : null 
 ) : null}
 
-                {dislikeQuestionId === each.id && (
+                {dislikeQuestionId === each._id && (
                   <DisLikeSection each={each} />
                 )}
               </div>

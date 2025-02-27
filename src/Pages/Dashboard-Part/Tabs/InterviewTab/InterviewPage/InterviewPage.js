@@ -430,7 +430,8 @@ useEffect(()=>{
     try {
       // const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/${interviewId}`)
       // const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/67ac9c914521bfcc354d5c7a`)
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/67aeb3c405f5f764298cac0e`)
+      // const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/67aeb3c405f5f764298cac0e`)
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/67ac9c914521bfcc354d5c7a`)
       console.log("response",response)
       setInterviewDetails(response.data)
       const {rounds} = response.data

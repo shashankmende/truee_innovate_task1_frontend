@@ -179,11 +179,13 @@ const Feedback = ({interviewDetails,setInterviewDetails,setRoundDetails,roundDet
 
     const getInterviewDetails = async()=>{
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/${interviewId}`)
+        // const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/${interviewId}`)
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/interview/67ac9c914521bfcc354d5c7a`)
         console.log("response",response)
         setInterviewDetails(response.data)
         const {rounds} = response.data
-        const filteredRounds = rounds.filter(EachRound=>EachRound.round===round)
+        const filteredRounds = rounds.filter(EachRound=>EachRound.round==="Technical")
+        // const filteredRounds = rounds.filter(EachRound=>EachRound.round===round)
         console.log("filtered rounds",filteredRounds)
         setRoundDetails(filteredRounds[0])
       } catch (error) {
